@@ -30,3 +30,4 @@ venv
 .venv
 .DS_Store
 .idea
+config.yaml

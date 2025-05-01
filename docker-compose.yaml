@@ -1,4 +1,40 @@
+volumes:
+  pg_data:
+  jaeger_data:
+
 services:
+  jaeger:
+    image: jaegertracing/all-in-one
+    container_name: jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    volumes:
+      - jaeger_data:/tmp
+    ports:
+      - "5775:5775"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+      - "9411:9411"
+      - "4317:4317"
+      - "4318:4318"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-pguser}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pgpass}
+      - POSTGRES_DB=${POSTGRES_DB:-dev}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
   api:
     build:
       context: api
