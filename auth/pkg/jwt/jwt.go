@@ -6,7 +6,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/larek-tech/diploma/auth/internal/auth/pb"
 	"github.com/yogenyslav/pkg/secure"
-	"strconv"
 	"time"
 )
 
@@ -43,8 +42,8 @@ func (j *Provider) CreateAccessToken(meta *pb.UserAuthMetadata) (string, error) 
 
 	jwtClaims := jwt.MapClaims{
 		"exp":   jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(j.cfg.Expire))),
-		"sub":   strconv.FormatInt(meta.UserId, 10),
-		"roles": meta.Roles,
+		"sub":   meta.GetUserId(),
+		"roles": meta.GetRoles(),
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaims)
