@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package ml;
+option go_package = "internal/ml/pb";
+
+enum ScenarioType {
+  UNDEFINED_SCENARIO = 0;
+  SYSTEM_PROMPT = 1;
+};
+
+message Scenario {
+  ScenarioType customType = 1;
+  string content = 2;
+};
+
+message Query {
+  int64 userId = 1;
+  string content = 2;
+};
+
+message ProcessQueryRequest {
+  Query query = 1;
+  Scenario scenario = 2;
+  repeated string documentIds = 3;
+};
+
+message Chunk {
+  string content = 1;
+};
+
+message ProcessQueryResponse {
+  Chunk chunk = 1;
+  repeated string documentIds = 2;
+};

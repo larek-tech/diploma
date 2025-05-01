@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package auth.v1;
+option go_package = "internal/auth/pb";
+
+import "auth/v1/model.proto";
+
+service AuthService {
+    rpc Login(LoginRequest) returns (LoginResponse) {};
+    rpc Validate(ValidateRequest) returns (ValidateResponse) {};
+};

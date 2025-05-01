@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package auth.v1;
+option go_package = "internal/auth/pb";
+
+message UserAuthMetadata {
+  int64 user_id = 1;
+  repeated int64 roles = 2;
+};
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+};
+
+message LoginResponse {
+  string token = 1;
+  string type = 2;
+  UserAuthMetadata meta = 3;
+};
+
+message ValidateRequest {
+  string token = 1;
+};
+
+message ValidateResponse {
+  UserAuthMetadata meta = 1;
+};

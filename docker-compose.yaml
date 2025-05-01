@@ -1,0 +1,32 @@
+services:
+  api:
+    build:
+      context: api
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "9000:9000"
+
+  auth:
+    build:
+      context: auth
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "9001:9001"
+
+  chat:
+    build:
+      context: chat
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "9002:9002"
+
+  domain:
+    build:
+      context: api
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "9003:9003"
