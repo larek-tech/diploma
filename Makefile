@@ -14,8 +14,7 @@ proto-ml:
 	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
 		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir $(ML_PROTO_SRC); \
 	done
-	mkdir -p ml/pb
-	@python -m grpc_tools.protoc -I$(PROTO_SRC) --python_out=ml/pb --pyi_out=ml/pb --grpc_python_out=ml/pb $(ML_PROTO_SRC);
+	@python -m grpc_tools.protoc -I$(PROTO_SRC) --python_out=ml --pyi_out=ml --grpc_python_out=ml $(ML_PROTO_SRC);
 
 .PHONY: proto
 proto: proto-auth proto-ml
