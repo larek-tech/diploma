@@ -1,6 +1,6 @@
 package main
 
-import "github.com/yogenyslav/rag-api/api/pkg"
+import "github.com/larek-tech/diploma/api/pkg"
 
 func main() {
 	pkg.Run()

@@ -1,6 +1,6 @@
 package main
 
-import "github.com/yogenyslav/rag-api/chat/pkg"
+import "github.com/larek-tech/diploma/chat/pkg"
 
 func main() {
 	pkg.Run()
