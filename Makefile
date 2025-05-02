@@ -99,6 +99,20 @@ proto-ml:
 		$(ML_PROTO_SRC)/service.proto $(ML_PROTO_SRC)/model.proto;
 	@echo "Protobuf stubs for auth service generated\n"
 
+.PHONY: proto-data
+proto-data: DATA_PROTO_SRC=$(PROTO_SRC)/data/v1
+proto-data:
+	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
+  		echo "Generating stubs in $$dir";\
+		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
+			$(DATA_PROTO_SRC)/service.proto $(DATA_PROTO_SRC)/model.proto; \
+	done
+	@mkdir -p ml/data/pb
+	@echo "Generating stubs in ./ml"
+	@python3 -m grpc_tools.protoc -I$(PROTO_SRC) --python_out=ml/data/pb --pyi_out=ml/data/pb --grpc_python_out=ml/data/pb \
+		$(DATA_PROTO_SRC)/service.proto $(DATA_PROTO_SRC)/model.proto;
+	@echo "Protobuf stubs for auth service generated\n"
+
 .PHONY: proto
-proto: proto-auth proto-ml
+proto: proto-auth proto-ml proto-data
 	@echo "All protobuf stubs generated"

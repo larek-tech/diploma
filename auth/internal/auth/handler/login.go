@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/larek-tech/diploma/auth/internal/auth/pb"
 	"github.com/yogenyslav/pkg/errs"
 	"go.opentelemetry.io/otel/attribute"
@@ -21,7 +22,7 @@ func (h *Handler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginRes
 
 	resp, err := h.ac.Login(ctx, req)
 	if err != nil {
-		logError(errs.WrapErr(err), span)
+		logError(errs.WrapErr(err), span, "login")
 		return nil, status.Error(rescodes.Unauthenticated, "failed to login")
 	}
 

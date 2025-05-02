@@ -61,7 +61,7 @@ services:
 
   domain:
     build:
-      context: api
+      context: domain
       dockerfile: Dockerfile
     restart: always
     ports:

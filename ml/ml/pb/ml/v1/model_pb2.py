@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11ml/v1/model.proto\x12\x02ml\"A\n\x08Scenario\x12$\n\ncustomType\x18\x01 \x01(\x0e\x32\x10.ml.ScenarioType\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"(\n\x05Query\x12\x0e\n\x06userId\x18\x01 \x01(\x03\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"d\n\x13ProcessQueryRequest\x12\x18\n\x05query\x18\x01 \x01(\x0b\x32\t.ml.Query\x12\x1e\n\x08scenario\x18\x02 \x01(\x0b\x32\x0c.ml.Scenario\x12\x13\n\x0b\x64ocumentIds\x18\x03 \x03(\t\"\x18\n\x05\x43hunk\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\t\"E\n\x14ProcessQueryResponse\x12\x18\n\x05\x63hunk\x18\x01 \x01(\x0b\x32\t.ml.Chunk\x12\x13\n\x0b\x64ocumentIds\x18\x02 \x03(\t*9\n\x0cScenarioType\x12\x16\n\x12UNDEFINED_SCENARIO\x10\x00\x12\x11\n\rSYSTEM_PROMPT\x10\x01\x42\x10Z\x0einternal/ml/pbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11ml/v1/model.proto\x12\x02ml\"A\n\x08Scenario\x12$\n\ncustomType\x18\x01 \x01(\x0e\x32\x10.ml.ScenarioType\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"(\n\x05Query\x12\x0e\n\x06userId\x18\x01 \x01(\x03\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"b\n\x13ProcessQueryRequest\x12\x18\n\x05query\x18\x01 \x01(\x0b\x32\t.ml.Query\x12\x1e\n\x08scenario\x18\x02 \x01(\x0b\x32\x0c.ml.Scenario\x12\x11\n\tsourceIds\x18\x03 \x03(\t\"\x18\n\x05\x43hunk\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\t\"C\n\x14ProcessQueryResponse\x12\x18\n\x05\x63hunk\x18\x01 \x01(\x0b\x32\t.ml.Chunk\x12\x11\n\tsourceIds\x18\x02 \x03(\t*9\n\x0cScenarioType\x12\x16\n\x12UNDEFINED_SCENARIO\x10\x00\x12\x11\n\rSYSTEM_PROMPT\x10\x01\x42\x10Z\x0einternal/ml/pbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,16 +32,16 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'ml.v1.model_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z\016internal/ml/pb'
-  _globals['_SCENARIOTYPE']._serialized_start=333
-  _globals['_SCENARIOTYPE']._serialized_end=390
+  _globals['_SCENARIOTYPE']._serialized_start=329
+  _globals['_SCENARIOTYPE']._serialized_end=386
   _globals['_SCENARIO']._serialized_start=25
   _globals['_SCENARIO']._serialized_end=90
   _globals['_QUERY']._serialized_start=92
   _globals['_QUERY']._serialized_end=132
   _globals['_PROCESSQUERYREQUEST']._serialized_start=134
-  _globals['_PROCESSQUERYREQUEST']._serialized_end=234
-  _globals['_CHUNK']._serialized_start=236
-  _globals['_CHUNK']._serialized_end=260
-  _globals['_PROCESSQUERYRESPONSE']._serialized_start=262
-  _globals['_PROCESSQUERYRESPONSE']._serialized_end=331
+  _globals['_PROCESSQUERYREQUEST']._serialized_end=232
+  _globals['_CHUNK']._serialized_start=234
+  _globals['_CHUNK']._serialized_end=258
+  _globals['_PROCESSQUERYRESPONSE']._serialized_start=260
+  _globals['_PROCESSQUERYRESPONSE']._serialized_end=327
 # @@protoc_insertion_point(module_scope)

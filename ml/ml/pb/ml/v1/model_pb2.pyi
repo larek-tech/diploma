@@ -30,14 +30,14 @@ class Query(_message.Message):
     def __init__(self, userId: _Optional[int] = ..., content: _Optional[str] = ...) -> None: ...
 
 class ProcessQueryRequest(_message.Message):
-    __slots__ = ("query", "scenario", "documentIds")
+    __slots__ = ("query", "scenario", "sourceIds")
     QUERY_FIELD_NUMBER: _ClassVar[int]
     SCENARIO_FIELD_NUMBER: _ClassVar[int]
-    DOCUMENTIDS_FIELD_NUMBER: _ClassVar[int]
+    SOURCEIDS_FIELD_NUMBER: _ClassVar[int]
     query: Query
     scenario: Scenario
-    documentIds: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, query: _Optional[_Union[Query, _Mapping]] = ..., scenario: _Optional[_Union[Scenario, _Mapping]] = ..., documentIds: _Optional[_Iterable[str]] = ...) -> None: ...
+    sourceIds: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, query: _Optional[_Union[Query, _Mapping]] = ..., scenario: _Optional[_Union[Scenario, _Mapping]] = ..., sourceIds: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class Chunk(_message.Message):
     __slots__ = ("content",)
@@ -46,9 +46,9 @@ class Chunk(_message.Message):
     def __init__(self, content: _Optional[str] = ...) -> None: ...
 
 class ProcessQueryResponse(_message.Message):
-    __slots__ = ("chunk", "documentIds")
+    __slots__ = ("chunk", "sourceIds")
     CHUNK_FIELD_NUMBER: _ClassVar[int]
-    DOCUMENTIDS_FIELD_NUMBER: _ClassVar[int]
+    SOURCEIDS_FIELD_NUMBER: _ClassVar[int]
     chunk: Chunk
-    documentIds: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, chunk: _Optional[_Union[Chunk, _Mapping]] = ..., documentIds: _Optional[_Iterable[str]] = ...) -> None: ...
+    sourceIds: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, chunk: _Optional[_Union[Chunk, _Mapping]] = ..., sourceIds: _Optional[_Iterable[str]] = ...) -> None: ...

@@ -149,7 +149,6 @@ github.com/xdg-go/stringprep
 # github.com/yogenyslav/pkg v0.5.3
 ## explicit; go 1.24.2
 github.com/yogenyslav/pkg/errs
-github.com/yogenyslav/pkg/grpc_client
 github.com/yogenyslav/pkg/infrastructure/tracing
 github.com/yogenyslav/pkg/interceptor
 github.com/yogenyslav/pkg/secure

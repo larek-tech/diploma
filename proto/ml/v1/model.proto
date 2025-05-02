@@ -21,7 +21,7 @@ message Query {
 message ProcessQueryRequest {
   Query query = 1;
   Scenario scenario = 2;
-  repeated string documentIds = 3;
+  repeated string sourceIds = 3;
 };
 
 message Chunk {
@@ -30,5 +30,5 @@ message Chunk {
 
 message ProcessQueryResponse {
   Chunk chunk = 1;
-  repeated string documentIds = 2;
+  repeated string sourceIds = 2;
 };

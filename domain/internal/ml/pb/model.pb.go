@@ -175,7 +175,7 @@ type ProcessQueryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Query         *Query                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	Scenario      *Scenario              `protobuf:"bytes,2,opt,name=scenario,proto3" json:"scenario,omitempty"`
-	DocumentIds   []string               `protobuf:"bytes,3,rep,name=documentIds,proto3" json:"documentIds,omitempty"`
+	SourceIds     []string               `protobuf:"bytes,3,rep,name=sourceIds,proto3" json:"sourceIds,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -224,9 +224,9 @@ func (x *ProcessQueryRequest) GetScenario() *Scenario {
 	return nil
 }
 
-func (x *ProcessQueryRequest) GetDocumentIds() []string {
+func (x *ProcessQueryRequest) GetSourceIds() []string {
 	if x != nil {
-		return x.DocumentIds
+		return x.SourceIds
 	}
 	return nil
 }
@@ -278,7 +278,7 @@ func (x *Chunk) GetContent() string {
 type ProcessQueryResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Chunk         *Chunk                 `protobuf:"bytes,1,opt,name=chunk,proto3" json:"chunk,omitempty"`
-	DocumentIds   []string               `protobuf:"bytes,2,rep,name=documentIds,proto3" json:"documentIds,omitempty"`
+	SourceIds     []string               `protobuf:"bytes,2,rep,name=sourceIds,proto3" json:"sourceIds,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -320,9 +320,9 @@ func (x *ProcessQueryResponse) GetChunk() *Chunk {
 	return nil
 }
 
-func (x *ProcessQueryResponse) GetDocumentIds() []string {
+func (x *ProcessQueryResponse) GetSourceIds() []string {
 	if x != nil {
-		return x.DocumentIds
+		return x.SourceIds
 	}
 	return nil
 }
@@ -339,16 +339,16 @@ const file_ml_v1_model_proto_rawDesc = "" +
 	"\acontent\x18\x02 \x01(\tR\acontent\"9\n" +
 	"\x05Query\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\x03R\x06userId\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\"\x82\x01\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\"~\n" +
 	"\x13ProcessQueryRequest\x12\x1f\n" +
 	"\x05query\x18\x01 \x01(\v2\t.ml.QueryR\x05query\x12(\n" +
-	"\bscenario\x18\x02 \x01(\v2\f.ml.ScenarioR\bscenario\x12 \n" +
-	"\vdocumentIds\x18\x03 \x03(\tR\vdocumentIds\"!\n" +
+	"\bscenario\x18\x02 \x01(\v2\f.ml.ScenarioR\bscenario\x12\x1c\n" +
+	"\tsourceIds\x18\x03 \x03(\tR\tsourceIds\"!\n" +
 	"\x05Chunk\x12\x18\n" +
-	"\acontent\x18\x01 \x01(\tR\acontent\"Y\n" +
+	"\acontent\x18\x01 \x01(\tR\acontent\"U\n" +
 	"\x14ProcessQueryResponse\x12\x1f\n" +
-	"\x05chunk\x18\x01 \x01(\v2\t.ml.ChunkR\x05chunk\x12 \n" +
-	"\vdocumentIds\x18\x02 \x03(\tR\vdocumentIds*9\n" +
+	"\x05chunk\x18\x01 \x01(\v2\t.ml.ChunkR\x05chunk\x12\x1c\n" +
+	"\tsourceIds\x18\x02 \x03(\tR\tsourceIds*9\n" +
 	"\fScenarioType\x12\x16\n" +
 	"\x12UNDEFINED_SCENARIO\x10\x00\x12\x11\n" +
 	"\rSYSTEM_PROMPT\x10\x01B\x10Z\x0einternal/ml/pbb\x06proto3"

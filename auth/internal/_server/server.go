@@ -1,31 +1,28 @@
 package server
 
 import (
-	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
-	"github.com/rs/zerolog/log"
-	"github.com/yogenyslav/pkg/errs"
-	"github.com/yogenyslav/pkg/interceptor"
-	"github.com/yogenyslav/pkg/storage"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel/trace"
-	"google.golang.org/grpc"
 	"net"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
+
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"github.com/rs/zerolog/log"
+	"github.com/yogenyslav/pkg/errs"
+	"github.com/yogenyslav/pkg/interceptor"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"google.golang.org/grpc"
 )
 
-// Server holds grpc auth server and its dependencies.
+// Server holds grpc auth server.
 type Server struct {
-	cfg    Config
-	srv    *grpc.Server
-	pg     storage.SQLDatabase
-	tracer trace.Tracer
+	cfg Config
+	srv *grpc.Server
 }
 
 // New creates new Server.
-func New(cfg Config, pg storage.SQLDatabase, tracer trace.Tracer) *Server {
+func New(cfg Config) *Server {
 	logOpts := []logging.Option{
 		logging.WithLogOnEvents(logging.StartCall), logging.WithLogOnEvents(logging.FinishCall),
 	}
@@ -38,13 +35,12 @@ func New(cfg Config, pg storage.SQLDatabase, tracer trace.Tracer) *Server {
 	srv := grpc.NewServer(srvOpts...)
 
 	return &Server{
-		cfg:    cfg,
-		srv:    srv,
-		pg:     pg,
-		tracer: tracer,
+		cfg: cfg,
+		srv: srv,
 	}
 }
 
+// GetSrv returns underlying gRPC conn.
 func (s *Server) GetSrv() *grpc.Server {
 	return s.srv
 }

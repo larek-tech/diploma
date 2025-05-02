@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+
 	"github.com/larek-tech/diploma/auth/config"
 	server "github.com/larek-tech/diploma/auth/internal/_server"
 	"github.com/larek-tech/diploma/auth/internal/auth/controller"
@@ -15,12 +16,14 @@ import (
 	"github.com/yogenyslav/pkg/infrastructure/tracing"
 	"github.com/yogenyslav/pkg/storage/postgres"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 const (
 	configPath = "./config/config.yaml"
 )
 
+// Run setup application and run it.
 func Run() error {
 	cfg, err := config.New(configPath)
 	if err != nil {
@@ -55,6 +58,7 @@ func Run() error {
 	}()
 
 	otel.SetTracerProvider(provider)
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 	tracer := otel.Tracer("auth")
 
 	pg, err := postgres.New(&cfg.Postgres, tracer)
@@ -68,7 +72,7 @@ func Run() error {
 	authController := controller.New(tracer, authRepo, jwtProvider)
 	authHandler := handler.New(tracer, authController)
 
-	srv := server.New(cfg.Server, pg, tracer)
+	srv := server.New(cfg.Server)
 	pb.RegisterAuthServiceServer(srv.GetSrv(), authHandler)
 	srv.Start()
 

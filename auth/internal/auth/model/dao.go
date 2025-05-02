@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-// UserDao is a data layer model for user.
+// UserDao is a data layer model.proto for user.
 type UserDao struct {
 	ID           int64     `db:"id"`
 	Email        string    `db:"email"`
@@ -22,7 +22,7 @@ const (
 	AdminRole Role = "admin"
 )
 
-// RoleDao is a data model for role.
+// RoleDao is a data model.proto for role.
 type RoleDao struct {
 	ID        int64     `db:"id"`
 	Name      Role      `db:"name"`

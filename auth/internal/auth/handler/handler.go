@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/larek-tech/diploma/auth/internal/auth/pb"
 	"github.com/rs/zerolog/log"
 	"go.opentelemetry.io/otel/codes"
@@ -28,8 +29,8 @@ func New(tracer trace.Tracer, ac authController) *Handler {
 	}
 }
 
-func logError(err error, span trace.Span) {
-	log.Err(err).Msg("login")
+func logError(err error, span trace.Span, msg string) {
+	log.Err(err).Msg(msg)
 	span.RecordError(err)
 	span.SetStatus(codes.Error, err.Error())
 }

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package data.v1;
+option go_package = "internal/data/pb";
+
+import "data/v1/model.proto";
+
+service DataService {
+  rpc VectorSearch(VectorSearchRequest) returns (VectorSearchResponse) {};
+};

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package domain.v1;
+option go_package = "internal/domain/pb";
+
+service DomainService {
+  rpc CreateSource() returns () {};
+  rpc GetSource() returns () {};
+  rpc UpdateSource() returns () {};
+  rpc DeleteSource() returns () {};
+  rpc ListSources() returns() {};
+};
