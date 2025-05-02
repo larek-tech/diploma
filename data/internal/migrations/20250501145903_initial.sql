@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS chunks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     index INT NOT NULL,
     document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+    source_id UUID REFERENCES sources(id) ON DELETE CASCADE,
     content TEXT,
     metadata JSONB,
     embeddings VECTOR(1024)

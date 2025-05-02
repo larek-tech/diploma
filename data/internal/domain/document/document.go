@@ -30,12 +30,13 @@ type Document struct {
 }
 
 type Chunk struct {
-	ID         string         `db:"id"`          // идентификатор чанка в векторном хранилище
-	Index      int            `db:"index"`       // индекс чанка в документе
-	DocumentID string         `db:"document_id"` // идентификатор документа к которому относиться данный чанк
-	Content    string         `db:"content"`     // текстовый контент чанка
-	Metadata   map[string]any `db:"metadata"`    // метаданные чанка (например, заголовок, автор, дата создания и т.д.)
-	Embeddings []float32      `db:"embeddings"`  // векторное представление чанка
+	ID         string    `db:"id"`          // идентификатор чанка в векторном хранилище
+	Index      int       `db:"index"`       // индекс чанка в документе
+	SourceID   string    `db:"source_id"`   // идентификатор источника к которому относиться данный чанк
+	DocumentID string    `db:"document_id"` // идентификатор документа к которому относиться данный чанк
+	Content    string    `db:"content"`     // текстовый контент чанка
+	Metadata   []byte    `db:"metadata"`    // метаданные чанка (например, заголовок, автор, дата создания и т.д.)
+	Embeddings []float32 `db:"embeddings"`  // векторное представление чанка
 }
 
 type Questions struct {
@@ -43,4 +44,9 @@ type Questions struct {
 	ChunkID    string    `db:"chunk_id"`
 	Question   string    `db:"question"`
 	Embeddings []float32 `db:"embeddings"`
+}
+
+type SearchResult struct {
+	Chunk
+	CosineSimilarity float32 `db:"cosine_similarity"` // оценка релевантности чанка к запросу
 }
