@@ -105,7 +105,7 @@ func run() int {
 			return
 		}
 
-		res, err := chunkStore.Search(ctx, embededQuery[0], payload.SourceIDs, int(payload.TopK))
+		res, err := chunkStore.Search(ctx, embededQuery[0], payload.SourceIDs, payload.Threshold, int(payload.TopK))
 		if err != nil {
 			http.Error(w, "Internal server error:"+err.Error(), http.StatusInternalServerError)
 			return
