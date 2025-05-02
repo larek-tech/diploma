@@ -33,7 +33,7 @@ func (h Handler) Handle(ctx context.Context, job messages.PageJob) error {
 	if page == nil {
 		return fmt.Errorf("failed to get page from job")
 	}
-	outgoingPages, err := h.pageService.ParsePage(ctx, page)
+	outgoingPages, _, err := h.pageService.ParsePage(ctx, page)
 	if err != nil {
 		return fmt.Errorf("failed to handle page job: %w", err)
 	}
@@ -45,6 +45,13 @@ func (h Handler) Handle(ctx context.Context, job messages.PageJob) error {
 		if err != nil {
 			slog.Error("failed to publish outgoing page", "err", err)
 		}
+	}
+	err = h.publisher.Publish(ctx, messages.ResultMessage{
+		Type:  messages.WebResult,
+		ObjID: page.ID,
+	})
+	if err != nil {
+		slog.Error("failed to publish result message", "err", err)
 	}
 
 	return nil

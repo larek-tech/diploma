@@ -3,9 +3,7 @@ package parse_site
 import (
 	"context"
 	"log/slog"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/larek-tech/diploma/data/internal/domain/site"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas/messages"
 )
@@ -32,15 +30,14 @@ func (h Handler) Handle(ctx context.Context, job messages.SiteJob) error {
 		slog.Error("failed to save site", "site", currentSite, "error", err)
 		return err
 	}
-	indexPage := &site.Page{
-		ID:        uuid.NewString(),
-		SiteID:    currentSite.ID,
-		URL:       currentSite.URL,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+
+	indexPage, err := site.NewPage(currentSite.ID, currentSite.URL)
+	if err != nil {
+		slog.Error("failed to create index page", "site", currentSite, "error", err)
+		return err
 	}
 
-	err := h.pagePublisher.Publish(ctx, messages.PageJob{
+	err = h.pagePublisher.Publish(ctx, messages.PageJob{
 		Type:    messages.ParsePage,
 		Payload: indexPage,
 		Delay:   0,

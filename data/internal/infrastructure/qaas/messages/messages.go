@@ -7,8 +7,14 @@ import (
 type MessageType string
 
 const (
-	ParseSite MessageType = "web.parse_site" // сообщение для запуска парсинга сайта
-	ParsePage MessageType = "web.parse_page" // сообщение для запуска парсинга страницы
+	ParseSite MessageType = "web.parse_site"  // сообщение для запуска парсинга сайта
+	ParsePage MessageType = "web.parse_page"  // сообщение для запуска парсинга страницы
+	EmbedPage MessageType = "qaas.embed_page" // сообщение для векторизации страницы
+
+	WebResult MessageType = "web.page.result"
+
+	FileResult  MessageType = "s3.file.result"    // сообщение с результатами парсинга файла
+	EmbedResult MessageType = "qaas.embed.result" // сообщение с результатами векторизации
 )
 
 type Entity interface {
@@ -25,8 +31,7 @@ type SiteJob = DelayedJob[site.Site]
 type PageJob = DelayedJob[site.Page]
 
 type ResultMessage struct {
-	SourceID  string // uuid ID источника
-	JobID     string // uuid ID процесса парсинга
-	Processed int    // количество элементов обработанных за текущий проход
-	Total     int    // количество элементов полученное при первом обходе ресурса
+	SourceID string // uuid ID источника
+	Type     MessageType
+	ObjID    string // uuid объекта который надо обработать
 }

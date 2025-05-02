@@ -17,7 +17,7 @@ func New(db db) *Store {
 	}
 }
 func (s Store) Save(ctx context.Context, page *site.Page) error {
-	currentPage, err := s.GetByID(ctx, page.ID)
+	currentPage, err := s.GetByURL(ctx, page.ID)
 	if err != nil {
 		return err
 	}
@@ -25,22 +25,24 @@ func (s Store) Save(ctx context.Context, page *site.Page) error {
 		err = s.db.Exec(ctx, `
 UPDATE pages
 SET
-	url = $1,
-	metadata = $2,
-	raw = $3,
-	content = $4,
+    site_id = $1,
+	url = $2,
+	metadata = $3,
+	raw = $4,
+	content = $5,
 	updated_at = now()
-WHERE id = $5;
-`, page.URL, page.Metadata, page.Raw, page.Content, page.ID)
+WHERE id = $6;
+`, page.SiteID, page.URL, page.Metadata, page.Raw, page.Content, page.ID)
+		page.ID = currentPage.ID
 		if err != nil {
 			return err
 		}
 		return nil
 	}
 	err = s.db.Exec(ctx, `
-INSERT INTO pages (id, url, metadata, raw, content, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, now(), now());
-`, page.ID, page.URL, page.Metadata, page.Raw, page.Content)
+INSERT INTO pages (id, site_id,url, metadata, raw, content, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, now(), now());
+`, page.ID, page.SiteID, page.URL, page.Metadata, page.Raw, page.Content)
 	if err != nil {
 		return err
 	}
@@ -52,6 +54,7 @@ func (s Store) GetByURL(ctx context.Context, url string) (*site.Page, error) {
 	err := s.db.QueryStruct(ctx, &page, `
 SELECT
 	id,
+	site_id,
 	url,
 	metadata,
 	raw,
@@ -74,6 +77,7 @@ func (s Store) GetByID(ctx context.Context, id string) (*site.Page, error) {
 	err := s.db.QueryStruct(ctx, &page, `
 SELECT
 	id,
+	site_id,
 	url,
 metadata,
 raw,

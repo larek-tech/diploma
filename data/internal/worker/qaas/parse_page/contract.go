@@ -17,6 +17,6 @@ type (
 		Publish(ctx context.Context, msg any, time ...*time.Time) error
 	}
 	pageService interface {
-		ParsePage(ctx context.Context, page *site.Page) ([]*site.Page, error)
+		ParsePage(ctx context.Context, page *site.Page) ([]*site.Page, bool, error)
 	}
 )
