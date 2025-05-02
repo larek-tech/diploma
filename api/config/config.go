@@ -11,11 +11,12 @@ import (
 
 // Config is the application configuration.
 type Config struct {
-	LogLevel    string            `yaml:"log_level"`
-	Server      server.Config     `yaml:"server"`
-	Postgres    postgres.Config   `yaml:"postgres"`
-	Jaeger      tracing.Config    `yaml:"jaeger"`
-	AuthService grpcclient.Config `yaml:"auth_service"`
+	LogLevel      string            `yaml:"log_level"`
+	Server        server.Config     `yaml:"server"`
+	Postgres      postgres.Config   `yaml:"postgres"`
+	Jaeger        tracing.Config    `yaml:"jaeger"`
+	AuthService   grpcclient.Config `yaml:"auth_service"`
+	DomainService grpcclient.Config `yaml:"domain_service"`
 }
 
 // New creates new Config.

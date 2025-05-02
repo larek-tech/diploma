@@ -17,6 +17,8 @@ message Source {
   string title = 1;
   bytes content = 2;
   SourceType typ = 3;
+  optional UpdateParams updateParams = 4;
+  optional bytes credentials = 5;
 };
 
 message UpdateParams {
@@ -29,30 +31,37 @@ message CreateSourceRequest {
   Source source = 2;
 };
 
-message GetSourceRequest {
+message CreateSourceResponse {
+  int64 sourceId = 1;
+};
 
+message GetSourceRequest {
+  int64 userId = 1;
+  int64 sourceId = 2;
 };
 
 message GetSourceResponse {
-
+  Source source = 1;
 };
 
 message UpdateSourceRequest {
-
+  int64 userId = 1;
+  int64 sourceId = 2;
+  optional string title = 3;
+  optional bytes content = 4;
+  optional UpdateParams updateParams = 5;
+  optional bytes credentials = 6;
 };
 
 message DeleteSourceRequest {
-
+  int64 userId = 1;
+  int64 sourceId = 2;
 };
 
 message ListSourcesRequest {
-
+  int64 userId = 1;
 };
 
 message ListSourcesResponse {
-
-};
-
-message ModifySourceResponse {
-
+  repeated Source sources = 1;
 };

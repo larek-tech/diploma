@@ -5,6 +5,7 @@ PROTOC=protoc
 PROTO_SRC=./proto
 GOLANGCI_LINT=golangci-lint
 GOOSE=bin/goose
+SWAG=swag
 
 .PHONY: goose-download
 goose-download:
@@ -97,7 +98,7 @@ proto-ml:
 	@echo "Generating stubs in ./ml"
 	@python3 -m grpc_tools.protoc -I$(PROTO_SRC) --python_out=ml/ml/pb --pyi_out=ml/ml/pb --grpc_python_out=ml/ml/pb \
 		$(ML_PROTO_SRC)/service.proto $(ML_PROTO_SRC)/model.proto;
-	@echo "Protobuf stubs for auth service generated\n"
+	@echo "Protobuf stubs for ml service generated\n"
 
 .PHONY: proto-data
 proto-data: DATA_PROTO_SRC=$(PROTO_SRC)/data/v1
@@ -111,8 +112,24 @@ proto-data:
 	@echo "Generating stubs in ./ml"
 	@python3 -m grpc_tools.protoc -I$(PROTO_SRC) --python_out=ml/data/pb --pyi_out=ml/data/pb --grpc_python_out=ml/data/pb \
 		$(DATA_PROTO_SRC)/service.proto $(DATA_PROTO_SRC)/model.proto;
-	@echo "Protobuf stubs for auth service generated\n"
+	@echo "Protobuf stubs for data service generated\n"
+
+.PHONY: proto-domain
+proto-domain: DOMAIN_PROTO_SRC=$(PROTO_SRC)/domain/v1
+proto-domain:
+	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
+		echo "Generating stubs in $$dir";\
+		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
+			$(DOMAIN_PROTO_SRC)/service.proto $(DOMAIN_PROTO_SRC)/model.proto \
+			$(PROTO_SRC)/google/protobuf/timestamp.proto $(PROTO_SRC)/google/protobuf/empty.proto; \
+	done
+	@echo "Protobuf stubs for domain service generated\n"
 
 .PHONY: proto
-proto: proto-auth proto-ml proto-data
+proto: proto-auth proto-ml proto-data proto-domain
 	@echo "All protobuf stubs generated"
+
+.PHONY: swag
+swag:
+	mkdir -p api/docs
+	cd api && SWAG init -g cmd/server/main.go -o ./docs

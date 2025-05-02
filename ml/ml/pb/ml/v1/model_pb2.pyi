@@ -22,12 +22,14 @@ class Scenario(_message.Message):
     def __init__(self, customType: _Optional[_Union[ScenarioType, str]] = ..., content: _Optional[str] = ...) -> None: ...
 
 class Query(_message.Message):
-    __slots__ = ("userId", "content")
+    __slots__ = ("userId", "content", "modelName")
     USERID_FIELD_NUMBER: _ClassVar[int]
     CONTENT_FIELD_NUMBER: _ClassVar[int]
+    MODELNAME_FIELD_NUMBER: _ClassVar[int]
     userId: int
     content: str
-    def __init__(self, userId: _Optional[int] = ..., content: _Optional[str] = ...) -> None: ...
+    modelName: str
+    def __init__(self, userId: _Optional[int] = ..., content: _Optional[str] = ..., modelName: _Optional[str] = ...) -> None: ...
 
 class ProcessQueryRequest(_message.Message):
     __slots__ = ("query", "scenario", "sourceIds")

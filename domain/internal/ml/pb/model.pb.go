@@ -123,6 +123,7 @@ type Query struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        int64                  `protobuf:"varint,1,opt,name=userId,proto3" json:"userId,omitempty"`
 	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	ModelName     string                 `protobuf:"bytes,3,opt,name=modelName,proto3" json:"modelName,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -167,6 +168,13 @@ func (x *Query) GetUserId() int64 {
 func (x *Query) GetContent() string {
 	if x != nil {
 		return x.Content
+	}
+	return ""
+}
+
+func (x *Query) GetModelName() string {
+	if x != nil {
+		return x.ModelName
 	}
 	return ""
 }
@@ -336,10 +344,11 @@ const file_ml_v1_model_proto_rawDesc = "" +
 	"\n" +
 	"customType\x18\x01 \x01(\x0e2\x10.ml.ScenarioTypeR\n" +
 	"customType\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\"9\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\"W\n" +
 	"\x05Query\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\x03R\x06userId\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\"~\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\x12\x1c\n" +
+	"\tmodelName\x18\x03 \x01(\tR\tmodelName\"~\n" +
 	"\x13ProcessQueryRequest\x12\x1f\n" +
 	"\x05query\x18\x01 \x01(\v2\t.ml.QueryR\x05query\x12(\n" +
 	"\bscenario\x18\x02 \x01(\v2\f.ml.ScenarioR\bscenario\x12\x1c\n" +

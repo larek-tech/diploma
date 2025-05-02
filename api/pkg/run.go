@@ -5,6 +5,7 @@ import (
 
 	"github.com/larek-tech/diploma/api/config"
 	server "github.com/larek-tech/diploma/api/internal/_server"
+	"github.com/larek-tech/diploma/api/internal/api"
 	"github.com/larek-tech/diploma/api/internal/auth"
 	"github.com/larek-tech/diploma/api/internal/auth/handler"
 	"github.com/larek-tech/diploma/api/internal/auth/middleware"
@@ -79,6 +80,7 @@ func Run() error {
 	if err != nil {
 		return errs.WrapErr(err, "connect to auth service")
 	}
+	defer authConn.Close()
 	authService := pb.NewAuthServiceClient(authConn.Conn())
 
 	srv := server.New(cfg.Server)
@@ -88,9 +90,21 @@ func Run() error {
 	authHandler := handler.New(authService, tracer)
 	auth.SetupRoutes(authRouter, authHandler)
 
+	// Connect to domain service via gRPC
+	domainConn, err := grpcclient.NewGrpcClient(
+		&cfg.DomainService,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
+	)
+	if err != nil {
+		return errs.WrapErr(err, "connect to domain service")
+	}
+	defer domainConn.Close()
+
 	// Api routes with JWT middleware
 	apiRouter := srv.GetSrv().Group("/api/v1")
 	apiRouter.Use(middleware.Jwt(authService))
+	api.SetupRoutes(apiRouter, tracer, domainConn.Conn())
 
 	srv.Start()
 

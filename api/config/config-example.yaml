@@ -16,3 +16,6 @@ postgres:
 auth_service:
   host: auth
   port: 9001
+domain_service:
+  host: domain
+  port: 9003

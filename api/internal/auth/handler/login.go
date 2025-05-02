@@ -7,7 +7,16 @@ import (
 	"github.com/yogenyslav/pkg/errs"
 )
 
-// Login authorizes user with credentials.
+// Login godoc
+// @Summary Login user.
+// @Description Authorizes user with provided credentials.
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param req body pb.LoginRequest true "User credentials"
+// @Success 200 {object} pb.LoginResponse "Auth token and metadata"
+// @Failure 401 {object} string "Unauthorized"
+// @Router /auth/v1/login [post]
 func (h *Handler) Login(c *fiber.Ctx) error {
 	var req pb.LoginRequest
 	if err := c.BodyParser(&req); err != nil {

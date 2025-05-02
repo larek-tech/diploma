@@ -32,3 +32,4 @@ venv
 .idea
 config.yaml
 requests
+google.golang.org

@@ -1,0 +1,299 @@
+basePath: /
+definitions:
+  pb.CreateSourceRequest:
+    properties:
+      source:
+        $ref: '#/definitions/pb.Source'
+      userId:
+        type: integer
+    type: object
+  pb.CreateSourceResponse:
+    properties:
+      sourceId:
+        type: integer
+    type: object
+  pb.GetSourceResponse:
+    properties:
+      source:
+        $ref: '#/definitions/pb.Source'
+    type: object
+  pb.ListSourcesResponse:
+    properties:
+      sources:
+        items:
+          $ref: '#/definitions/pb.Source'
+        type: array
+    type: object
+  pb.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  pb.LoginResponse:
+    properties:
+      meta:
+        $ref: '#/definitions/pb.UserAuthMetadata'
+      token:
+        type: string
+      type:
+        type: string
+    type: object
+  pb.Source:
+    properties:
+      content:
+        items:
+          type: integer
+        type: array
+      credentials:
+        items:
+          type: integer
+        type: array
+      title:
+        type: string
+      typ:
+        $ref: '#/definitions/pb.SourceType'
+      updateParams:
+        $ref: '#/definitions/pb.UpdateParams'
+    type: object
+  pb.SourceType:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    type: integer
+    x-enum-varnames:
+    - SourceType_UNDEFINED_SOURCE_TYPE
+    - SourceType_WEB_SOURCE
+    - SourceType_SINGLE_FILE
+    - SourceType_ARCHIVED_FILES
+    - SourceType_WITH_CREDENTIALS
+  pb.UpdateParams:
+    properties:
+      everyPeriod:
+        type: integer
+      onTime:
+        $ref: '#/definitions/timestamppb.Timestamp'
+    type: object
+  pb.UpdateSourceRequest:
+    properties:
+      content:
+        items:
+          type: integer
+        type: array
+      credentials:
+        items:
+          type: integer
+        type: array
+      sourceId:
+        type: integer
+      title:
+        type: string
+      updateParams:
+        $ref: '#/definitions/pb.UpdateParams'
+      userId:
+        type: integer
+    type: object
+  pb.UserAuthMetadata:
+    properties:
+      roles:
+        items:
+          type: integer
+        type: array
+      userId:
+        type: integer
+    type: object
+  timestamppb.Timestamp:
+    properties:
+      nanos:
+        description: |-
+          Non-negative fractions of a second at nanosecond resolution. Negative
+          second values with fractions must still have non-negative nanos values
+          that count forward in time. Must be from 0 to 999,999,999
+          inclusive.
+        type: integer
+      seconds:
+        description: |-
+          Represents seconds of UTC time since Unix epoch
+          1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
+          9999-12-31T23:59:59Z inclusive.
+        type: integer
+    type: object
+host: localhost:9000
+info:
+  contact: {}
+  description: Diploma RAG API service documentation.
+  license:
+    name: MIT
+    url: https://github.com/larek-tech/diploma/blob/api/LICENSE
+  title: Diploma API
+  version: "1.0"
+paths:
+  /api/v1/domain/:
+    post:
+      consumes:
+      - application/json
+      description: Creates new domain source used for RAG vector search.
+      parameters:
+      - description: Input data for creating source
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.CreateSourceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Source successfully created
+          schema:
+            $ref: '#/definitions/pb.CreateSourceResponse'
+        "400":
+          description: Failed to create source
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create new source.
+      tags:
+      - domain
+    put:
+      consumes:
+      - application/json
+      description: Update source information or params for update job.
+      parameters:
+      - description: Update params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.UpdateSourceRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Source updated
+          schema:
+            type: string
+        "400":
+          description: Failed to update source
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update source.
+      tags:
+      - domain
+  /api/v1/domain/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete domain source by ID.
+      parameters:
+      - description: Source ID
+        in: path
+        name: sourceID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Source deleted
+          schema:
+            type: string
+        "400":
+          description: Failed to delete source
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete source.
+      tags:
+      - domain
+    get:
+      consumes:
+      - application/json
+      description: Returns information about source and its update parameters.
+      parameters:
+      - description: Requested source ID
+        in: path
+        name: sourceID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Source
+          schema:
+            $ref: '#/definitions/pb.GetSourceResponse'
+        "400":
+          description: Failed to get source
+          schema:
+            type: string
+        "404":
+          description: Source not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get source.
+      tags:
+      - domain
+  /api/v1/domain/list:
+    get:
+      consumes:
+      - application/json
+      description: List sources to which user has access.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of sources
+          schema:
+            $ref: '#/definitions/pb.ListSourcesResponse'
+        "400":
+          description: Failed to list sources
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List sources.
+      tags:
+      - domain
+  /auth/v1/login:
+    post:
+      consumes:
+      - application/json
+      description: Authorizes user with provided credentials.
+      parameters:
+      - description: User credentials
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Auth token and metadata
+          schema:
+            $ref: '#/definitions/pb.LoginResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: Login user.
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

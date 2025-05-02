@@ -23,7 +23,7 @@ func Jwt(authService pb.AuthServiceClient) fiber.Handler {
 		}
 
 		req := &pb.ValidateRequest{Token: token[1]}
-		resp, err := authService.Validate(c.Context(), req)
+		resp, err := authService.Validate(c.UserContext(), req)
 		if err != nil {
 			return errs.WrapErr(shared.ErrUnauthorized, err.Error())
 		}

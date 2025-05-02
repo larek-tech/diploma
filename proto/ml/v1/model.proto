@@ -16,6 +16,7 @@ message Scenario {
 message Query {
   int64 userId = 1;
   string content = 2;
+  string modelName = 3;
 };
 
 message ProcessQueryRequest {

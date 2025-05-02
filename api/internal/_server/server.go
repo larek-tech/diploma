@@ -12,6 +12,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	recovermw "github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/swagger"
+	_ "github.com/larek-tech/diploma/api/docs"
 	"github.com/rs/zerolog/log"
 	"github.com/yogenyslav/pkg/errs"
 	"github.com/yogenyslav/pkg/response"
@@ -41,6 +43,7 @@ func New(cfg Config) *Server {
 		AllowHeaders:     cfg.GetAllowedHeaders(),
 		AllowCredentials: cfg.AllowCredentials,
 	}))
+	srv.Use("/api/v1/swagger/*", swagger.HandlerDefault)
 	srv.Use(recovermw.New())
 
 	return &Server{

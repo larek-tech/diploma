@@ -3,7 +3,6 @@ package response
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -48,10 +47,10 @@ func NewErrorHandler(errStatus map[error]ErrorResponse) ErrorHandler {
 // Handler is a method that handles the error and returns a JSON response.
 // Should be used as a fiber.Config.ErrorHandler.
 func (h ErrorHandler) Handler(logger *zerolog.Logger) fiber.ErrorHandler {
-	return func(ctx *fiber.Ctx, err error) error {
+	return func(c *fiber.Ctx, err error) error {
 		e := h.getErrorResponse(err)
 		logger.Err(err).Msg(e.Msg)
-		return ctx.Status(e.Status).JSON(e) //nolint:wrapcheck // no need to wrap
+		return c.Status(e.Status).JSON(e) //nolint:wrapcheck // no need to wrap
 	}
 }
 
@@ -98,8 +97,6 @@ func (h ErrorHandler) getErrorResponse(err error) ErrorResponse {
 	}
 	if e.Msg == "" {
 		e.Msg = err.Error()
-	} else {
-		e.Msg = fmt.Sprintf("%s %v", e.Msg, err)
 	}
 
 	return e

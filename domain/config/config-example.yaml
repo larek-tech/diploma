@@ -1,0 +1,14 @@
+log_level: "debug"
+server:
+  grpc_port: 9003
+jaeger:
+  host: "jaeger"
+  port: 4318
+postgres:
+  user: "pguser"
+  password: "pgpass"
+  host: "postgres"
+  db: "dev"
+  ssl: false
+  port: 5432
+  retry_timeout: 5
