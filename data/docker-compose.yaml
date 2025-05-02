@@ -2,9 +2,11 @@ services:
   postgres:
     build:
       context: .
-      dockerfile: Dockerfile.pgq
+      dockerfile: docker/postgres.Dockerfile
     container_name: postgres_local
     restart: unless-stopped
+    env_file:
+      - local.env
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -20,5 +22,86 @@ services:
       timeout: 5s
       retries: 5
 
+  migrator:
+    build:
+      context: .
+      dockerfile: docker/migrator.Dockerfile
+    container_name: migrator_local
+    depends_on:
+      - postgres
+    env_file:
+        - local.env
+    environment:
+      POSTGRES_DB: master
+      POSTGRES_HOST: postgres_local
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+
+  ollama:
+    build:
+        context: .
+        dockerfile: docker/ollama.Dockerfile
+    container_name: ollama_local
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+        - ollama_data:/root/.ollama
+    env_file:
+        - local.env
+    environment:
+      OLLAMA_KEEP_ALIVE: 24h
+      OLLAMA_CONTEXT_LENGTH: 8192
+    healthcheck:
+      test: "bash -c 'cat < /dev/null > /dev/tcp/localhost/11434'"
+      interval: 5s
+
+  crawler:
+    build:
+      context: .
+      dockerfile: docker/crawler.Dockerfile
+    container_name: crawler_local
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    env_file:
+        - local.env
+    environment:
+      POSTGRES_DB: master
+      POSTGRES_HOST: postgres_local
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      OLLAMA_HOST: http://ollama_local:11434
+      OLLAMA_MODEL: bge-m3:latest
+    ports:
+      - "9998:8080"
+  parser:
+    build:
+      context: .
+      dockerfile: docker/parser.Dockerfile
+    container_name: parser_local
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - ollama
+    env_file:
+        - local.env
+    environment:
+      POSTGRES_DB: master
+      POSTGRES_HOST: postgres_local
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      OLLAMA_LLM_ENDPOINT: http://ollama_local:11434
+      OLLAMA_LLM_MODEL: llama3.2
+      OLLAMA_EMBEDDER_ENDPOINT: http://ollama_local:11434
+      OLLAMA_EMBEDDER_MODEL: bge-m3:latest
+    ports:
+      - "9999:8081"
+
+
 volumes:
   postgres_data:
+  ollama_data:

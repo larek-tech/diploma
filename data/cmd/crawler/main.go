@@ -28,6 +28,7 @@ func main() {
 
 func run() int {
 	ctx := context.Background()
+	slog.Info("Starting server")
 	var pgCfg postgres.Cfg
 	if err := cleanenv.ReadEnv(&pgCfg); err != nil {
 		slog.Error("failed to read env", "error", err)
@@ -49,12 +50,14 @@ func run() int {
 	srcService := sourceService.New(sourceStore, pub, trManager)
 
 	chunkStore := chunkStorage.New(pg, trManager)
+	host, model := getOllamaConfig()
 	embedder, err := ollama.New(
-		ollama.WithServerURL("http://127.0.0.1:11434"),
-		ollama.WithModel("bge-m3"),
+		ollama.WithServerURL(host),
+		ollama.WithModel(model),
 	)
 
 	http.Handle("/test", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		slog.Info("Received test request")
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
@@ -81,15 +84,19 @@ func run() int {
 
 	http.Handle("/q", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
+			slog.Error("Method not allowed")
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		var payload SearchQuery
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+			slog.Error("Failed to decode request body", "error", err)
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
 		}
+		slog.Info("Received query", "query", payload.Query)
 		if len(payload.SourceIDs) == 0 {
+			slog.Error("Source IDs are required")
 			http.Error(w, "Source IDs are required", http.StatusBadRequest)
 			return
 		}
@@ -99,26 +106,31 @@ func run() int {
 		if payload.Threshold == 0 {
 			payload.Threshold = 0.1
 		}
-		embededQuery, err := embedder.CreateEmbedding(ctx, []string{payload.Query})
+		embedding, err := embedder.CreateEmbedding(ctx, []string{payload.Query})
 		if err != nil {
+			slog.Error("Failed to create embedding", "error", err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
-		res, err := chunkStore.Search(ctx, embededQuery[0], payload.SourceIDs, payload.Threshold, int(payload.TopK))
+		res, err := chunkStore.Search(ctx, embedding[0], payload.SourceIDs, payload.Threshold, int(payload.TopK))
 		if err != nil {
+			slog.Error("Failed to search chunks", "error", err)
 			http.Error(w, "Internal server error:"+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if len(res) == 0 {
+			slog.Error("No results found")
 			http.Error(w, "No results found", http.StatusNotFound)
 			return
 		}
 		resp, err := json.Marshal(res)
 		if err != nil {
+			slog.Error("Failed to marshal response", "error", err)
 			http.Error(w, fmt.Sprintf("marshaling err: %v", err), http.StatusInternalServerError)
 			return
 		}
+
 		w.WriteHeader(http.StatusOK)
 		w.Write(resp)
 	}))
@@ -155,4 +167,16 @@ func getSqlCon(db *postgres.DB) *sql.DB {
 		return nil
 	}
 	return sqlCon
+}
+
+func getOllamaConfig() (string, string) {
+	host := os.Getenv("OLLAMA_HOST")
+	if host == "" {
+		host = "http://localhost:11434"
+	}
+	model := os.Getenv("OLLAMA_MODEL")
+	if model == "" {
+		model = "bge-m3:latest"
+	}
+	return host, model
 }
