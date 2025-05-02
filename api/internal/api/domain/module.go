@@ -12,8 +12,8 @@ type domainHandler interface {
 	ListSources(c *fiber.Ctx) error
 }
 
-func Setup(api fiber.Router, h domainHandler) {
-
+// SetupRoutes maps domain routes.
+func SetupRoutes(api fiber.Router, h domainHandler) {
 	api.Post("/", h.CreateSource)
 	api.Get("/list", h.ListSources)
 	api.Put("/", h.CreateSource)

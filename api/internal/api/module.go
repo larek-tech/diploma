@@ -13,5 +13,5 @@ import (
 func SetupRoutes(api fiber.Router, tracer trace.Tracer, domainConn *grpc.ClientConn) {
 	domainHandler := handler.New(pb.NewDomainServiceClient(domainConn), tracer)
 	domainRouter := api.Group("/domain")
-	domain.Setup(domainRouter, domainHandler)
+	domain.SetupRoutes(domainRouter, domainHandler)
 }
