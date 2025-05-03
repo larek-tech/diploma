@@ -11,13 +11,13 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	documentService "github.com/larek-tech/diploma/data/internal/domain/document/service"
 	"github.com/larek-tech/diploma/data/internal/domain/site/service/crawler"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/ollama"
 	chunkStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/chunk"
 	documentStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/document"
 	pageStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/page"
 	questionStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/question"
 	siteStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/site"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/embed_document"
-	"github.com/tmc/langchaingo/llms/ollama"
 
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/parse_page"
@@ -37,7 +37,7 @@ func run() int {
 	if err := cleanenv.ReadEnv(&pgCfg); err != nil {
 		slog.Error("failed to read env", "error", err)
 	}
-	endpoint, model := getLLMConfig()
+	endpoint, _ := getLLMConfig()
 	pg, trManager, err := postgres.New(ctx, pgCfg)
 	if err != nil {
 		slog.Error("failed to create postgres", "error", err)
@@ -57,19 +57,17 @@ func run() int {
 		},
 		Jar: nil,
 	}
-	llm, err := ollama.New(
-		ollama.WithServerURL(endpoint),
-		ollama.WithModel(model),
-	)
+	llm, err := ollama.New(endpoint)
 	if err != nil {
 		slog.Error("failed to create LLM", "error", err)
 		return -1
 	}
-	embedderURL, embedderModel := getEmbedderConfig()
-	embedder, err := ollama.New(
-		ollama.WithServerURL(embedderURL),
-		ollama.WithModel(embedderModel),
-	)
+	embedderURL, _ := getEmbedderConfig()
+	embedderModel, err := ollama.New(embedderURL)
+	if err != nil {
+		slog.Error("failed to create embedder", "error", err)
+		return -1
+	}
 
 	pub := qaas.NewPublisher(pgq.NewPublisher(sqlDB))
 
@@ -79,7 +77,7 @@ func run() int {
 	chunkStore := chunkStorage.New(pg, trManager)
 	pageStore := pageStorage.New(pg)
 	pageService := crawler.New(httpClient, siteStore, pageStore, trManager)
-	embeddingService := documentService.New(documentStore, chunkStore, questionStore, embedder, llm, trManager)
+	embeddingService := documentService.New(documentStore, chunkStore, questionStore, embedderModel, llm, trManager)
 	consumer := qaas.NewConsumer(
 		parse_page.New(pageStore, pageService, pub),
 		parse_site.New(siteStore, pub),

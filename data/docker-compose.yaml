@@ -52,7 +52,7 @@ services:
         - local.env
     environment:
       OLLAMA_KEEP_ALIVE: 24h
-      OLLAMA_CONTEXT_LENGTH: 8192
+      # OLLAMA_CONTEXT_LENGTH: 8192 can be used in order to control the context length for all models otherwise set up in embedder / llm related configs
     healthcheck:
       test: "bash -c 'cat < /dev/null > /dev/tcp/localhost/11434'"
       interval: 5s
