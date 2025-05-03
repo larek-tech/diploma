@@ -84,10 +84,17 @@ LIMIT $4;`
 	if err != nil {
 		return nil, fmt.Errorf("failed to query chunks: %w", err)
 	}
-	for _, r := range res {
-		if err := json.Unmarshal([]byte(r.Metadata), &r.Metadata); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal metadata: %w", err)
-		}
-	}
+	//for _, r := range res {
+	//	if len(r.Metadata) == 0 {
+	//		continue
+	//	}
+	//	decoded, err := base64.StdEncoding.DecodeString(string(r.Metadata))
+	//	if err != nil {
+	//		return nil, fmt.Errorf("failed to base64 decode metadata: %w", err)
+	//	}
+	//	if err := json.Unmarshal(decoded, &r.Metadata); err != nil {
+	//		return nil, fmt.Errorf("failed to unmarshal metadata: %w", err)
+	//	}
+	//}
 	return res, nil
 }
