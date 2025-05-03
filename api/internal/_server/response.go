@@ -44,8 +44,8 @@ var (
 			Msg:    "can't parse request body",
 			Status: fiber.StatusUnprocessableEntity,
 		},
-		shared.ErrInvalidPath: {
-			Msg:    "can't parse path params",
+		shared.ErrInvalidParams: {
+			Msg:    "can't parse path or query params",
 			Status: fiber.StatusUnprocessableEntity,
 		},
 	}

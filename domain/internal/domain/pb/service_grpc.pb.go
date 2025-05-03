@@ -31,9 +31,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DomainServiceClient interface {
-	CreateSource(ctx context.Context, in *CreateSourceRequest, opts ...grpc.CallOption) (*CreateSourceResponse, error)
+	CreateSource(ctx context.Context, in *Source, opts ...grpc.CallOption) (*Source, error)
 	GetSource(ctx context.Context, in *GetSourceRequest, opts ...grpc.CallOption) (*GetSourceResponse, error)
-	UpdateSource(ctx context.Context, in *UpdateSourceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateSource(ctx context.Context, in *UpdateSourceRequest, opts ...grpc.CallOption) (*Source, error)
 	DeleteSource(ctx context.Context, in *DeleteSourceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListSources(ctx context.Context, in *ListSourcesRequest, opts ...grpc.CallOption) (*ListSourcesResponse, error)
 }
@@ -46,9 +46,9 @@ func NewDomainServiceClient(cc grpc.ClientConnInterface) DomainServiceClient {
 	return &domainServiceClient{cc}
 }
 
-func (c *domainServiceClient) CreateSource(ctx context.Context, in *CreateSourceRequest, opts ...grpc.CallOption) (*CreateSourceResponse, error) {
+func (c *domainServiceClient) CreateSource(ctx context.Context, in *Source, opts ...grpc.CallOption) (*Source, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateSourceResponse)
+	out := new(Source)
 	err := c.cc.Invoke(ctx, DomainService_CreateSource_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -66,9 +66,9 @@ func (c *domainServiceClient) GetSource(ctx context.Context, in *GetSourceReques
 	return out, nil
 }
 
-func (c *domainServiceClient) UpdateSource(ctx context.Context, in *UpdateSourceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *domainServiceClient) UpdateSource(ctx context.Context, in *UpdateSourceRequest, opts ...grpc.CallOption) (*Source, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
+	out := new(Source)
 	err := c.cc.Invoke(ctx, DomainService_UpdateSource_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -100,9 +100,9 @@ func (c *domainServiceClient) ListSources(ctx context.Context, in *ListSourcesRe
 // All implementations must embed UnimplementedDomainServiceServer
 // for forward compatibility.
 type DomainServiceServer interface {
-	CreateSource(context.Context, *CreateSourceRequest) (*CreateSourceResponse, error)
+	CreateSource(context.Context, *Source) (*Source, error)
 	GetSource(context.Context, *GetSourceRequest) (*GetSourceResponse, error)
-	UpdateSource(context.Context, *UpdateSourceRequest) (*emptypb.Empty, error)
+	UpdateSource(context.Context, *UpdateSourceRequest) (*Source, error)
 	DeleteSource(context.Context, *DeleteSourceRequest) (*emptypb.Empty, error)
 	ListSources(context.Context, *ListSourcesRequest) (*ListSourcesResponse, error)
 	mustEmbedUnimplementedDomainServiceServer()
@@ -115,13 +115,13 @@ type DomainServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedDomainServiceServer struct{}
 
-func (UnimplementedDomainServiceServer) CreateSource(context.Context, *CreateSourceRequest) (*CreateSourceResponse, error) {
+func (UnimplementedDomainServiceServer) CreateSource(context.Context, *Source) (*Source, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSource not implemented")
 }
 func (UnimplementedDomainServiceServer) GetSource(context.Context, *GetSourceRequest) (*GetSourceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSource not implemented")
 }
-func (UnimplementedDomainServiceServer) UpdateSource(context.Context, *UpdateSourceRequest) (*emptypb.Empty, error) {
+func (UnimplementedDomainServiceServer) UpdateSource(context.Context, *UpdateSourceRequest) (*Source, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSource not implemented")
 }
 func (UnimplementedDomainServiceServer) DeleteSource(context.Context, *DeleteSourceRequest) (*emptypb.Empty, error) {
@@ -152,7 +152,7 @@ func RegisterDomainServiceServer(s grpc.ServiceRegistrar, srv DomainServiceServe
 }
 
 func _DomainService_CreateSource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateSourceRequest)
+	in := new(Source)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ func _DomainService_CreateSource_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: DomainService_CreateSource_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DomainServiceServer).CreateSource(ctx, req.(*CreateSourceRequest))
+		return srv.(DomainServiceServer).CreateSource(ctx, req.(*Source))
 	}
 	return interceptor(ctx, in, info, handler)
 }

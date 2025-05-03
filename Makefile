@@ -121,7 +121,7 @@ proto-domain:
 		echo "Generating stubs in $$dir";\
 		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
 			$(DOMAIN_PROTO_SRC)/service.proto $(DOMAIN_PROTO_SRC)/model.proto \
-			$(PROTO_SRC)/google/protobuf/timestamp.proto $(PROTO_SRC)/google/protobuf/empty.proto; \
+			$(PROTO_SRC)/google/protobuf/timestamp.proto $(PROTO_SRC)/google/type/timeofday.proto; \
 	done
 	@echo "Protobuf stubs for domain service generated\n"
 
@@ -132,4 +132,4 @@ proto: proto-auth proto-ml proto-data proto-domain
 .PHONY: swag
 swag:
 	mkdir -p api/docs
-	cd api && SWAG init -g cmd/server/main.go -o ./docs
+	cd api && SWAG init -g cmd/server/main.go -o ./docs && SWAG fmt

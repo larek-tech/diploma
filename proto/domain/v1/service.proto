@@ -7,9 +7,9 @@ import "google/protobuf/empty.proto";
 import "domain/v1/model.proto";
 
 service DomainService {
-  rpc CreateSource(CreateSourceRequest) returns (CreateSourceResponse) {};
+  rpc CreateSource(Source) returns (Source) {};
   rpc GetSource(GetSourceRequest) returns (GetSourceResponse) {};
-  rpc UpdateSource(UpdateSourceRequest) returns (google.protobuf.Empty) {};
+  rpc UpdateSource(UpdateSourceRequest) returns (Source) {};
   rpc DeleteSource(DeleteSourceRequest) returns (google.protobuf.Empty) {};
   rpc ListSources(ListSourcesRequest) returns(ListSourcesResponse) {};
 };

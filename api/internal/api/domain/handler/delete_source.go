@@ -8,16 +8,17 @@ import (
 )
 
 // DeleteSource godoc
-// @Summary Delete source.
-// @Description Delete domain source by ID.
-// @Tags domain
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Param sourceID path int true "Source ID"
-// @Success 204 {object} string "Source deleted"
-// @Failure 400 {object} string "Failed to delete source"
-// @Router /api/v1/domain/{id} [delete]
+//
+//	@Summary		Delete source.
+//	@Description	Delete domain source by ID.
+//	@Tags			domain
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			sourceID	path		int		true	"Source ID"
+//	@Success		204			{object}	string	"Source deleted"
+//	@Failure		400			{object}	string	"Failed to delete source"
+//	@Router			/api/v1/domain/{id} [delete]
 func (h *Handler) DeleteSource(c *fiber.Ctx) error {
 	var req pb.DeleteSourceRequest
 
@@ -28,13 +29,13 @@ func (h *Handler) DeleteSource(c *fiber.Ctx) error {
 
 	sourceID, err := c.ParamsInt(sourceIDParam)
 	if err != nil {
-		return errs.WrapErr(shared.ErrInvalidPath, err.Error())
+		return errs.WrapErr(shared.ErrInvalidParams, err.Error())
 	}
 
-	req.UserId = userID
 	req.SourceId = int64(sourceID)
+	ctx := pushUserID(c.UserContext(), userID)
 
-	_, err = h.domainService.DeleteSource(c.UserContext(), &req)
+	_, err = h.domainService.DeleteSource(ctx, &req)
 	if err != nil {
 		return errs.WrapErr(shared.ErrDeleteSource, err.Error())
 	}

@@ -25,36 +25,35 @@ var File_domain_v1_service_proto protoreflect.FileDescriptor
 
 const file_domain_v1_service_proto_rawDesc = "" +
 	"\n" +
-	"\x17domain/v1/service.proto\x12\tdomain.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x15domain/v1/model.proto2\x90\x03\n" +
-	"\rDomainService\x12Q\n" +
-	"\fCreateSource\x12\x1e.domain.v1.CreateSourceRequest\x1a\x1f.domain.v1.CreateSourceResponse\"\x00\x12H\n" +
-	"\tGetSource\x12\x1b.domain.v1.GetSourceRequest\x1a\x1c.domain.v1.GetSourceResponse\"\x00\x12H\n" +
-	"\fUpdateSource\x12\x1e.domain.v1.UpdateSourceRequest\x1a\x16.google.protobuf.Empty\"\x00\x12H\n" +
+	"\x17domain/v1/service.proto\x12\tdomain.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x15domain/v1/model.proto2\xf0\x02\n" +
+	"\rDomainService\x126\n" +
+	"\fCreateSource\x12\x11.domain.v1.Source\x1a\x11.domain.v1.Source\"\x00\x12H\n" +
+	"\tGetSource\x12\x1b.domain.v1.GetSourceRequest\x1a\x1c.domain.v1.GetSourceResponse\"\x00\x12C\n" +
+	"\fUpdateSource\x12\x1e.domain.v1.UpdateSourceRequest\x1a\x11.domain.v1.Source\"\x00\x12H\n" +
 	"\fDeleteSource\x12\x1e.domain.v1.DeleteSourceRequest\x1a\x16.google.protobuf.Empty\"\x00\x12N\n" +
 	"\vListSources\x12\x1d.domain.v1.ListSourcesRequest\x1a\x1e.domain.v1.ListSourcesResponse\"\x00B\x14Z\x12internal/domain/pbb\x06proto3"
 
 var file_domain_v1_service_proto_goTypes = []any{
-	(*CreateSourceRequest)(nil),  // 0: domain.v1.CreateSourceRequest
-	(*GetSourceRequest)(nil),     // 1: domain.v1.GetSourceRequest
-	(*UpdateSourceRequest)(nil),  // 2: domain.v1.UpdateSourceRequest
-	(*DeleteSourceRequest)(nil),  // 3: domain.v1.DeleteSourceRequest
-	(*ListSourcesRequest)(nil),   // 4: domain.v1.ListSourcesRequest
-	(*CreateSourceResponse)(nil), // 5: domain.v1.CreateSourceResponse
-	(*GetSourceResponse)(nil),    // 6: domain.v1.GetSourceResponse
-	(*emptypb.Empty)(nil),        // 7: google.protobuf.Empty
-	(*ListSourcesResponse)(nil),  // 8: domain.v1.ListSourcesResponse
+	(*Source)(nil),              // 0: domain.v1.Source
+	(*GetSourceRequest)(nil),    // 1: domain.v1.GetSourceRequest
+	(*UpdateSourceRequest)(nil), // 2: domain.v1.UpdateSourceRequest
+	(*DeleteSourceRequest)(nil), // 3: domain.v1.DeleteSourceRequest
+	(*ListSourcesRequest)(nil),  // 4: domain.v1.ListSourcesRequest
+	(*GetSourceResponse)(nil),   // 5: domain.v1.GetSourceResponse
+	(*emptypb.Empty)(nil),       // 6: google.protobuf.Empty
+	(*ListSourcesResponse)(nil), // 7: domain.v1.ListSourcesResponse
 }
 var file_domain_v1_service_proto_depIdxs = []int32{
-	0, // 0: domain.v1.DomainService.CreateSource:input_type -> domain.v1.CreateSourceRequest
+	0, // 0: domain.v1.DomainService.CreateSource:input_type -> domain.v1.Source
 	1, // 1: domain.v1.DomainService.GetSource:input_type -> domain.v1.GetSourceRequest
 	2, // 2: domain.v1.DomainService.UpdateSource:input_type -> domain.v1.UpdateSourceRequest
 	3, // 3: domain.v1.DomainService.DeleteSource:input_type -> domain.v1.DeleteSourceRequest
 	4, // 4: domain.v1.DomainService.ListSources:input_type -> domain.v1.ListSourcesRequest
-	5, // 5: domain.v1.DomainService.CreateSource:output_type -> domain.v1.CreateSourceResponse
-	6, // 6: domain.v1.DomainService.GetSource:output_type -> domain.v1.GetSourceResponse
-	7, // 7: domain.v1.DomainService.UpdateSource:output_type -> google.protobuf.Empty
-	7, // 8: domain.v1.DomainService.DeleteSource:output_type -> google.protobuf.Empty
-	8, // 9: domain.v1.DomainService.ListSources:output_type -> domain.v1.ListSourcesResponse
+	0, // 5: domain.v1.DomainService.CreateSource:output_type -> domain.v1.Source
+	5, // 6: domain.v1.DomainService.GetSource:output_type -> domain.v1.GetSourceResponse
+	0, // 7: domain.v1.DomainService.UpdateSource:output_type -> domain.v1.Source
+	6, // 8: domain.v1.DomainService.DeleteSource:output_type -> google.protobuf.Empty
+	7, // 9: domain.v1.DomainService.ListSources:output_type -> domain.v1.ListSourcesResponse
 	5, // [5:10] is the sub-list for method output_type
 	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

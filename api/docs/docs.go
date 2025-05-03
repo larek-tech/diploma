@@ -20,49 +20,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/v1/domain/": {
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update source information or params for update job.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "domain"
-                ],
-                "summary": "Update source.",
-                "parameters": [
-                    {
-                        "description": "Update params",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/pb.UpdateSourceRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Source updated",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Failed to update source",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -87,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/pb.CreateSourceRequest"
+                            "$ref": "#/definitions/pb.Source"
                         }
                     }
                 ],
@@ -95,7 +52,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Source successfully created",
                         "schema": {
-                            "$ref": "#/definitions/pb.CreateSourceResponse"
+                            "$ref": "#/definitions/pb.Source"
                         }
                     },
                     "400": {
@@ -125,6 +82,22 @@ const docTemplate = `{
                     "domain"
                 ],
                 "summary": "List sources.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of sources",
@@ -183,6 +156,56 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update source information or params for update job.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Update source.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Source ID",
+                        "name": "sourceID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.UpdateSourceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Source updated",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Source"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to update source",
                         "schema": {
                             "type": "string"
                         }
@@ -273,25 +296,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "pb.CreateSourceRequest": {
-            "type": "object",
-            "properties": {
-                "source": {
-                    "$ref": "#/definitions/pb.Source"
-                },
-                "userId": {
-                    "type": "integer"
-                }
-            }
-        },
-        "pb.CreateSourceResponse": {
-            "type": "object",
-            "properties": {
-                "sourceId": {
-                    "type": "integer"
-                }
-            }
-        },
         "pb.GetSourceResponse": {
             "type": "object",
             "properties": {
@@ -386,7 +390,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "onTime": {
-                    "$ref": "#/definitions/timestamppb.Timestamp"
+                    "$ref": "#/definitions/timeofday.TimeOfDay"
                 }
             }
         },
@@ -413,9 +417,6 @@ const docTemplate = `{
                 },
                 "updateParams": {
                     "$ref": "#/definitions/pb.UpdateParams"
-                },
-                "userId": {
-                    "type": "integer"
                 }
             }
         },
@@ -433,15 +434,23 @@ const docTemplate = `{
                 }
             }
         },
-        "timestamppb.Timestamp": {
+        "timeofday.TimeOfDay": {
             "type": "object",
             "properties": {
+                "hours": {
+                    "description": "Hours of day in 24 hour format. Should be from 0 to 23. An API may choose\nto allow the value \"24:00:00\" for scenarios like business closing time.",
+                    "type": "integer"
+                },
+                "minutes": {
+                    "description": "Minutes of hour of day. Must be from 0 to 59.",
+                    "type": "integer"
+                },
                 "nanos": {
-                    "description": "Non-negative fractions of a second at nanosecond resolution. Negative\nsecond values with fractions must still have non-negative nanos values\nthat count forward in time. Must be from 0 to 999,999,999\ninclusive.",
+                    "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
                     "type": "integer"
                 },
                 "seconds": {
-                    "description": "Represents seconds of UTC time since Unix epoch\n1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to\n9999-12-31T23:59:59Z inclusive.",
+                    "description": "Seconds of minutes of the time. Must normally be from 0 to 59. An API may\nallow the value 60 if it allows leap-seconds.",
                     "type": "integer"
                 }
             }

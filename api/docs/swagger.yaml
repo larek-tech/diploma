@@ -1,17 +1,5 @@
 basePath: /
 definitions:
-  pb.CreateSourceRequest:
-    properties:
-      source:
-        $ref: '#/definitions/pb.Source'
-      userId:
-        type: integer
-    type: object
-  pb.CreateSourceResponse:
-    properties:
-      sourceId:
-        type: integer
-    type: object
   pb.GetSourceResponse:
     properties:
       source:
@@ -76,7 +64,7 @@ definitions:
       everyPeriod:
         type: integer
       onTime:
-        $ref: '#/definitions/timestamppb.Timestamp'
+        $ref: '#/definitions/timeofday.TimeOfDay'
     type: object
   pb.UpdateSourceRequest:
     properties:
@@ -94,8 +82,6 @@ definitions:
         type: string
       updateParams:
         $ref: '#/definitions/pb.UpdateParams'
-      userId:
-        type: integer
     type: object
   pb.UserAuthMetadata:
     properties:
@@ -106,20 +92,23 @@ definitions:
       userId:
         type: integer
     type: object
-  timestamppb.Timestamp:
+  timeofday.TimeOfDay:
     properties:
-      nanos:
+      hours:
         description: |-
-          Non-negative fractions of a second at nanosecond resolution. Negative
-          second values with fractions must still have non-negative nanos values
-          that count forward in time. Must be from 0 to 999,999,999
-          inclusive.
+          Hours of day in 24 hour format. Should be from 0 to 23. An API may choose
+          to allow the value "24:00:00" for scenarios like business closing time.
+        type: integer
+      minutes:
+        description: Minutes of hour of day. Must be from 0 to 59.
+        type: integer
+      nanos:
+        description: Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
         type: integer
       seconds:
         description: |-
-          Represents seconds of UTC time since Unix epoch
-          1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
-          9999-12-31T23:59:59Z inclusive.
+          Seconds of minutes of the time. Must normally be from 0 to 59. An API may
+          allow the value 60 if it allows leap-seconds.
         type: integer
     type: object
 host: localhost:9000
@@ -143,14 +132,14 @@ paths:
         name: req
         required: true
         schema:
-          $ref: '#/definitions/pb.CreateSourceRequest'
+          $ref: '#/definitions/pb.Source'
       produces:
       - application/json
       responses:
         "201":
           description: Source successfully created
           schema:
-            $ref: '#/definitions/pb.CreateSourceResponse'
+            $ref: '#/definitions/pb.Source'
         "400":
           description: Failed to create source
           schema:
@@ -158,33 +147,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Create new source.
-      tags:
-      - domain
-    put:
-      consumes:
-      - application/json
-      description: Update source information or params for update job.
-      parameters:
-      - description: Update params
-        in: body
-        name: req
-        required: true
-        schema:
-          $ref: '#/definitions/pb.UpdateSourceRequest'
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: Source updated
-          schema:
-            type: string
-        "400":
-          description: Failed to update source
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: Update source.
       tags:
       - domain
   /api/v1/domain/{id}:
@@ -244,11 +206,54 @@ paths:
       summary: Get source.
       tags:
       - domain
+    put:
+      consumes:
+      - application/json
+      description: Update source information or params for update job.
+      parameters:
+      - description: Source ID
+        in: path
+        name: sourceID
+        required: true
+        type: integer
+      - description: Update params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.UpdateSourceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Source updated
+          schema:
+            $ref: '#/definitions/pb.Source'
+        "400":
+          description: Failed to update source
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update source.
+      tags:
+      - domain
   /api/v1/domain/list:
     get:
       consumes:
       - application/json
       description: List sources to which user has access.
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: Pagination limit
+        in: query
+        name: limit
+        required: true
+        type: integer
       produces:
       - application/json
       responses:

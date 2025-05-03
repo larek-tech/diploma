@@ -8,17 +8,18 @@ import (
 )
 
 // GetSource godoc
-// @Summary Get source.
-// @Description Returns information about source and its update parameters.
-// @Tags domain
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Param sourceID path int true "Requested source ID"
-// @Success 200 {object} pb.GetSourceResponse "Source"
-// @Failure 400 {object} string "Failed to get source"
-// @Failure 404 {object} string "Source not found"
-// @Router /api/v1/domain/{id} [get]
+//
+//	@Summary		Get source.
+//	@Description	Returns information about source and its update parameters.
+//	@Tags			domain
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			sourceID	path		int						true	"Requested source ID"
+//	@Success		200			{object}	pb.GetSourceResponse	"Source"
+//	@Failure		400			{object}	string					"Failed to get source"
+//	@Failure		404			{object}	string					"Source not found"
+//	@Router			/api/v1/domain/{id} [get]
 func (h *Handler) GetSource(c *fiber.Ctx) error {
 	var req pb.GetSourceRequest
 
@@ -29,13 +30,13 @@ func (h *Handler) GetSource(c *fiber.Ctx) error {
 
 	sourceID, err := c.ParamsInt(sourceIDParam)
 	if err != nil {
-		return errs.WrapErr(shared.ErrInvalidPath, err.Error())
+		return errs.WrapErr(shared.ErrInvalidParams, err.Error())
 	}
 
-	req.UserId = userID
 	req.SourceId = int64(sourceID)
+	ctx := pushUserID(c.UserContext(), userID)
 
-	resp, err := h.domainService.GetSource(c.UserContext(), &req)
+	resp, err := h.domainService.GetSource(ctx, &req)
 	if err != nil {
 		return errs.WrapErr(shared.ErrGetSource, err.Error())
 	}

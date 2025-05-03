@@ -8,3 +8,8 @@ const (
 	// UserRolesKey is a key for storing user roles in context.
 	UserRolesKey
 )
+
+const (
+	// UserIDHeader header name for passing user ID between gRPC services.
+	UserIDHeader string = "x-user-id"
+)

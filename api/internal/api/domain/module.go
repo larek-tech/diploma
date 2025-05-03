@@ -16,7 +16,7 @@ type domainHandler interface {
 func SetupRoutes(api fiber.Router, h domainHandler) {
 	api.Post("/", h.CreateSource)
 	api.Get("/list", h.ListSources)
-	api.Put("/", h.CreateSource)
 	api.Get("/:id", h.GetSource)
+	api.Put("/:id", h.UpdateSource)
 	api.Delete("/:id", h.DeleteSource)
 }

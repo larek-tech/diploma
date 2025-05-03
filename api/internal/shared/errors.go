@@ -34,6 +34,6 @@ var (
 var (
 	// ErrInvalidBody is an error when provided an invalid request body that can't be parsed.
 	ErrInvalidBody = errors.New("can't parse invalid request body")
-	// ErrInvalidPath is an error when provided an invalid path param that can't be parsed.
-	ErrInvalidPath = errors.New("can't parse invalid path params")
+	// ErrInvalidParams is an error when provided invalid path or query param that can't be parsed.
+	ErrInvalidParams = errors.New("can't parse invalid path or query params")
 )

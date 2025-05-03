@@ -3,7 +3,7 @@ syntax = "proto3";
 package domain.v1;
 option go_package = "internal/domain/pb";
 
-import "google/protobuf/timestamp.proto";
+import "google/type/timeofday.proto";
 
 enum SourceType {
   UNDEFINED_SOURCE_TYPE = 0;
@@ -11,6 +11,11 @@ enum SourceType {
   SINGLE_FILE = 2;
   ARCHIVED_FILES = 3;
   WITH_CREDENTIALS = 4;
+};
+
+message UpdateParams {
+  int64 everyPeriod = 1;
+  google.type.TimeOfDay onTime = 2;
 };
 
 message Source {
@@ -21,23 +26,8 @@ message Source {
   optional bytes credentials = 5;
 };
 
-message UpdateParams {
-  int64 everyPeriod = 1;
-  google.protobuf.Timestamp onTime = 2;
-};
-
-message CreateSourceRequest {
-  int64 userId = 1;
-  Source source = 2;
-};
-
-message CreateSourceResponse {
-  int64 sourceId = 1;
-};
-
 message GetSourceRequest {
-  int64 userId = 1;
-  int64 sourceId = 2;
+  int64 sourceId = 1;
 };
 
 message GetSourceResponse {
@@ -45,21 +35,20 @@ message GetSourceResponse {
 };
 
 message UpdateSourceRequest {
-  int64 userId = 1;
-  int64 sourceId = 2;
-  optional string title = 3;
-  optional bytes content = 4;
-  optional UpdateParams updateParams = 5;
-  optional bytes credentials = 6;
+  int64 sourceId = 1;
+  optional string title = 2;
+  optional bytes content = 3;
+  optional UpdateParams updateParams = 4;
+  optional bytes credentials = 5;
 };
 
 message DeleteSourceRequest {
-  int64 userId = 1;
-  int64 sourceId = 2;
+  int64 sourceId = 1;
 };
 
 message ListSourcesRequest {
-  int64 userId = 1;
+  uint64 offset = 1;
+  uint64 limit = 2;
 };
 
 message ListSourcesResponse {
