@@ -101,12 +101,14 @@ services:
     ports:
       - "9999:8081"
   kafka:
-    image: johnnypark/kafka-zookeeper
+    build:
+      context: docker/
+      dockerfile: kafka.Dockerfile
     ports:
       - "2181:2181"
       - "9092:9092"
     environment:
-      - ADVERTISED_HOST=127.0.0.1
+      - ADVERTISED_HOST=localhost:9092kafka:9092
       - NUM_PARTITIONS=2
 
 
