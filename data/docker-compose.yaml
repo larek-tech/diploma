@@ -56,6 +56,13 @@ services:
     healthcheck:
       test: "bash -c 'cat < /dev/null > /dev/tcp/localhost/11434'"
       interval: 5s
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   crawler:
     build:
@@ -77,6 +84,7 @@ services:
       OLLAMA_MODEL: bge-m3:latest
     ports:
       - "9998:8080"
+      - "9990:50051"
   parser:
     build:
       context: .

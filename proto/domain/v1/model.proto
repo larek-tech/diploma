@@ -3,6 +3,7 @@ syntax = "proto3";
 package domain.v1;
 option go_package = "internal/domain/pb";
 
+<<<<<<< HEAD
 enum SourceType {
   TYPE_UNDEFINED = 0;
   TYPE_WEB = 1;
@@ -29,12 +30,23 @@ message CronFormat {
 message UpdateParams {
   optional int64 everyPeriod = 1;
   optional CronFormat cron = 2;
+=======
+import "google/protobuf/timestamp.proto";
+
+enum SourceType {
+  UNDEFINED_SOURCE_TYPE = 0;
+  WEB_SOURCE = 1;
+  SINGLE_FILE = 2;
+  ARCHIVED_FILES = 3;
+  WITH_CREDENTIALS = 4;
+>>>>>>> d946f4c (stable)
 };
 
 message Source {
   string title = 1;
   bytes content = 2;
   SourceType typ = 3;
+<<<<<<< HEAD
   optional UpdateParams updateParams = 4;
   optional bytes credentials = 5;
 };
@@ -66,4 +78,44 @@ message ListSourcesRequest {
 
 message ListSourcesResponse {
   repeated Source sources = 1;
+=======
+};
+
+message UpdateParams {
+  int64 everyPeriod = 1;
+  google.protobuf.Timestamp onTime = 2;
+};
+
+message CreateSourceRequest {
+  int64 userId = 1;
+  Source source = 2;
+};
+
+message GetSourceRequest {
+
+};
+
+message GetSourceResponse {
+
+};
+
+message UpdateSourceRequest {
+
+};
+
+message DeleteSourceRequest {
+
+};
+
+message ListSourcesRequest {
+
+};
+
+message ListSourcesResponse {
+
+};
+
+message ModifySourceResponse {
+
+>>>>>>> d946f4c (stable)
 };

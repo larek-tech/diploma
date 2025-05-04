@@ -5,11 +5,38 @@ description = "Default template for PDM package"
 authors = [
     {name = "", email = ""},
 ]
-dependencies = ["cookiecutter-data-science>=2.2.0", "grpcio>=1.71.0", "grpcio-tools>=1.71.0", "ruff>=0.11.7"]
+dependencies = ["cookiecutter-data-science>=2.2.0", "grpcio>=1.71.0", "grpcio-tools>=1.71.0", "ruff>=0.11.7", "transformers>=4.51.3", "torch>=2.7.0"]
 requires-python = "==3.11.*"
 readme = "README.md"
 license = {text = "MIT"}
 
 
+[project.optional-dependencies]
+notebook = [
+    "ipykernel>=6.29.5",
+    "pandas>=2.2.3",
+]
 [tool.pdm]
 distribution = false
+
+
+[tool.ruff]
+line-length = 79
+fix = false
+unsafe-fixes = false
+cache-dir = "./.cache/ruff"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["D1", "D203", "D205", "D213", "FA", "ANN101", "ANN102", "PLR0912",
+    "PLR0913", "COM812", "RUF001", "RUF002", "RUF003", "D407", "D413"
+]
+
+[tool.ruff.lint.isort]
+no-lines-before = ["standard-library", "local-folder"]
+known-third-party = []
+known-local-folder = ["comm_clf"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"*__init__.py" = ["F401"]
+"tests/*.py" = ["ANN401", "S101", "S311", "FBT001"]
