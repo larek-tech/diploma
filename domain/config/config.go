@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/ilyakaznacheev/cleanenv"
 	server "github.com/larek-tech/diploma/domain/internal/_server"
+	"github.com/larek-tech/diploma/domain/pkg/kafka"
 	"github.com/yogenyslav/pkg/errs"
 	"github.com/yogenyslav/pkg/infrastructure/tracing"
 	"github.com/yogenyslav/pkg/storage/postgres"
@@ -14,6 +15,7 @@ type Config struct {
 	Server   server.Config   `yaml:"server"`
 	Postgres postgres.Config `yaml:"postgres"`
 	Jaeger   tracing.Config  `yaml:"jaeger"`
+	Kafka    kafka.Config    `yaml:"kafka"`
 }
 
 // New creates new Config.

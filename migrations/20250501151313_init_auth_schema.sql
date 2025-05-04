@@ -5,7 +5,7 @@ alter database dev
 create schema auth;
 create table auth.role (
     id bigserial primary key,
-    name text not null,
+    name text unique not null,
     created_at timestamp not null default current_timestamp,
     is_deleted bool not null default false
 );

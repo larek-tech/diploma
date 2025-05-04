@@ -1,5 +1,18 @@
 basePath: /
 definitions:
+  pb.CronFormat:
+    properties:
+      dayOfMonth:
+        type: integer
+      dayOfWeek:
+        type: integer
+      hour:
+        type: integer
+      minute:
+        type: integer
+      month:
+        type: integer
+    type: object
   pb.GetSourceResponse:
     properties:
       source:
@@ -54,17 +67,17 @@ definitions:
     - 4
     type: integer
     x-enum-varnames:
-    - SourceType_UNDEFINED_SOURCE_TYPE
-    - SourceType_WEB_SOURCE
-    - SourceType_SINGLE_FILE
-    - SourceType_ARCHIVED_FILES
-    - SourceType_WITH_CREDENTIALS
+    - SourceType_TYPE_UNDEFINED
+    - SourceType_TYPE_WEB
+    - SourceType_TYPE_SINGLE_FILE
+    - SourceType_TYPE_ARCHIVED_FILES
+    - SourceType_TYPE_WITH_CREDENTIALS
   pb.UpdateParams:
     properties:
+      cron:
+        $ref: '#/definitions/pb.CronFormat'
       everyPeriod:
         type: integer
-      onTime:
-        $ref: '#/definitions/timeofday.TimeOfDay'
     type: object
   pb.UpdateSourceRequest:
     properties:
@@ -90,25 +103,6 @@ definitions:
           type: integer
         type: array
       userId:
-        type: integer
-    type: object
-  timeofday.TimeOfDay:
-    properties:
-      hours:
-        description: |-
-          Hours of day in 24 hour format. Should be from 0 to 23. An API may choose
-          to allow the value "24:00:00" for scenarios like business closing time.
-        type: integer
-      minutes:
-        description: Minutes of hour of day. Must be from 0 to 59.
-        type: integer
-      nanos:
-        description: Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
-        type: integer
-      seconds:
-        description: |-
-          Seconds of minutes of the time. Must normally be from 0 to 59. An API may
-          allow the value 60 if it allows leap-seconds.
         type: integer
     type: object
 host: localhost:9000

@@ -296,6 +296,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "pb.CronFormat": {
+            "type": "object",
+            "properties": {
+                "dayOfMonth": {
+                    "type": "integer"
+                },
+                "dayOfWeek": {
+                    "type": "integer"
+                },
+                "hour": {
+                    "type": "integer"
+                },
+                "minute": {
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "integer"
+                }
+            }
+        },
         "pb.GetSourceResponse": {
             "type": "object",
             "properties": {
@@ -376,21 +396,21 @@ const docTemplate = `{
                 4
             ],
             "x-enum-varnames": [
-                "SourceType_UNDEFINED_SOURCE_TYPE",
-                "SourceType_WEB_SOURCE",
-                "SourceType_SINGLE_FILE",
-                "SourceType_ARCHIVED_FILES",
-                "SourceType_WITH_CREDENTIALS"
+                "SourceType_TYPE_UNDEFINED",
+                "SourceType_TYPE_WEB",
+                "SourceType_TYPE_SINGLE_FILE",
+                "SourceType_TYPE_ARCHIVED_FILES",
+                "SourceType_TYPE_WITH_CREDENTIALS"
             ]
         },
         "pb.UpdateParams": {
             "type": "object",
             "properties": {
+                "cron": {
+                    "$ref": "#/definitions/pb.CronFormat"
+                },
                 "everyPeriod": {
                     "type": "integer"
-                },
-                "onTime": {
-                    "$ref": "#/definitions/timeofday.TimeOfDay"
                 }
             }
         },
@@ -430,27 +450,6 @@ const docTemplate = `{
                     }
                 },
                 "userId": {
-                    "type": "integer"
-                }
-            }
-        },
-        "timeofday.TimeOfDay": {
-            "type": "object",
-            "properties": {
-                "hours": {
-                    "description": "Hours of day in 24 hour format. Should be from 0 to 23. An API may choose\nto allow the value \"24:00:00\" for scenarios like business closing time.",
-                    "type": "integer"
-                },
-                "minutes": {
-                    "description": "Minutes of hour of day. Must be from 0 to 59.",
-                    "type": "integer"
-                },
-                "nanos": {
-                    "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
-                    "type": "integer"
-                },
-                "seconds": {
-                    "description": "Seconds of minutes of the time. Must normally be from 0 to 59. An API may\nallow the value 60 if it allows leap-seconds.",
                     "type": "integer"
                 }
             }

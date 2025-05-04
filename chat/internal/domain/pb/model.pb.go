@@ -7,7 +7,6 @@
 package pb
 
 import (
-	timeofday "google.golang.org/genproto/googleapis/type/timeofday"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -25,28 +24,28 @@ const (
 type SourceType int32
 
 const (
-	SourceType_UNDEFINED_SOURCE_TYPE SourceType = 0
-	SourceType_WEB_SOURCE            SourceType = 1
-	SourceType_SINGLE_FILE           SourceType = 2
-	SourceType_ARCHIVED_FILES        SourceType = 3
-	SourceType_WITH_CREDENTIALS      SourceType = 4
+	SourceType_TYPE_UNDEFINED        SourceType = 0
+	SourceType_TYPE_WEB              SourceType = 1
+	SourceType_TYPE_SINGLE_FILE      SourceType = 2
+	SourceType_TYPE_ARCHIVED_FILES   SourceType = 3
+	SourceType_TYPE_WITH_CREDENTIALS SourceType = 4
 )
 
 // Enum value maps for SourceType.
 var (
 	SourceType_name = map[int32]string{
-		0: "UNDEFINED_SOURCE_TYPE",
-		1: "WEB_SOURCE",
-		2: "SINGLE_FILE",
-		3: "ARCHIVED_FILES",
-		4: "WITH_CREDENTIALS",
+		0: "TYPE_UNDEFINED",
+		1: "TYPE_WEB",
+		2: "TYPE_SINGLE_FILE",
+		3: "TYPE_ARCHIVED_FILES",
+		4: "TYPE_WITH_CREDENTIALS",
 	}
 	SourceType_value = map[string]int32{
-		"UNDEFINED_SOURCE_TYPE": 0,
-		"WEB_SOURCE":            1,
-		"SINGLE_FILE":           2,
-		"ARCHIVED_FILES":        3,
-		"WITH_CREDENTIALS":      4,
+		"TYPE_UNDEFINED":        0,
+		"TYPE_WEB":              1,
+		"TYPE_SINGLE_FILE":      2,
+		"TYPE_ARCHIVED_FILES":   3,
+		"TYPE_WITH_CREDENTIALS": 4,
 	}
 )
 
@@ -77,17 +76,145 @@ func (SourceType) EnumDescriptor() ([]byte, []int) {
 	return file_domain_v1_model_proto_rawDescGZIP(), []int{0}
 }
 
+type SourceStatus int32
+
+const (
+	SourceStatus_STATUS_UNDEFINED SourceStatus = 0
+	SourceStatus_STATUS_READY     SourceStatus = 1
+	SourceStatus_STATUS_PARSING   SourceStatus = 2
+	SourceStatus_STATUS_FAILED    SourceStatus = 3
+)
+
+// Enum value maps for SourceStatus.
+var (
+	SourceStatus_name = map[int32]string{
+		0: "STATUS_UNDEFINED",
+		1: "STATUS_READY",
+		2: "STATUS_PARSING",
+		3: "STATUS_FAILED",
+	}
+	SourceStatus_value = map[string]int32{
+		"STATUS_UNDEFINED": 0,
+		"STATUS_READY":     1,
+		"STATUS_PARSING":   2,
+		"STATUS_FAILED":    3,
+	}
+)
+
+func (x SourceStatus) Enum() *SourceStatus {
+	p := new(SourceStatus)
+	*p = x
+	return p
+}
+
+func (x SourceStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SourceStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_domain_v1_model_proto_enumTypes[1].Descriptor()
+}
+
+func (SourceStatus) Type() protoreflect.EnumType {
+	return &file_domain_v1_model_proto_enumTypes[1]
+}
+
+func (x SourceStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SourceStatus.Descriptor instead.
+func (SourceStatus) EnumDescriptor() ([]byte, []int) {
+	return file_domain_v1_model_proto_rawDescGZIP(), []int{1}
+}
+
+type CronFormat struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Minute        int32                  `protobuf:"varint,1,opt,name=minute,proto3" json:"minute,omitempty"`
+	Hour          int32                  `protobuf:"varint,2,opt,name=hour,proto3" json:"hour,omitempty"`
+	DayOfMonth    int32                  `protobuf:"varint,3,opt,name=dayOfMonth,proto3" json:"dayOfMonth,omitempty"`
+	Month         int32                  `protobuf:"varint,4,opt,name=month,proto3" json:"month,omitempty"`
+	DayOfWeek     int32                  `protobuf:"varint,5,opt,name=dayOfWeek,proto3" json:"dayOfWeek,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CronFormat) Reset() {
+	*x = CronFormat{}
+	mi := &file_domain_v1_model_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CronFormat) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CronFormat) ProtoMessage() {}
+
+func (x *CronFormat) ProtoReflect() protoreflect.Message {
+	mi := &file_domain_v1_model_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CronFormat.ProtoReflect.Descriptor instead.
+func (*CronFormat) Descriptor() ([]byte, []int) {
+	return file_domain_v1_model_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *CronFormat) GetMinute() int32 {
+	if x != nil {
+		return x.Minute
+	}
+	return 0
+}
+
+func (x *CronFormat) GetHour() int32 {
+	if x != nil {
+		return x.Hour
+	}
+	return 0
+}
+
+func (x *CronFormat) GetDayOfMonth() int32 {
+	if x != nil {
+		return x.DayOfMonth
+	}
+	return 0
+}
+
+func (x *CronFormat) GetMonth() int32 {
+	if x != nil {
+		return x.Month
+	}
+	return 0
+}
+
+func (x *CronFormat) GetDayOfWeek() int32 {
+	if x != nil {
+		return x.DayOfWeek
+	}
+	return 0
+}
+
 type UpdateParams struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	EveryPeriod   int64                  `protobuf:"varint,1,opt,name=everyPeriod,proto3" json:"everyPeriod,omitempty"`
-	OnTime        *timeofday.TimeOfDay   `protobuf:"bytes,2,opt,name=onTime,proto3" json:"onTime,omitempty"`
+	EveryPeriod   *int64                 `protobuf:"varint,1,opt,name=everyPeriod,proto3,oneof" json:"everyPeriod,omitempty"`
+	Cron          *CronFormat            `protobuf:"bytes,2,opt,name=cron,proto3,oneof" json:"cron,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UpdateParams) Reset() {
 	*x = UpdateParams{}
-	mi := &file_domain_v1_model_proto_msgTypes[0]
+	mi := &file_domain_v1_model_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -99,7 +226,7 @@ func (x *UpdateParams) String() string {
 func (*UpdateParams) ProtoMessage() {}
 
 func (x *UpdateParams) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[0]
+	mi := &file_domain_v1_model_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -112,19 +239,19 @@ func (x *UpdateParams) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateParams.ProtoReflect.Descriptor instead.
 func (*UpdateParams) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{0}
+	return file_domain_v1_model_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *UpdateParams) GetEveryPeriod() int64 {
-	if x != nil {
-		return x.EveryPeriod
+	if x != nil && x.EveryPeriod != nil {
+		return *x.EveryPeriod
 	}
 	return 0
 }
 
-func (x *UpdateParams) GetOnTime() *timeofday.TimeOfDay {
+func (x *UpdateParams) GetCron() *CronFormat {
 	if x != nil {
-		return x.OnTime
+		return x.Cron
 	}
 	return nil
 }
@@ -142,7 +269,7 @@ type Source struct {
 
 func (x *Source) Reset() {
 	*x = Source{}
-	mi := &file_domain_v1_model_proto_msgTypes[1]
+	mi := &file_domain_v1_model_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -154,7 +281,7 @@ func (x *Source) String() string {
 func (*Source) ProtoMessage() {}
 
 func (x *Source) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[1]
+	mi := &file_domain_v1_model_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -167,7 +294,7 @@ func (x *Source) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Source.ProtoReflect.Descriptor instead.
 func (*Source) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{1}
+	return file_domain_v1_model_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Source) GetTitle() string {
@@ -188,7 +315,7 @@ func (x *Source) GetTyp() SourceType {
 	if x != nil {
 		return x.Typ
 	}
-	return SourceType_UNDEFINED_SOURCE_TYPE
+	return SourceType_TYPE_UNDEFINED
 }
 
 func (x *Source) GetUpdateParams() *UpdateParams {
@@ -214,7 +341,7 @@ type GetSourceRequest struct {
 
 func (x *GetSourceRequest) Reset() {
 	*x = GetSourceRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[2]
+	mi := &file_domain_v1_model_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -226,7 +353,7 @@ func (x *GetSourceRequest) String() string {
 func (*GetSourceRequest) ProtoMessage() {}
 
 func (x *GetSourceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[2]
+	mi := &file_domain_v1_model_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -239,7 +366,7 @@ func (x *GetSourceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSourceRequest.ProtoReflect.Descriptor instead.
 func (*GetSourceRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{2}
+	return file_domain_v1_model_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetSourceRequest) GetSourceId() int64 {
@@ -258,7 +385,7 @@ type GetSourceResponse struct {
 
 func (x *GetSourceResponse) Reset() {
 	*x = GetSourceResponse{}
-	mi := &file_domain_v1_model_proto_msgTypes[3]
+	mi := &file_domain_v1_model_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -270,7 +397,7 @@ func (x *GetSourceResponse) String() string {
 func (*GetSourceResponse) ProtoMessage() {}
 
 func (x *GetSourceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[3]
+	mi := &file_domain_v1_model_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -283,7 +410,7 @@ func (x *GetSourceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSourceResponse.ProtoReflect.Descriptor instead.
 func (*GetSourceResponse) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{3}
+	return file_domain_v1_model_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetSourceResponse) GetSource() *Source {
@@ -306,7 +433,7 @@ type UpdateSourceRequest struct {
 
 func (x *UpdateSourceRequest) Reset() {
 	*x = UpdateSourceRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[4]
+	mi := &file_domain_v1_model_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -318,7 +445,7 @@ func (x *UpdateSourceRequest) String() string {
 func (*UpdateSourceRequest) ProtoMessage() {}
 
 func (x *UpdateSourceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[4]
+	mi := &file_domain_v1_model_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -331,7 +458,7 @@ func (x *UpdateSourceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSourceRequest.ProtoReflect.Descriptor instead.
 func (*UpdateSourceRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{4}
+	return file_domain_v1_model_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UpdateSourceRequest) GetSourceId() int64 {
@@ -378,7 +505,7 @@ type DeleteSourceRequest struct {
 
 func (x *DeleteSourceRequest) Reset() {
 	*x = DeleteSourceRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[5]
+	mi := &file_domain_v1_model_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -390,7 +517,7 @@ func (x *DeleteSourceRequest) String() string {
 func (*DeleteSourceRequest) ProtoMessage() {}
 
 func (x *DeleteSourceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[5]
+	mi := &file_domain_v1_model_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -403,7 +530,7 @@ func (x *DeleteSourceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteSourceRequest.ProtoReflect.Descriptor instead.
 func (*DeleteSourceRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{5}
+	return file_domain_v1_model_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DeleteSourceRequest) GetSourceId() int64 {
@@ -423,7 +550,7 @@ type ListSourcesRequest struct {
 
 func (x *ListSourcesRequest) Reset() {
 	*x = ListSourcesRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[6]
+	mi := &file_domain_v1_model_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -435,7 +562,7 @@ func (x *ListSourcesRequest) String() string {
 func (*ListSourcesRequest) ProtoMessage() {}
 
 func (x *ListSourcesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[6]
+	mi := &file_domain_v1_model_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -448,7 +575,7 @@ func (x *ListSourcesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSourcesRequest.ProtoReflect.Descriptor instead.
 func (*ListSourcesRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{6}
+	return file_domain_v1_model_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ListSourcesRequest) GetOffset() uint64 {
@@ -474,7 +601,7 @@ type ListSourcesResponse struct {
 
 func (x *ListSourcesResponse) Reset() {
 	*x = ListSourcesResponse{}
-	mi := &file_domain_v1_model_proto_msgTypes[7]
+	mi := &file_domain_v1_model_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -486,7 +613,7 @@ func (x *ListSourcesResponse) String() string {
 func (*ListSourcesResponse) ProtoMessage() {}
 
 func (x *ListSourcesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[7]
+	mi := &file_domain_v1_model_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -499,7 +626,7 @@ func (x *ListSourcesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSourcesResponse.ProtoReflect.Descriptor instead.
 func (*ListSourcesResponse) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{7}
+	return file_domain_v1_model_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListSourcesResponse) GetSources() []*Source {
@@ -513,10 +640,21 @@ var File_domain_v1_model_proto protoreflect.FileDescriptor
 
 const file_domain_v1_model_proto_rawDesc = "" +
 	"\n" +
-	"\x15domain/v1/model.proto\x12\tdomain.v1\x1a\x1bgoogle/type/timeofday.proto\"`\n" +
-	"\fUpdateParams\x12 \n" +
-	"\veveryPeriod\x18\x01 \x01(\x03R\veveryPeriod\x12.\n" +
-	"\x06onTime\x18\x02 \x01(\v2\x16.google.type.TimeOfDayR\x06onTime\"\xeb\x01\n" +
+	"\x15domain/v1/model.proto\x12\tdomain.v1\"\x8c\x01\n" +
+	"\n" +
+	"CronFormat\x12\x16\n" +
+	"\x06minute\x18\x01 \x01(\x05R\x06minute\x12\x12\n" +
+	"\x04hour\x18\x02 \x01(\x05R\x04hour\x12\x1e\n" +
+	"\n" +
+	"dayOfMonth\x18\x03 \x01(\x05R\n" +
+	"dayOfMonth\x12\x14\n" +
+	"\x05month\x18\x04 \x01(\x05R\x05month\x12\x1c\n" +
+	"\tdayOfWeek\x18\x05 \x01(\x05R\tdayOfWeek\"~\n" +
+	"\fUpdateParams\x12%\n" +
+	"\veveryPeriod\x18\x01 \x01(\x03H\x00R\veveryPeriod\x88\x01\x01\x12.\n" +
+	"\x04cron\x18\x02 \x01(\v2\x15.domain.v1.CronFormatH\x01R\x04cron\x88\x01\x01B\x0e\n" +
+	"\f_everyPeriodB\a\n" +
+	"\x05_cron\"\xeb\x01\n" +
 	"\x06Source\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x18\n" +
 	"\acontent\x18\x02 \x01(\fR\acontent\x12'\n" +
@@ -546,15 +684,19 @@ const file_domain_v1_model_proto_rawDesc = "" +
 	"\x06offset\x18\x01 \x01(\x04R\x06offset\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x04R\x05limit\"B\n" +
 	"\x13ListSourcesResponse\x12+\n" +
-	"\asources\x18\x01 \x03(\v2\x11.domain.v1.SourceR\asources*r\n" +
+	"\asources\x18\x01 \x03(\v2\x11.domain.v1.SourceR\asources*x\n" +
 	"\n" +
-	"SourceType\x12\x19\n" +
-	"\x15UNDEFINED_SOURCE_TYPE\x10\x00\x12\x0e\n" +
-	"\n" +
-	"WEB_SOURCE\x10\x01\x12\x0f\n" +
-	"\vSINGLE_FILE\x10\x02\x12\x12\n" +
-	"\x0eARCHIVED_FILES\x10\x03\x12\x14\n" +
-	"\x10WITH_CREDENTIALS\x10\x04B\x14Z\x12internal/domain/pbb\x06proto3"
+	"SourceType\x12\x12\n" +
+	"\x0eTYPE_UNDEFINED\x10\x00\x12\f\n" +
+	"\bTYPE_WEB\x10\x01\x12\x14\n" +
+	"\x10TYPE_SINGLE_FILE\x10\x02\x12\x17\n" +
+	"\x13TYPE_ARCHIVED_FILES\x10\x03\x12\x19\n" +
+	"\x15TYPE_WITH_CREDENTIALS\x10\x04*]\n" +
+	"\fSourceStatus\x12\x14\n" +
+	"\x10STATUS_UNDEFINED\x10\x00\x12\x10\n" +
+	"\fSTATUS_READY\x10\x01\x12\x12\n" +
+	"\x0eSTATUS_PARSING\x10\x02\x12\x11\n" +
+	"\rSTATUS_FAILED\x10\x03B\x14Z\x12internal/domain/pbb\x06proto3"
 
 var (
 	file_domain_v1_model_proto_rawDescOnce sync.Once
@@ -568,27 +710,28 @@ func file_domain_v1_model_proto_rawDescGZIP() []byte {
 	return file_domain_v1_model_proto_rawDescData
 }
 
-var file_domain_v1_model_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_domain_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_domain_v1_model_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_domain_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_domain_v1_model_proto_goTypes = []any{
 	(SourceType)(0),             // 0: domain.v1.SourceType
-	(*UpdateParams)(nil),        // 1: domain.v1.UpdateParams
-	(*Source)(nil),              // 2: domain.v1.Source
-	(*GetSourceRequest)(nil),    // 3: domain.v1.GetSourceRequest
-	(*GetSourceResponse)(nil),   // 4: domain.v1.GetSourceResponse
-	(*UpdateSourceRequest)(nil), // 5: domain.v1.UpdateSourceRequest
-	(*DeleteSourceRequest)(nil), // 6: domain.v1.DeleteSourceRequest
-	(*ListSourcesRequest)(nil),  // 7: domain.v1.ListSourcesRequest
-	(*ListSourcesResponse)(nil), // 8: domain.v1.ListSourcesResponse
-	(*timeofday.TimeOfDay)(nil), // 9: google.type.TimeOfDay
+	(SourceStatus)(0),           // 1: domain.v1.SourceStatus
+	(*CronFormat)(nil),          // 2: domain.v1.CronFormat
+	(*UpdateParams)(nil),        // 3: domain.v1.UpdateParams
+	(*Source)(nil),              // 4: domain.v1.Source
+	(*GetSourceRequest)(nil),    // 5: domain.v1.GetSourceRequest
+	(*GetSourceResponse)(nil),   // 6: domain.v1.GetSourceResponse
+	(*UpdateSourceRequest)(nil), // 7: domain.v1.UpdateSourceRequest
+	(*DeleteSourceRequest)(nil), // 8: domain.v1.DeleteSourceRequest
+	(*ListSourcesRequest)(nil),  // 9: domain.v1.ListSourcesRequest
+	(*ListSourcesResponse)(nil), // 10: domain.v1.ListSourcesResponse
 }
 var file_domain_v1_model_proto_depIdxs = []int32{
-	9, // 0: domain.v1.UpdateParams.onTime:type_name -> google.type.TimeOfDay
+	2, // 0: domain.v1.UpdateParams.cron:type_name -> domain.v1.CronFormat
 	0, // 1: domain.v1.Source.typ:type_name -> domain.v1.SourceType
-	1, // 2: domain.v1.Source.updateParams:type_name -> domain.v1.UpdateParams
-	2, // 3: domain.v1.GetSourceResponse.source:type_name -> domain.v1.Source
-	1, // 4: domain.v1.UpdateSourceRequest.updateParams:type_name -> domain.v1.UpdateParams
-	2, // 5: domain.v1.ListSourcesResponse.sources:type_name -> domain.v1.Source
+	3, // 2: domain.v1.Source.updateParams:type_name -> domain.v1.UpdateParams
+	4, // 3: domain.v1.GetSourceResponse.source:type_name -> domain.v1.Source
+	3, // 4: domain.v1.UpdateSourceRequest.updateParams:type_name -> domain.v1.UpdateParams
+	4, // 5: domain.v1.ListSourcesResponse.sources:type_name -> domain.v1.Source
 	6, // [6:6] is the sub-list for method output_type
 	6, // [6:6] is the sub-list for method input_type
 	6, // [6:6] is the sub-list for extension type_name
@@ -602,14 +745,15 @@ func file_domain_v1_model_proto_init() {
 		return
 	}
 	file_domain_v1_model_proto_msgTypes[1].OneofWrappers = []any{}
-	file_domain_v1_model_proto_msgTypes[4].OneofWrappers = []any{}
+	file_domain_v1_model_proto_msgTypes[2].OneofWrappers = []any{}
+	file_domain_v1_model_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_domain_v1_model_proto_rawDesc), len(file_domain_v1_model_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   8,
+			NumEnums:      2,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

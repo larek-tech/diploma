@@ -11,6 +11,10 @@ enum ScenarioType {
 message Scenario {
   ScenarioType customType = 1;
   string content = 2;
+//  bool useMultiQuery = 3;
+//  bool useQuestions = 4; // hypothetical questions
+//  uint64 chunkSize = 5;
+//  uint64 topK = 6;
 };
 
 message Query {

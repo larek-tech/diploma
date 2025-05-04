@@ -2,30 +2,11 @@ package main
 
 import (
 	"github.com/larek-tech/diploma/domain/pkg"
-	"time"
+	"github.com/yogenyslav/pkg/errs"
 )
 
 func main() {
-	pkg.Run()
-}
-
-type SourceType uint8
-
-const (
-	SourceWithCredentials = iota
-	SourceSingleFile
-	SourceArchivedFiles
-)
-
-type UpdateParams struct {
-	EveryPeriod int       `json:"every_period"` // обновлять каждые X секунд
-	OnTime      time.Time `json:"on_time"`      // обновлять при наступлении даты+времени
-}
-
-type DataMessage struct {
-	Title        string       `json:"title"`
-	Content      []byte       `json:"content"` // byte-строка с url или считанный файл
-	Type         SourceType   `json:"type"`
-	Credentials  []byte       `json:"credentials"`
-	UpdateParams UpdateParams `json:"update_params"`
+	if err := pkg.Run(); err != nil {
+		panic(errs.WrapErr(err, "fatal application error"))
+	}
 }

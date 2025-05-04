@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
+	authpb "github.com/larek-tech/diploma/api/internal/auth/pb"
 	"github.com/larek-tech/diploma/api/internal/domain/pb"
 	"github.com/larek-tech/diploma/api/internal/shared"
 	"github.com/yogenyslav/pkg/errs"
@@ -23,18 +24,24 @@ import (
 func (h *Handler) GetSource(c *fiber.Ctx) error {
 	var req pb.GetSourceRequest
 
-	userID, ok := c.Locals(shared.UserIDKey).(int64)
-	if !ok {
-		return errs.WrapErr(shared.ErrUnauthorized, "no user ID in context")
-	}
-
 	sourceID, err := c.ParamsInt(sourceIDParam)
 	if err != nil {
 		return errs.WrapErr(shared.ErrInvalidParams, err.Error())
 	}
-
 	req.SourceId = int64(sourceID)
-	ctx := pushUserID(c.UserContext(), userID)
+
+	userID, ok := c.Locals(shared.UserIDKey).(int64)
+	if !ok {
+		return errs.WrapErr(shared.ErrUnauthorized, "no user ID in context")
+	}
+	userRoleIDs, ok := c.Locals(shared.UserRolesKey).([]int64)
+	if !ok {
+		return errs.WrapErr(shared.ErrUnauthorized, "no user roles in context")
+	}
+	ctx := pushUserMeta(c.UserContext(), &authpb.UserAuthMetadata{
+		UserId: userID,
+		Roles:  userRoleIDs,
+	})
 
 	resp, err := h.domainService.GetSource(ctx, &req)
 	if err != nil {

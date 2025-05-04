@@ -3,19 +3,32 @@ syntax = "proto3";
 package domain.v1;
 option go_package = "internal/domain/pb";
 
-import "google/type/timeofday.proto";
-
 enum SourceType {
-  UNDEFINED_SOURCE_TYPE = 0;
-  WEB_SOURCE = 1;
-  SINGLE_FILE = 2;
-  ARCHIVED_FILES = 3;
-  WITH_CREDENTIALS = 4;
+  TYPE_UNDEFINED = 0;
+  TYPE_WEB = 1;
+  TYPE_SINGLE_FILE = 2;
+  TYPE_ARCHIVED_FILES = 3;
+  TYPE_WITH_CREDENTIALS = 4;
 };
 
+enum SourceStatus {
+  STATUS_UNDEFINED = 0;
+  STATUS_READY = 1;
+  STATUS_PARSING = 2;
+  STATUS_FAILED = 3;
+}
+
+message CronFormat {
+  int32 minute = 1;
+  int32 hour = 2;
+  int32 dayOfMonth = 3;
+  int32 month = 4;
+  int32 dayOfWeek = 5;
+}
+
 message UpdateParams {
-  int64 everyPeriod = 1;
-  google.type.TimeOfDay onTime = 2;
+  optional int64 everyPeriod = 1;
+  optional CronFormat cron = 2;
 };
 
 message Source {

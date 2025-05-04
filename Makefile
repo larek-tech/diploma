@@ -30,6 +30,8 @@ docker-down:
 docker-remove:
 	docker volume rm ${BASE_IMAGE}_pg_data
 	docker volume rm ${BASE_IMAGE}_jaeger_data
+	docker volume rm ${BASE_IMAGE}_zoo_data
+	docker volume rm ${BASE_IMAGE}_kafka_data
 	docker image rm ${BASE_IMAGE}-auth
 	docker image rm ${BASE_IMAGE}-api
 	docker image rm ${BASE_IMAGE}-chat
@@ -121,7 +123,7 @@ proto-domain:
 		echo "Generating stubs in $$dir";\
 		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
 			$(DOMAIN_PROTO_SRC)/service.proto $(DOMAIN_PROTO_SRC)/model.proto \
-			$(PROTO_SRC)/google/protobuf/timestamp.proto $(PROTO_SRC)/google/type/timeofday.proto; \
+			$(PROTO_SRC)/google/protobuf/timestamp.proto; \
 	done
 	@echo "Protobuf stubs for domain service generated\n"
 

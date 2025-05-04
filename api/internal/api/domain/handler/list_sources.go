@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
+	authpb "github.com/larek-tech/diploma/api/internal/auth/pb"
 	"github.com/larek-tech/diploma/api/internal/domain/pb"
 	"github.com/larek-tech/diploma/api/internal/shared"
 	"github.com/yogenyslav/pkg/errs"
@@ -33,7 +34,14 @@ func (h *Handler) ListSources(c *fiber.Ctx) error {
 	if !ok {
 		return errs.WrapErr(shared.ErrUnauthorized, "no user ID in context")
 	}
-	ctx := pushUserID(c.UserContext(), userID)
+	userRoleIDs, ok := c.Locals(shared.UserRolesKey).([]int64)
+	if !ok {
+		return errs.WrapErr(shared.ErrUnauthorized, "no user roles in context")
+	}
+	ctx := pushUserMeta(c.UserContext(), &authpb.UserAuthMetadata{
+		UserId: userID,
+		Roles:  userRoleIDs,
+	})
 
 	req := pb.ListSourcesRequest{
 		Offset: uint64(offset),

@@ -2,11 +2,17 @@ package pkg
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
+	"github.com/IBM/sarama"
 	"github.com/larek-tech/diploma/domain/config"
 	server "github.com/larek-tech/diploma/domain/internal/_server"
+	"github.com/larek-tech/diploma/domain/internal/domain/controller"
 	"github.com/larek-tech/diploma/domain/internal/domain/handler"
 	"github.com/larek-tech/diploma/domain/internal/domain/pb"
+	"github.com/larek-tech/diploma/domain/internal/domain/repo"
+	"github.com/larek-tech/diploma/domain/pkg/kafka"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/yogenyslav/pkg/errs"
@@ -49,7 +55,7 @@ func Run() error {
 		return errs.WrapErr(err)
 	}
 	defer func() {
-		if e := provider.Shutdown(ctx); err != nil {
+		if e := provider.Shutdown(ctx); e != nil {
 			log.Warn().Err(errs.WrapErr(e)).Msg("shutdown tracing provider")
 		}
 	}()
@@ -64,9 +70,46 @@ func Run() error {
 	}
 	defer pg.Close()
 
+	adminBrokerAddr := fmt.Sprintf("%s:%d", cfg.Kafka.Brokers[0].Host, cfg.Kafka.Brokers[0].Port)
+	clusterAdmin, err := sarama.NewClusterAdmin([]string{adminBrokerAddr}, sarama.NewConfig())
+	if err != nil {
+		return errs.WrapErr(err, "kafka setup")
+	}
+	for _, topic := range cfg.Kafka.Topics {
+		err = clusterAdmin.CreateTopic(topic.Name, &sarama.TopicDetail{
+			NumPartitions:     topic.Partitions,
+			ReplicationFactor: 1,
+		}, false)
+		if err != nil && !errors.Is(err, sarama.ErrTopicAlreadyExists) {
+			return errs.WrapErr(err, "create kafka topic")
+		}
+	}
+
+	kafkaProducer, errCh, err := kafka.NewAsyncProducer(&cfg.Kafka, sarama.NewRoundRobinPartitioner, sarama.WaitForAll)
+	if err != nil {
+		return errs.WrapErr(err, "create kafka producer")
+	}
+	go func() {
+		for e := range errCh {
+			log.Warn().Err(errs.WrapErr(e)).Msg("kafka producer error")
+		}
+	}()
+	defer kafkaProducer.Close()
+
+	kafkaConsumer, err := kafka.NewConsumer(&cfg.Kafka)
+	if err != nil {
+		return errs.WrapErr(err, "create kafka consumer")
+	}
+	defer kafkaConsumer.SingleConsumer.Close()
+
 	srv := server.New(cfg.Server)
 
-	domainHandler := handler.New(nil, tracer)
+	sourceRepo := repo.NewSourceRepo(pg)
+	sourceController, err := controller.NewSourceController(ctx, sourceRepo, tracer, kafkaProducer, kafkaConsumer)
+	if err != nil {
+		return errs.WrapErr(err, "create source controller")
+	}
+	domainHandler := handler.New(sourceController, nil, tracer)
 	pb.RegisterDomainServiceServer(srv.GetSrv(), domainHandler)
 
 	srv.Start()
