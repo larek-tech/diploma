@@ -4,10 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
-	"os"
-	"os/signal"
 	"strconv"
-	"syscall"
 
 	"google.golang.org/grpc"
 )
@@ -25,41 +22,23 @@ func New() *Server {
 	return &Server{srv: srv}
 }
 
-func (s Server) Run() {
+func (s Server) Run() error {
 	defer s.srv.GracefulStop()
 
 	slog.Info("Starting server")
 
-	errCh := make(chan error, 1)
-	stopCh := make(chan os.Signal, 1)
-	signal.Notify(stopCh, syscall.SIGINT, syscall.SIGTERM)
-
-	go s.listenGrpc(errCh)
-
-	select {
-	case <-stopCh:
-		slog.Info("Received shutdown signal")
-	case err := <-errCh:
-
-		slog.Error("Error occurred", "error", err)
-	}
-
-}
-
-func (s Server) GetSrv() *grpc.Server {
-	return s.srv
-}
-
-func (s Server) listenGrpc(errCh chan error) {
 	lis, err := net.Listen("tcp", net.JoinHostPort("", strconv.Itoa(port)))
 	if err != nil {
-		errCh <- fmt.Errorf("create net listener: %w", err)
-		return
+		return fmt.Errorf("create net listener: %w", err)
 	}
 	slog.Info("Listening grpc on port", "port", port)
 
 	if err = s.srv.Serve(lis); err != nil {
-		errCh <- fmt.Errorf("shutting down: %w", err)
-		return
+		return fmt.Errorf("shutting down: %w", err)
 	}
+	return nil
+}
+
+func (s Server) GetSrv() *grpc.Server {
+	return s.srv
 }

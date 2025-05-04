@@ -16,10 +16,12 @@ import (
 	sourceService "github.com/larek-tech/diploma/data/internal/domain/source/service"
 	"github.com/larek-tech/diploma/data/internal/grpc/vector_search"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/grpc/server"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/kafka"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/ollama"
 	chunkStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/chunk"
 	sourceStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/source"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
+	"github.com/larek-tech/diploma/data/internal/worker/kafka/create_source"
 	"github.com/larek-tech/storage/postgres"
 
 	"go.dataddo.com/pgq"
@@ -33,11 +35,18 @@ func main() {
 func run() int {
 	ctx := context.Background()
 	slog.Info("Starting server")
-	var pgCfg postgres.Cfg
-	if err := cleanenv.ReadEnv(&pgCfg); err != nil {
-		slog.Error("failed to read env", "error", err)
+	kafkaCfg, err := getKafkaConfig()
+	if err != nil {
+		slog.Error(err.Error())
+		return -1
 	}
-	pg, trManager, err := postgres.New(ctx, pgCfg)
+
+	pgCfg, err := getPGConfig()
+	if err != nil {
+		slog.Error(err.Error())
+		return -1
+	}
+	pg, trManager, err := postgres.New(ctx, *pgCfg)
 	if err != nil {
 		slog.Error("failed to create postgres", "error", err)
 		return 1
@@ -59,6 +68,12 @@ func run() int {
 	if err != nil {
 		slog.Error("failed to create ollama client", "error", err)
 		return 1
+	}
+
+	kafkaConsumer, err := kafka.NewConsumer(*kafkaCfg, create_source.New().Handle)
+	if err != nil {
+		// for now kafka can be disabled and we can accept messages from http and grpc
+		slog.Error("failed to create kafka consumer: %w", err)
 	}
 
 	http.Handle("/test", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -144,13 +159,24 @@ func run() int {
 	pb.RegisterDataServiceServer(srv.GetSrv(), vector_search.New(chunkStore, embedder))
 
 	go func() {
-		//slog.Info("gRPC server started")
+		slog.Info("gRPC server started")
 		grpcErr := srv.Run()
 		if grpcErr != nil {
 			slog.Error("Failed to start gRPC server", "error", grpcErr)
 			return
 		}
 
+	}()
+	go func() {
+		if kafkaConsumer != nil {
+			slog.Info("Starting kafka consumer")
+			kafkaErr := kafkaConsumer.Run(ctx)
+			if kafkaErr != nil {
+				slog.Error("failed to run kafka: %w", kafkaErr)
+			}
+		} else {
+			slog.Info("Kafka consumer is disabled")
+		}
 	}()
 
 	slog.Info("Starting server on :8080")
@@ -197,4 +223,21 @@ func getOllamaConfig() (string, string) {
 		model = "bge-m3:latest"
 	}
 	return host, model
+}
+
+func getPGConfig() (*postgres.Cfg, error) {
+	var pgCfg postgres.Cfg
+	if err := cleanenv.ReadEnv(&pgCfg); err != nil {
+		return nil, fmt.Errorf("failed to read postgresql config: %w", err)
+
+	}
+	return &pgCfg, nil
+}
+
+func getKafkaConfig() (*kafka.Config, error) {
+	var cfg kafka.Config
+	if err := cleanenv.ReadEnv(&cfg); err != nil {
+		return nil, fmt.Errorf("failed to read kafka config: %w", err)
+	}
+	return &cfg, nil
 }
