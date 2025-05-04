@@ -96,6 +96,7 @@ proto-ml:
 		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
 			$(ML_PROTO_SRC)/service.proto $(ML_PROTO_SRC)/model.proto; \
 	done
+<<<<<<< HEAD
 	@mkdir -p ml/ml/pb
 	@echo "Generating stubs in ./ml"
 	@python3 -m grpc_tools.protoc -I$(PROTO_SRC) --python_out=ml/ml/pb --pyi_out=ml/ml/pb --grpc_python_out=ml/ml/pb \
@@ -126,6 +127,9 @@ proto-domain:
 			$(PROTO_SRC)/google/protobuf/timestamp.proto; \
 	done
 	@echo "Protobuf stubs for domain service generated\n"
+=======
+	@python -m grpc_tools.protoc -I$(PROTO_SRC) --python_out=ml --pyi_out=ml --grpc_python_out=ml $(ML_PROTO_SRC);
+>>>>>>> a2b7c86 (test)
 
 .PHONY: proto
 proto: proto-auth proto-ml proto-data proto-domain
