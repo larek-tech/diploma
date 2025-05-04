@@ -57,7 +57,7 @@ func (s Storage) Delete(ctx context.Context, documentID string) error {
 	return s.db.Exec(ctx, "DELETE FROM chunks WHERE document_id = $1", documentID)
 }
 
-func (s Storage) Search(ctx context.Context, query []float32, sourceIDs []string, limit int) ([]*document.SearchResult, error) {
+func (s Storage) Search(ctx context.Context, query []float32, sourceIDs []string, threshold float32, limit int) ([]*document.SearchResult, error) {
 	if len(query) == 0 {
 		return nil, fmt.Errorf("query is empty")
 	}
@@ -75,12 +75,12 @@ SELECT
     metadata,
     1 - (embeddings <=> $1) AS cosine_similarity
 FROM chunks
-WHERE source_id = ANY($2)
+WHERE source_id = ANY($2) AND 1 - (embeddings <=> $1) > $3
 ORDER BY 1 - (embeddings <=> $1) desc 
-LIMIT $3;`
+LIMIT $4;`
 
 	var res []*document.SearchResult
-	err := s.db.QueryStructs(ctx, &res, sql, prepareVector(query), sourceIDs, limit)
+	err := s.db.QueryStructs(ctx, &res, sql, prepareVector(query), sourceIDs, threshold, limit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query chunks: %w", err)
 	}
