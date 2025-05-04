@@ -1,0 +1,21 @@
+meta {
+  name: q
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/q
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "query": "what is Bankside Nursery",
+    "sourceIds": ["97646205-2b6f-447c-b989-bdf614fc08be"],
+    "topK": 3,
+    "threshold": 0.1,
+    "useQuestions": false
+  }
+}

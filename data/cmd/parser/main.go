@@ -37,7 +37,7 @@ func run() int {
 	if err := cleanenv.ReadEnv(&pgCfg); err != nil {
 		slog.Error("failed to read env", "error", err)
 	}
-	endpoint, model := os.Getenv("OLLAMA_ENDPOINT"), os.Getenv("OLLAMA_MODEL")
+	endpoint, model := getLLMConfig()
 	pg, trManager, err := postgres.New(ctx, pgCfg)
 	if err != nil {
 		slog.Error("failed to create postgres", "error", err)
@@ -65,9 +65,10 @@ func run() int {
 		slog.Error("failed to create LLM", "error", err)
 		return -1
 	}
+	embedderURL, embedderModel := getEmbedderConfig()
 	embedder, err := ollama.New(
-		ollama.WithServerURL("http://127.0.0.1:11434"),
-		ollama.WithModel("bge-m3"),
+		ollama.WithServerURL(embedderURL),
+		ollama.WithModel(embedderModel),
 	)
 
 	pub := qaas.NewPublisher(pgq.NewPublisher(sqlDB))
@@ -106,7 +107,26 @@ func getSqlCon(db *postgres.DB) *sql.DB {
 	return sqlCon
 }
 
-//sourceService "github.com/larek-tech/diploma/data/internal/domain/source/service"
-//sourceStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/source"
-//sourceStore := sourceStorage.New(pg)
-//srcService := sourceService.New(sourceStore, pub, trManager)
+func getLLMConfig() (string, string) {
+	host := os.Getenv("OLLAMA_LLM_ENDPOINT")
+	if host == "" {
+		host = "http://localhost:11434"
+	}
+	model := os.Getenv("OLLAMA_LLM_MODEL")
+	if model == "" {
+		model = "llama3:latest"
+	}
+	return host, model
+}
+
+func getEmbedderConfig() (string, string) {
+	host := os.Getenv("OLLAMA_EMBEDDER_ENDPOINT")
+	if host == "" {
+		host = "http://localhost:11434"
+	}
+	model := os.Getenv("OLLAMA_EMBEDDER_MODEL")
+	if model == "" {
+		model = "bge-m3:latest"
+	}
+	return host, model
+}
