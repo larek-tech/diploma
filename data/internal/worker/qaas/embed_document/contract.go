@@ -18,8 +18,4 @@ type (
 	siteStore interface {
 		GetByID(ctx context.Context, id string) (*site.Site, error)
 	}
-	documentStore interface {
-		GetByID(ctx context.Context, id string) (*document.Document, error)
-		Save(ctx context.Context, doc *document.Document) error
-	}
 )

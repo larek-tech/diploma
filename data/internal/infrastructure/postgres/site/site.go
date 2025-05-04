@@ -45,8 +45,8 @@ WHERE id = $4;
 }
 
 func (s Storage) GetByID(ctx context.Context, id string) (*site.Site, error) {
-	var site site.Site
-	err := s.db.QueryStruct(ctx, &site, `
+	var res site.Site
+	err := s.db.QueryStruct(ctx, &res, `
 SELECT
     id,
     source_id,
@@ -58,18 +58,18 @@ FROM sites WHERE id = $1;
 	if err != nil {
 		return nil, err
 	}
-	pagesIDs, err := s.fetchPagesIDs(ctx, site)
+	pagesIDs, err := s.fetchPagesIDs(ctx, res)
 	if err != nil {
 		return nil, err
 	}
-	site.AvailablePages = pagesIDs
+	res.AvailablePages = pagesIDs
 
-	return &site, nil
+	return &res, nil
 }
 
 func (s Storage) GetByURL(ctx context.Context, url string) (*site.Site, error) {
-	var site site.Site
-	err := s.db.QueryStruct(ctx, &site, `
+	var res site.Site
+	err := s.db.QueryStruct(ctx, &res, `
 SELECT
     id,
     source_id,
@@ -81,13 +81,13 @@ FROM sites WHERE url = $1;
 	if err != nil {
 		return nil, err
 	}
-	pagesIDs, err := s.fetchPagesIDs(ctx, site)
+	pagesIDs, err := s.fetchPagesIDs(ctx, res)
 	if err != nil {
 		return nil, err
 	}
-	site.AvailablePages = pagesIDs
+	res.AvailablePages = pagesIDs
 
-	return &site, nil
+	return &res, nil
 }
 
 func (s Storage) fetchPagesIDs(ctx context.Context, site site.Site) ([]string, error) {
