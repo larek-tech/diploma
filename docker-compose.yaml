@@ -1,8 +1,12 @@
 volumes:
   pg_data:
   jaeger_data:
+  zoo_data_log:
+  zoo_data_secrets:
   zoo_data:
+  kafka_data_cfg:
   kafka_data:
+  kafka_data_secrets:
 
 services:
   jaeger:
@@ -52,8 +56,8 @@ services:
       timeout: 10s
       retries: 3
     volumes:
-      - zoo_data:/var/lib/zookeeper/log
-      - zoo_data:/etc/zookeeper/secrets
+      - zoo_data_log:/var/lib/zookeeper/log
+      - zoo_data_secrets:/etc/zookeeper/secrets
       - zoo_data:/var/lib/zookeeper/data
     ports:
       - "2181:2181"
@@ -76,9 +80,9 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INT:PLAINTEXT,LISTENER_EXT:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INT
     volumes:
-      - kafka_data:/mnt/shared/config
+      - kafka_data_cfg:/mnt/shared/config
       - kafka_data:/var/lib/kafka/data
-      - kafka_data:/etc/kafka/secrets
+      - kafka_data_secrets:/etc/kafka/secrets
 
   api:
     build:

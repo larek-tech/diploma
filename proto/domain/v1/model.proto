@@ -3,6 +3,8 @@ syntax = "proto3";
 package domain.v1;
 option go_package = "internal/domain/pb";
 
+import "google/protobuf/timestamp.proto";
+
 enum SourceType {
   TYPE_UNDEFINED = 0;
   TYPE_WEB = 1;
@@ -32,6 +34,19 @@ message UpdateParams {
 };
 
 message Source {
+  int64 id = 1;
+  int64 userId = 2;
+  string title = 3;
+  bytes content = 4;
+  SourceType typ = 5;
+  optional UpdateParams updateParams = 6;
+  optional bytes credentials = 7;
+  SourceStatus status = 8;
+  google.protobuf.Timestamp createdAt = 9;
+  google.protobuf.Timestamp updatedAt = 10;
+};
+
+message CreateSourceRequest {
   string title = 1;
   bytes content = 2;
   SourceType typ = 3;
@@ -66,4 +81,44 @@ message ListSourcesRequest {
 
 message ListSourcesResponse {
   repeated Source sources = 1;
+};
+
+message Domain {
+  int64 id = 1;
+  string title = 2;
+  repeated int64 sourceIds = 3;
+  google.protobuf.Timestamp createdAt = 4;
+  google.protobuf.Timestamp updatedAt = 5;
+};
+
+message CreateDomainRequest {
+  string title = 1;
+  repeated int64 sourceIds = 2;
+};
+
+message GetDomainRequest {
+  int64 domainId = 1;
+}
+
+message GetDomainResponse {
+  Domain domain = 1;
+};
+
+message UpdateDomainRequest {
+  int64 domainId = 1;
+  string title = 2;
+  repeated int64 sourceIds = 3;
+};
+
+message DeleteDomainRequest {
+  int64 domainId = 1;
+};
+
+message ListDomainsRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+};
+
+message ListDomainsResponse {
+  repeated Domain domains = 1;
 };

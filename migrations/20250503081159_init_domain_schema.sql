@@ -69,7 +69,7 @@ create table domain.domain (
     id bigserial primary key,
     title text not null,
     user_id bigint not null,
-    source_ids text[] not null,
+    source_ids bigint[] not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp
 );
@@ -148,10 +148,68 @@ as $$
         where dpr.role_id = any(rids);
 $$;
 
+create or replace function domain.cleanup_source_permitted_users()
+    returns trigger as
+$$
+begin
+    delete from domain.source_permitted_users
+    where internal_source_id = old.internal_id;
+    return old;
+end;
+$$
+    language plpgsql;
+
+create trigger trg_cleanup_source_permitted_users
+    after delete on domain.source
+    for each row
+execute function domain.cleanup_source_permitted_users();
+
+create or replace function domain.cleanup_domain_permitted_users()
+    returns trigger as
+$$
+begin
+    delete from domain.domain_permitted_users
+    where domain_id = old.id;
+    return old;
+end;
+$$
+    language plpgsql;
+
+create trigger trg_cleanup_domain_permitted_users
+    after delete on domain.domain
+    for each row
+execute function domain.cleanup_domain_permitted_users();
+
+create or replace function domain.cleanup_source_ids_in_domain()
+    returns trigger as
+$$
+begin
+    update domain.domain
+    set source_ids = array_remove(source_ids, old.internal_id),
+        updated_at = current_timestamp
+    where old.internal_id = any(source_ids);
+
+    return old;
+end;
+$$
+    language plpgsql;
+
+create trigger trg_cleanup_source_ids_in_domain
+    after delete on domain.source
+    for each row
+execute function domain.cleanup_source_ids_in_domain();
+
+
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
+drop trigger trg_cleanup_source_ids_in_domain on domain.source;
+drop function domain.cleanup_source_ids_in_domain();
+drop trigger trg_cleanup_domain_permitted_users on domain.domain;
+drop function domain.cleanup_domain_permitted_users;
+drop trigger trg_cleanup_source_permitted_users on domain.source;
+drop function domain.cleanup_source_permitted_users();
 drop function domain.get_permitted_sources(uid bigint, rids bigint[]);
 drop function domain.get_permitted_domains(uid bigint, rids bigint[]);
 drop trigger trg_permit_user_domain on domain.domain;

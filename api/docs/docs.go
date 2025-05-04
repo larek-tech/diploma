@@ -26,7 +26,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Creates new domain source used for RAG vector search.",
+                "description": "Creates new domain (group of sources used for RAG vector search).",
                 "consumes": [
                     "application/json"
                 ],
@@ -36,6 +36,253 @@ const docTemplate = `{
                 "tags": [
                     "domain"
                 ],
+                "summary": "Create new domain.",
+                "parameters": [
+                    {
+                        "description": "Input data for creating domain",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.CreateDomainRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Domain successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Domain"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to create domain",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/domain/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List domains to which user has access.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "List domains.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of domains",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListDomainsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list domains",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/domain/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns information about domain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Get domain.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested domain ID",
+                        "name": "domainID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Domain",
+                        "schema": {
+                            "$ref": "#/definitions/pb.GetDomainResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to get domain",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update domain information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Update domain.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "domainID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.UpdateDomainRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Domain updated",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Domain"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to update domain",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete domain by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Delete domain.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "domainID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Domain deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to delete domain",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/source/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates new source used for RAG vector search.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
                 "summary": "Create new source.",
                 "parameters": [
                     {
@@ -44,7 +291,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/pb.Source"
+                            "$ref": "#/definitions/pb.CreateSourceRequest"
                         }
                     }
                 ],
@@ -64,7 +311,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/domain/list": {
+        "/api/v1/source/list": {
             "get": {
                 "security": [
                     {
@@ -79,7 +326,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "domain"
+                    "source"
                 ],
                 "summary": "List sources.",
                 "parameters": [
@@ -114,7 +361,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/domain/{id}": {
+        "/api/v1/source/{id}": {
             "get": {
                 "security": [
                     {
@@ -129,7 +376,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "domain"
+                    "source"
                 ],
                 "summary": "Get source.",
                 "parameters": [
@@ -176,7 +423,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "domain"
+                    "source"
                 ],
                 "summary": "Update source.",
                 "parameters": [
@@ -209,6 +456,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             },
@@ -226,7 +479,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "domain"
+                    "source"
                 ],
                 "summary": "Delete source.",
                 "parameters": [
@@ -247,6 +500,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Failed to delete source",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
                         "schema": {
                             "type": "string"
                         }
@@ -296,6 +555,46 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "pb.CreateDomainRequest": {
+            "type": "object",
+            "properties": {
+                "sourceIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "pb.CreateSourceRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "credentials": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "typ": {
+                    "$ref": "#/definitions/pb.SourceType"
+                },
+                "updateParams": {
+                    "$ref": "#/definitions/pb.UpdateParams"
+                }
+            }
+        },
         "pb.CronFormat": {
             "type": "object",
             "properties": {
@@ -316,11 +615,53 @@ const docTemplate = `{
                 }
             }
         },
+        "pb.Domain": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "sourceIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                }
+            }
+        },
+        "pb.GetDomainResponse": {
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "$ref": "#/definitions/pb.Domain"
+                }
+            }
+        },
         "pb.GetSourceResponse": {
             "type": "object",
             "properties": {
                 "source": {
                     "$ref": "#/definitions/pb.Source"
+                }
+            }
+        },
+        "pb.ListDomainsResponse": {
+            "type": "object",
+            "properties": {
+                "domains": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.Domain"
+                    }
                 }
             }
         },
@@ -369,11 +710,20 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
                 "credentials": {
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "$ref": "#/definitions/pb.SourceStatus"
                 },
                 "title": {
                     "type": "string"
@@ -383,8 +733,29 @@ const docTemplate = `{
                 },
                 "updateParams": {
                     "$ref": "#/definitions/pb.UpdateParams"
+                },
+                "updatedAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "userId": {
+                    "type": "integer"
                 }
             }
+        },
+        "pb.SourceStatus": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "SourceStatus_STATUS_UNDEFINED",
+                "SourceStatus_STATUS_READY",
+                "SourceStatus_STATUS_PARSING",
+                "SourceStatus_STATUS_FAILED"
+            ]
         },
         "pb.SourceType": {
             "type": "integer",
@@ -402,6 +773,23 @@ const docTemplate = `{
                 "SourceType_TYPE_ARCHIVED_FILES",
                 "SourceType_TYPE_WITH_CREDENTIALS"
             ]
+        },
+        "pb.UpdateDomainRequest": {
+            "type": "object",
+            "properties": {
+                "domainId": {
+                    "type": "integer"
+                },
+                "sourceIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
         },
         "pb.UpdateParams": {
             "type": "object",
@@ -450,6 +838,19 @@ const docTemplate = `{
                     }
                 },
                 "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "timestamppb.Timestamp": {
+            "type": "object",
+            "properties": {
+                "nanos": {
+                    "description": "Non-negative fractions of a second at nanosecond resolution. Negative\nsecond values with fractions must still have non-negative nanos values\nthat count forward in time. Must be from 0 to 999,999,999\ninclusive.",
+                    "type": "integer"
+                },
+                "seconds": {
+                    "description": "Represents seconds of UTC time since Unix epoch\n1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to\n9999-12-31T23:59:59Z inclusive.",
                     "type": "integer"
                 }
             }

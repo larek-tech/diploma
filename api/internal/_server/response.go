@@ -29,6 +29,26 @@ var (
 			Msg:    "failed listing available sources",
 			Status: fiber.StatusBadRequest,
 		},
+		shared.ErrCreateDomain: {
+			Msg:    "failed creating domain",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrGetDomain: {
+			Msg:    "failed getting domain",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrUpdateDomain: {
+			Msg:    "failed updating domain",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrDeleteDomain: {
+			Msg:    "failed deleting domain",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrListDomains: {
+			Msg:    "failed listing available domains",
+			Status: fiber.StatusBadRequest,
+		},
 		// 401
 		shared.ErrUnauthorized: {
 			Msg:    "unauthorized",
@@ -36,7 +56,11 @@ var (
 		},
 		// 404
 		shared.ErrSourceNotFound: {
-			Msg:    "no source with such id",
+			Msg:    "source not found",
+			Status: fiber.StatusNotFound,
+		},
+		shared.ErrDomainNotFound: {
+			Msg:    "domain not found",
 			Status: fiber.StatusNotFound,
 		},
 		// 422

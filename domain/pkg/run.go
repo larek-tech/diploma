@@ -8,10 +8,13 @@ import (
 	"github.com/IBM/sarama"
 	"github.com/larek-tech/diploma/domain/config"
 	server "github.com/larek-tech/diploma/domain/internal/_server"
-	"github.com/larek-tech/diploma/domain/internal/domain/controller"
-	"github.com/larek-tech/diploma/domain/internal/domain/handler"
+	dc "github.com/larek-tech/diploma/domain/internal/domain/domain/controller"
+	dh "github.com/larek-tech/diploma/domain/internal/domain/domain/handler"
+	dr "github.com/larek-tech/diploma/domain/internal/domain/domain/repo"
 	"github.com/larek-tech/diploma/domain/internal/domain/pb"
-	"github.com/larek-tech/diploma/domain/internal/domain/repo"
+	sc "github.com/larek-tech/diploma/domain/internal/domain/source/controller"
+	sh "github.com/larek-tech/diploma/domain/internal/domain/source/handler"
+	sr "github.com/larek-tech/diploma/domain/internal/domain/source/repo"
 	"github.com/larek-tech/diploma/domain/pkg/kafka"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -104,12 +107,19 @@ func Run() error {
 
 	srv := server.New(cfg.Server)
 
-	sourceRepo := repo.NewSourceRepo(pg)
-	sourceController, err := controller.NewSourceController(ctx, sourceRepo, tracer, kafkaProducer, kafkaConsumer)
+	// Setup source module
+	sourceRepo := sr.New(pg)
+	sourceController, err := sc.New(ctx, sourceRepo, tracer, kafkaProducer, kafkaConsumer)
 	if err != nil {
 		return errs.WrapErr(err, "create source controller")
 	}
-	domainHandler := handler.New(sourceController, nil, tracer)
+	sourceHandler := sh.New(sourceController, tracer)
+	pb.RegisterSourceServiceServer(srv.GetSrv(), sourceHandler)
+
+	// Setup domain module
+	domainRepo := dr.New(pg)
+	domainController := dc.New(domainRepo, tracer)
+	domainHandler := dh.New(domainController, tracer)
 	pb.RegisterDomainServiceServer(srv.GetSrv(), domainHandler)
 
 	srv.Start()

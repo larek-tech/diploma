@@ -25,40 +25,65 @@ var File_domain_v1_service_proto protoreflect.FileDescriptor
 
 const file_domain_v1_service_proto_rawDesc = "" +
 	"\n" +
-	"\x17domain/v1/service.proto\x12\tdomain.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x15domain/v1/model.proto2\xf0\x02\n" +
-	"\rDomainService\x126\n" +
-	"\fCreateSource\x12\x11.domain.v1.Source\x1a\x11.domain.v1.Source\"\x00\x12H\n" +
+	"\x17domain/v1/service.proto\x12\tdomain.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x15domain/v1/model.proto2\xfd\x02\n" +
+	"\rSourceService\x12C\n" +
+	"\fCreateSource\x12\x1e.domain.v1.CreateSourceRequest\x1a\x11.domain.v1.Source\"\x00\x12H\n" +
 	"\tGetSource\x12\x1b.domain.v1.GetSourceRequest\x1a\x1c.domain.v1.GetSourceResponse\"\x00\x12C\n" +
 	"\fUpdateSource\x12\x1e.domain.v1.UpdateSourceRequest\x1a\x11.domain.v1.Source\"\x00\x12H\n" +
 	"\fDeleteSource\x12\x1e.domain.v1.DeleteSourceRequest\x1a\x16.google.protobuf.Empty\"\x00\x12N\n" +
-	"\vListSources\x12\x1d.domain.v1.ListSourcesRequest\x1a\x1e.domain.v1.ListSourcesResponse\"\x00B\x14Z\x12internal/domain/pbb\x06proto3"
+	"\vListSources\x12\x1d.domain.v1.ListSourcesRequest\x1a\x1e.domain.v1.ListSourcesResponse\"\x002\xfd\x02\n" +
+	"\rDomainService\x12C\n" +
+	"\fCreateDomain\x12\x1e.domain.v1.CreateDomainRequest\x1a\x11.domain.v1.Domain\"\x00\x12H\n" +
+	"\tGetDomain\x12\x1b.domain.v1.GetDomainRequest\x1a\x1c.domain.v1.GetDomainResponse\"\x00\x12C\n" +
+	"\fUpdateDomain\x12\x1e.domain.v1.UpdateDomainRequest\x1a\x11.domain.v1.Domain\"\x00\x12H\n" +
+	"\fDeleteDomain\x12\x1e.domain.v1.DeleteDomainRequest\x1a\x16.google.protobuf.Empty\"\x00\x12N\n" +
+	"\vListDomains\x12\x1d.domain.v1.ListDomainsRequest\x1a\x1e.domain.v1.ListDomainsResponse\"\x00B\x14Z\x12internal/domain/pbb\x06proto3"
 
 var file_domain_v1_service_proto_goTypes = []any{
-	(*Source)(nil),              // 0: domain.v1.Source
+	(*CreateSourceRequest)(nil), // 0: domain.v1.CreateSourceRequest
 	(*GetSourceRequest)(nil),    // 1: domain.v1.GetSourceRequest
 	(*UpdateSourceRequest)(nil), // 2: domain.v1.UpdateSourceRequest
 	(*DeleteSourceRequest)(nil), // 3: domain.v1.DeleteSourceRequest
 	(*ListSourcesRequest)(nil),  // 4: domain.v1.ListSourcesRequest
-	(*GetSourceResponse)(nil),   // 5: domain.v1.GetSourceResponse
-	(*emptypb.Empty)(nil),       // 6: google.protobuf.Empty
-	(*ListSourcesResponse)(nil), // 7: domain.v1.ListSourcesResponse
+	(*CreateDomainRequest)(nil), // 5: domain.v1.CreateDomainRequest
+	(*GetDomainRequest)(nil),    // 6: domain.v1.GetDomainRequest
+	(*UpdateDomainRequest)(nil), // 7: domain.v1.UpdateDomainRequest
+	(*DeleteDomainRequest)(nil), // 8: domain.v1.DeleteDomainRequest
+	(*ListDomainsRequest)(nil),  // 9: domain.v1.ListDomainsRequest
+	(*Source)(nil),              // 10: domain.v1.Source
+	(*GetSourceResponse)(nil),   // 11: domain.v1.GetSourceResponse
+	(*emptypb.Empty)(nil),       // 12: google.protobuf.Empty
+	(*ListSourcesResponse)(nil), // 13: domain.v1.ListSourcesResponse
+	(*Domain)(nil),              // 14: domain.v1.Domain
+	(*GetDomainResponse)(nil),   // 15: domain.v1.GetDomainResponse
+	(*ListDomainsResponse)(nil), // 16: domain.v1.ListDomainsResponse
 }
 var file_domain_v1_service_proto_depIdxs = []int32{
-	0, // 0: domain.v1.DomainService.CreateSource:input_type -> domain.v1.Source
-	1, // 1: domain.v1.DomainService.GetSource:input_type -> domain.v1.GetSourceRequest
-	2, // 2: domain.v1.DomainService.UpdateSource:input_type -> domain.v1.UpdateSourceRequest
-	3, // 3: domain.v1.DomainService.DeleteSource:input_type -> domain.v1.DeleteSourceRequest
-	4, // 4: domain.v1.DomainService.ListSources:input_type -> domain.v1.ListSourcesRequest
-	0, // 5: domain.v1.DomainService.CreateSource:output_type -> domain.v1.Source
-	5, // 6: domain.v1.DomainService.GetSource:output_type -> domain.v1.GetSourceResponse
-	0, // 7: domain.v1.DomainService.UpdateSource:output_type -> domain.v1.Source
-	6, // 8: domain.v1.DomainService.DeleteSource:output_type -> google.protobuf.Empty
-	7, // 9: domain.v1.DomainService.ListSources:output_type -> domain.v1.ListSourcesResponse
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: domain.v1.SourceService.CreateSource:input_type -> domain.v1.CreateSourceRequest
+	1,  // 1: domain.v1.SourceService.GetSource:input_type -> domain.v1.GetSourceRequest
+	2,  // 2: domain.v1.SourceService.UpdateSource:input_type -> domain.v1.UpdateSourceRequest
+	3,  // 3: domain.v1.SourceService.DeleteSource:input_type -> domain.v1.DeleteSourceRequest
+	4,  // 4: domain.v1.SourceService.ListSources:input_type -> domain.v1.ListSourcesRequest
+	5,  // 5: domain.v1.DomainService.CreateDomain:input_type -> domain.v1.CreateDomainRequest
+	6,  // 6: domain.v1.DomainService.GetDomain:input_type -> domain.v1.GetDomainRequest
+	7,  // 7: domain.v1.DomainService.UpdateDomain:input_type -> domain.v1.UpdateDomainRequest
+	8,  // 8: domain.v1.DomainService.DeleteDomain:input_type -> domain.v1.DeleteDomainRequest
+	9,  // 9: domain.v1.DomainService.ListDomains:input_type -> domain.v1.ListDomainsRequest
+	10, // 10: domain.v1.SourceService.CreateSource:output_type -> domain.v1.Source
+	11, // 11: domain.v1.SourceService.GetSource:output_type -> domain.v1.GetSourceResponse
+	10, // 12: domain.v1.SourceService.UpdateSource:output_type -> domain.v1.Source
+	12, // 13: domain.v1.SourceService.DeleteSource:output_type -> google.protobuf.Empty
+	13, // 14: domain.v1.SourceService.ListSources:output_type -> domain.v1.ListSourcesResponse
+	14, // 15: domain.v1.DomainService.CreateDomain:output_type -> domain.v1.Domain
+	15, // 16: domain.v1.DomainService.GetDomain:output_type -> domain.v1.GetDomainResponse
+	14, // 17: domain.v1.DomainService.UpdateDomain:output_type -> domain.v1.Domain
+	12, // 18: domain.v1.DomainService.DeleteDomain:output_type -> google.protobuf.Empty
+	16, // 19: domain.v1.DomainService.ListDomains:output_type -> domain.v1.ListDomainsResponse
+	10, // [10:20] is the sub-list for method output_type
+	0,  // [0:10] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_domain_v1_service_proto_init() }
@@ -75,7 +100,7 @@ func file_domain_v1_service_proto_init() {
 			NumEnums:      0,
 			NumMessages:   0,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_domain_v1_service_proto_goTypes,
 		DependencyIndexes: file_domain_v1_service_proto_depIdxs,

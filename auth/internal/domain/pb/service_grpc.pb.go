@@ -20,22 +20,276 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	DomainService_CreateSource_FullMethodName = "/domain.v1.DomainService/CreateSource"
-	DomainService_GetSource_FullMethodName    = "/domain.v1.DomainService/GetSource"
-	DomainService_UpdateSource_FullMethodName = "/domain.v1.DomainService/UpdateSource"
-	DomainService_DeleteSource_FullMethodName = "/domain.v1.DomainService/DeleteSource"
-	DomainService_ListSources_FullMethodName  = "/domain.v1.DomainService/ListSources"
+	SourceService_CreateSource_FullMethodName = "/domain.v1.SourceService/CreateSource"
+	SourceService_GetSource_FullMethodName    = "/domain.v1.SourceService/GetSource"
+	SourceService_UpdateSource_FullMethodName = "/domain.v1.SourceService/UpdateSource"
+	SourceService_DeleteSource_FullMethodName = "/domain.v1.SourceService/DeleteSource"
+	SourceService_ListSources_FullMethodName  = "/domain.v1.SourceService/ListSources"
+)
+
+// SourceServiceClient is the client API for SourceService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type SourceServiceClient interface {
+	CreateSource(ctx context.Context, in *CreateSourceRequest, opts ...grpc.CallOption) (*Source, error)
+	GetSource(ctx context.Context, in *GetSourceRequest, opts ...grpc.CallOption) (*GetSourceResponse, error)
+	UpdateSource(ctx context.Context, in *UpdateSourceRequest, opts ...grpc.CallOption) (*Source, error)
+	DeleteSource(ctx context.Context, in *DeleteSourceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ListSources(ctx context.Context, in *ListSourcesRequest, opts ...grpc.CallOption) (*ListSourcesResponse, error)
+}
+
+type sourceServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewSourceServiceClient(cc grpc.ClientConnInterface) SourceServiceClient {
+	return &sourceServiceClient{cc}
+}
+
+func (c *sourceServiceClient) CreateSource(ctx context.Context, in *CreateSourceRequest, opts ...grpc.CallOption) (*Source, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Source)
+	err := c.cc.Invoke(ctx, SourceService_CreateSource_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sourceServiceClient) GetSource(ctx context.Context, in *GetSourceRequest, opts ...grpc.CallOption) (*GetSourceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSourceResponse)
+	err := c.cc.Invoke(ctx, SourceService_GetSource_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sourceServiceClient) UpdateSource(ctx context.Context, in *UpdateSourceRequest, opts ...grpc.CallOption) (*Source, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Source)
+	err := c.cc.Invoke(ctx, SourceService_UpdateSource_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sourceServiceClient) DeleteSource(ctx context.Context, in *DeleteSourceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, SourceService_DeleteSource_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sourceServiceClient) ListSources(ctx context.Context, in *ListSourcesRequest, opts ...grpc.CallOption) (*ListSourcesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListSourcesResponse)
+	err := c.cc.Invoke(ctx, SourceService_ListSources_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// SourceServiceServer is the server API for SourceService service.
+// All implementations must embed UnimplementedSourceServiceServer
+// for forward compatibility.
+type SourceServiceServer interface {
+	CreateSource(context.Context, *CreateSourceRequest) (*Source, error)
+	GetSource(context.Context, *GetSourceRequest) (*GetSourceResponse, error)
+	UpdateSource(context.Context, *UpdateSourceRequest) (*Source, error)
+	DeleteSource(context.Context, *DeleteSourceRequest) (*emptypb.Empty, error)
+	ListSources(context.Context, *ListSourcesRequest) (*ListSourcesResponse, error)
+	mustEmbedUnimplementedSourceServiceServer()
+}
+
+// UnimplementedSourceServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedSourceServiceServer struct{}
+
+func (UnimplementedSourceServiceServer) CreateSource(context.Context, *CreateSourceRequest) (*Source, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSource not implemented")
+}
+func (UnimplementedSourceServiceServer) GetSource(context.Context, *GetSourceRequest) (*GetSourceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSource not implemented")
+}
+func (UnimplementedSourceServiceServer) UpdateSource(context.Context, *UpdateSourceRequest) (*Source, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateSource not implemented")
+}
+func (UnimplementedSourceServiceServer) DeleteSource(context.Context, *DeleteSourceRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteSource not implemented")
+}
+func (UnimplementedSourceServiceServer) ListSources(context.Context, *ListSourcesRequest) (*ListSourcesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListSources not implemented")
+}
+func (UnimplementedSourceServiceServer) mustEmbedUnimplementedSourceServiceServer() {}
+func (UnimplementedSourceServiceServer) testEmbeddedByValue()                       {}
+
+// UnsafeSourceServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SourceServiceServer will
+// result in compilation errors.
+type UnsafeSourceServiceServer interface {
+	mustEmbedUnimplementedSourceServiceServer()
+}
+
+func RegisterSourceServiceServer(s grpc.ServiceRegistrar, srv SourceServiceServer) {
+	// If the following call pancis, it indicates UnimplementedSourceServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&SourceService_ServiceDesc, srv)
+}
+
+func _SourceService_CreateSource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSourceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SourceServiceServer).CreateSource(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SourceService_CreateSource_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SourceServiceServer).CreateSource(ctx, req.(*CreateSourceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SourceService_GetSource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSourceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SourceServiceServer).GetSource(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SourceService_GetSource_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SourceServiceServer).GetSource(ctx, req.(*GetSourceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SourceService_UpdateSource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateSourceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SourceServiceServer).UpdateSource(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SourceService_UpdateSource_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SourceServiceServer).UpdateSource(ctx, req.(*UpdateSourceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SourceService_DeleteSource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteSourceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SourceServiceServer).DeleteSource(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SourceService_DeleteSource_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SourceServiceServer).DeleteSource(ctx, req.(*DeleteSourceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SourceService_ListSources_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSourcesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SourceServiceServer).ListSources(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SourceService_ListSources_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SourceServiceServer).ListSources(ctx, req.(*ListSourcesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// SourceService_ServiceDesc is the grpc.ServiceDesc for SourceService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var SourceService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "domain.v1.SourceService",
+	HandlerType: (*SourceServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateSource",
+			Handler:    _SourceService_CreateSource_Handler,
+		},
+		{
+			MethodName: "GetSource",
+			Handler:    _SourceService_GetSource_Handler,
+		},
+		{
+			MethodName: "UpdateSource",
+			Handler:    _SourceService_UpdateSource_Handler,
+		},
+		{
+			MethodName: "DeleteSource",
+			Handler:    _SourceService_DeleteSource_Handler,
+		},
+		{
+			MethodName: "ListSources",
+			Handler:    _SourceService_ListSources_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "domain/v1/service.proto",
+}
+
+const (
+	DomainService_CreateDomain_FullMethodName = "/domain.v1.DomainService/CreateDomain"
+	DomainService_GetDomain_FullMethodName    = "/domain.v1.DomainService/GetDomain"
+	DomainService_UpdateDomain_FullMethodName = "/domain.v1.DomainService/UpdateDomain"
+	DomainService_DeleteDomain_FullMethodName = "/domain.v1.DomainService/DeleteDomain"
+	DomainService_ListDomains_FullMethodName  = "/domain.v1.DomainService/ListDomains"
 )
 
 // DomainServiceClient is the client API for DomainService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DomainServiceClient interface {
-	CreateSource(ctx context.Context, in *Source, opts ...grpc.CallOption) (*Source, error)
-	GetSource(ctx context.Context, in *GetSourceRequest, opts ...grpc.CallOption) (*GetSourceResponse, error)
-	UpdateSource(ctx context.Context, in *UpdateSourceRequest, opts ...grpc.CallOption) (*Source, error)
-	DeleteSource(ctx context.Context, in *DeleteSourceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	ListSources(ctx context.Context, in *ListSourcesRequest, opts ...grpc.CallOption) (*ListSourcesResponse, error)
+	CreateDomain(ctx context.Context, in *CreateDomainRequest, opts ...grpc.CallOption) (*Domain, error)
+	GetDomain(ctx context.Context, in *GetDomainRequest, opts ...grpc.CallOption) (*GetDomainResponse, error)
+	UpdateDomain(ctx context.Context, in *UpdateDomainRequest, opts ...grpc.CallOption) (*Domain, error)
+	DeleteDomain(ctx context.Context, in *DeleteDomainRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ListDomains(ctx context.Context, in *ListDomainsRequest, opts ...grpc.CallOption) (*ListDomainsResponse, error)
 }
 
 type domainServiceClient struct {
@@ -46,50 +300,50 @@ func NewDomainServiceClient(cc grpc.ClientConnInterface) DomainServiceClient {
 	return &domainServiceClient{cc}
 }
 
-func (c *domainServiceClient) CreateSource(ctx context.Context, in *Source, opts ...grpc.CallOption) (*Source, error) {
+func (c *domainServiceClient) CreateDomain(ctx context.Context, in *CreateDomainRequest, opts ...grpc.CallOption) (*Domain, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Source)
-	err := c.cc.Invoke(ctx, DomainService_CreateSource_FullMethodName, in, out, cOpts...)
+	out := new(Domain)
+	err := c.cc.Invoke(ctx, DomainService_CreateDomain_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *domainServiceClient) GetSource(ctx context.Context, in *GetSourceRequest, opts ...grpc.CallOption) (*GetSourceResponse, error) {
+func (c *domainServiceClient) GetDomain(ctx context.Context, in *GetDomainRequest, opts ...grpc.CallOption) (*GetDomainResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetSourceResponse)
-	err := c.cc.Invoke(ctx, DomainService_GetSource_FullMethodName, in, out, cOpts...)
+	out := new(GetDomainResponse)
+	err := c.cc.Invoke(ctx, DomainService_GetDomain_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *domainServiceClient) UpdateSource(ctx context.Context, in *UpdateSourceRequest, opts ...grpc.CallOption) (*Source, error) {
+func (c *domainServiceClient) UpdateDomain(ctx context.Context, in *UpdateDomainRequest, opts ...grpc.CallOption) (*Domain, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Source)
-	err := c.cc.Invoke(ctx, DomainService_UpdateSource_FullMethodName, in, out, cOpts...)
+	out := new(Domain)
+	err := c.cc.Invoke(ctx, DomainService_UpdateDomain_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *domainServiceClient) DeleteSource(ctx context.Context, in *DeleteSourceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *domainServiceClient) DeleteDomain(ctx context.Context, in *DeleteDomainRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, DomainService_DeleteSource_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, DomainService_DeleteDomain_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *domainServiceClient) ListSources(ctx context.Context, in *ListSourcesRequest, opts ...grpc.CallOption) (*ListSourcesResponse, error) {
+func (c *domainServiceClient) ListDomains(ctx context.Context, in *ListDomainsRequest, opts ...grpc.CallOption) (*ListDomainsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListSourcesResponse)
-	err := c.cc.Invoke(ctx, DomainService_ListSources_FullMethodName, in, out, cOpts...)
+	out := new(ListDomainsResponse)
+	err := c.cc.Invoke(ctx, DomainService_ListDomains_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -100,11 +354,11 @@ func (c *domainServiceClient) ListSources(ctx context.Context, in *ListSourcesRe
 // All implementations must embed UnimplementedDomainServiceServer
 // for forward compatibility.
 type DomainServiceServer interface {
-	CreateSource(context.Context, *Source) (*Source, error)
-	GetSource(context.Context, *GetSourceRequest) (*GetSourceResponse, error)
-	UpdateSource(context.Context, *UpdateSourceRequest) (*Source, error)
-	DeleteSource(context.Context, *DeleteSourceRequest) (*emptypb.Empty, error)
-	ListSources(context.Context, *ListSourcesRequest) (*ListSourcesResponse, error)
+	CreateDomain(context.Context, *CreateDomainRequest) (*Domain, error)
+	GetDomain(context.Context, *GetDomainRequest) (*GetDomainResponse, error)
+	UpdateDomain(context.Context, *UpdateDomainRequest) (*Domain, error)
+	DeleteDomain(context.Context, *DeleteDomainRequest) (*emptypb.Empty, error)
+	ListDomains(context.Context, *ListDomainsRequest) (*ListDomainsResponse, error)
 	mustEmbedUnimplementedDomainServiceServer()
 }
 
@@ -115,20 +369,20 @@ type DomainServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedDomainServiceServer struct{}
 
-func (UnimplementedDomainServiceServer) CreateSource(context.Context, *Source) (*Source, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateSource not implemented")
+func (UnimplementedDomainServiceServer) CreateDomain(context.Context, *CreateDomainRequest) (*Domain, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDomain not implemented")
 }
-func (UnimplementedDomainServiceServer) GetSource(context.Context, *GetSourceRequest) (*GetSourceResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSource not implemented")
+func (UnimplementedDomainServiceServer) GetDomain(context.Context, *GetDomainRequest) (*GetDomainResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDomain not implemented")
 }
-func (UnimplementedDomainServiceServer) UpdateSource(context.Context, *UpdateSourceRequest) (*Source, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateSource not implemented")
+func (UnimplementedDomainServiceServer) UpdateDomain(context.Context, *UpdateDomainRequest) (*Domain, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateDomain not implemented")
 }
-func (UnimplementedDomainServiceServer) DeleteSource(context.Context, *DeleteSourceRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteSource not implemented")
+func (UnimplementedDomainServiceServer) DeleteDomain(context.Context, *DeleteDomainRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteDomain not implemented")
 }
-func (UnimplementedDomainServiceServer) ListSources(context.Context, *ListSourcesRequest) (*ListSourcesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListSources not implemented")
+func (UnimplementedDomainServiceServer) ListDomains(context.Context, *ListDomainsRequest) (*ListDomainsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListDomains not implemented")
 }
 func (UnimplementedDomainServiceServer) mustEmbedUnimplementedDomainServiceServer() {}
 func (UnimplementedDomainServiceServer) testEmbeddedByValue()                       {}
@@ -151,92 +405,92 @@ func RegisterDomainServiceServer(s grpc.ServiceRegistrar, srv DomainServiceServe
 	s.RegisterService(&DomainService_ServiceDesc, srv)
 }
 
-func _DomainService_CreateSource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Source)
+func _DomainService_CreateDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDomainRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DomainServiceServer).CreateSource(ctx, in)
+		return srv.(DomainServiceServer).CreateDomain(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DomainService_CreateSource_FullMethodName,
+		FullMethod: DomainService_CreateDomain_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DomainServiceServer).CreateSource(ctx, req.(*Source))
+		return srv.(DomainServiceServer).CreateDomain(ctx, req.(*CreateDomainRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DomainService_GetSource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSourceRequest)
+func _DomainService_GetDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDomainRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DomainServiceServer).GetSource(ctx, in)
+		return srv.(DomainServiceServer).GetDomain(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DomainService_GetSource_FullMethodName,
+		FullMethod: DomainService_GetDomain_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DomainServiceServer).GetSource(ctx, req.(*GetSourceRequest))
+		return srv.(DomainServiceServer).GetDomain(ctx, req.(*GetDomainRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DomainService_UpdateSource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateSourceRequest)
+func _DomainService_UpdateDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDomainRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DomainServiceServer).UpdateSource(ctx, in)
+		return srv.(DomainServiceServer).UpdateDomain(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DomainService_UpdateSource_FullMethodName,
+		FullMethod: DomainService_UpdateDomain_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DomainServiceServer).UpdateSource(ctx, req.(*UpdateSourceRequest))
+		return srv.(DomainServiceServer).UpdateDomain(ctx, req.(*UpdateDomainRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DomainService_DeleteSource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteSourceRequest)
+func _DomainService_DeleteDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteDomainRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DomainServiceServer).DeleteSource(ctx, in)
+		return srv.(DomainServiceServer).DeleteDomain(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DomainService_DeleteSource_FullMethodName,
+		FullMethod: DomainService_DeleteDomain_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DomainServiceServer).DeleteSource(ctx, req.(*DeleteSourceRequest))
+		return srv.(DomainServiceServer).DeleteDomain(ctx, req.(*DeleteDomainRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DomainService_ListSources_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListSourcesRequest)
+func _DomainService_ListDomains_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDomainsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DomainServiceServer).ListSources(ctx, in)
+		return srv.(DomainServiceServer).ListDomains(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DomainService_ListSources_FullMethodName,
+		FullMethod: DomainService_ListDomains_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DomainServiceServer).ListSources(ctx, req.(*ListSourcesRequest))
+		return srv.(DomainServiceServer).ListDomains(ctx, req.(*ListDomainsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -249,24 +503,24 @@ var DomainService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*DomainServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateSource",
-			Handler:    _DomainService_CreateSource_Handler,
+			MethodName: "CreateDomain",
+			Handler:    _DomainService_CreateDomain_Handler,
 		},
 		{
-			MethodName: "GetSource",
-			Handler:    _DomainService_GetSource_Handler,
+			MethodName: "GetDomain",
+			Handler:    _DomainService_GetDomain_Handler,
 		},
 		{
-			MethodName: "UpdateSource",
-			Handler:    _DomainService_UpdateSource_Handler,
+			MethodName: "UpdateDomain",
+			Handler:    _DomainService_UpdateDomain_Handler,
 		},
 		{
-			MethodName: "DeleteSource",
-			Handler:    _DomainService_DeleteSource_Handler,
+			MethodName: "DeleteDomain",
+			Handler:    _DomainService_DeleteDomain_Handler,
 		},
 		{
-			MethodName: "ListSources",
-			Handler:    _DomainService_ListSources_Handler,
+			MethodName: "ListDomains",
+			Handler:    _DomainService_ListDomains_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

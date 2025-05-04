@@ -5,18 +5,18 @@ import (
 )
 
 type domainHandler interface {
-	CreateSource(c *fiber.Ctx) error
-	GetSource(c *fiber.Ctx) error
-	UpdateSource(c *fiber.Ctx) error
-	DeleteSource(c *fiber.Ctx) error
-	ListSources(c *fiber.Ctx) error
+	CreateDomain(c *fiber.Ctx) error
+	GetDomain(c *fiber.Ctx) error
+	UpdateDomain(c *fiber.Ctx) error
+	DeleteDomain(c *fiber.Ctx) error
+	ListDomains(c *fiber.Ctx) error
 }
 
 // SetupRoutes maps domain routes.
 func SetupRoutes(api fiber.Router, h domainHandler) {
-	api.Post("/", h.CreateSource)
-	api.Get("/list", h.ListSources)
-	api.Get("/:id", h.GetSource)
-	api.Put("/:id", h.UpdateSource)
-	api.Delete("/:id", h.DeleteSource)
+	api.Post("/", h.CreateDomain)
+	api.Get("/list", h.ListDomains)
+	api.Get("/:id", h.GetDomain)
+	api.Put("/:id", h.UpdateDomain)
+	api.Delete("/:id", h.DeleteDomain)
 }

@@ -1,5 +1,31 @@
 basePath: /
 definitions:
+  pb.CreateDomainRequest:
+    properties:
+      sourceIds:
+        items:
+          type: integer
+        type: array
+      title:
+        type: string
+    type: object
+  pb.CreateSourceRequest:
+    properties:
+      content:
+        items:
+          type: integer
+        type: array
+      credentials:
+        items:
+          type: integer
+        type: array
+      title:
+        type: string
+      typ:
+        $ref: '#/definitions/pb.SourceType'
+      updateParams:
+        $ref: '#/definitions/pb.UpdateParams'
+    type: object
   pb.CronFormat:
     properties:
       dayOfMonth:
@@ -13,10 +39,37 @@ definitions:
       month:
         type: integer
     type: object
+  pb.Domain:
+    properties:
+      createdAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      id:
+        type: integer
+      sourceIds:
+        items:
+          type: integer
+        type: array
+      title:
+        type: string
+      updatedAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
+    type: object
+  pb.GetDomainResponse:
+    properties:
+      domain:
+        $ref: '#/definitions/pb.Domain'
+    type: object
   pb.GetSourceResponse:
     properties:
       source:
         $ref: '#/definitions/pb.Source'
+    type: object
+  pb.ListDomainsResponse:
+    properties:
+      domains:
+        items:
+          $ref: '#/definitions/pb.Domain'
+        type: array
     type: object
   pb.ListSourcesResponse:
     properties:
@@ -47,17 +100,39 @@ definitions:
         items:
           type: integer
         type: array
+      createdAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
       credentials:
         items:
           type: integer
         type: array
+      id:
+        type: integer
+      status:
+        $ref: '#/definitions/pb.SourceStatus'
       title:
         type: string
       typ:
         $ref: '#/definitions/pb.SourceType'
       updateParams:
         $ref: '#/definitions/pb.UpdateParams'
+      updatedAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      userId:
+        type: integer
     type: object
+  pb.SourceStatus:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - SourceStatus_STATUS_UNDEFINED
+    - SourceStatus_STATUS_READY
+    - SourceStatus_STATUS_PARSING
+    - SourceStatus_STATUS_FAILED
   pb.SourceType:
     enum:
     - 0
@@ -72,6 +147,17 @@ definitions:
     - SourceType_TYPE_SINGLE_FILE
     - SourceType_TYPE_ARCHIVED_FILES
     - SourceType_TYPE_WITH_CREDENTIALS
+  pb.UpdateDomainRequest:
+    properties:
+      domainId:
+        type: integer
+      sourceIds:
+        items:
+          type: integer
+        type: array
+      title:
+        type: string
+    type: object
   pb.UpdateParams:
     properties:
       cron:
@@ -105,6 +191,22 @@ definitions:
       userId:
         type: integer
     type: object
+  timestamppb.Timestamp:
+    properties:
+      nanos:
+        description: |-
+          Non-negative fractions of a second at nanosecond resolution. Negative
+          second values with fractions must still have non-negative nanos values
+          that count forward in time. Must be from 0 to 999,999,999
+          inclusive.
+        type: integer
+      seconds:
+        description: |-
+          Represents seconds of UTC time since Unix epoch
+          1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
+          9999-12-31T23:59:59Z inclusive.
+        type: integer
+    type: object
 host: localhost:9000
 info:
   contact: {}
@@ -119,14 +221,171 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates new domain source used for RAG vector search.
+      description: Creates new domain (group of sources used for RAG vector search).
+      parameters:
+      - description: Input data for creating domain
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.CreateDomainRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Domain successfully created
+          schema:
+            $ref: '#/definitions/pb.Domain'
+        "400":
+          description: Failed to create domain
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create new domain.
+      tags:
+      - domain
+  /api/v1/domain/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete domain by ID.
+      parameters:
+      - description: Domain ID
+        in: path
+        name: domainID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Domain deleted
+          schema:
+            type: string
+        "400":
+          description: Failed to delete domain
+          schema:
+            type: string
+        "404":
+          description: Domain not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete domain.
+      tags:
+      - domain
+    get:
+      consumes:
+      - application/json
+      description: Returns information about domain.
+      parameters:
+      - description: Requested domain ID
+        in: path
+        name: domainID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Domain
+          schema:
+            $ref: '#/definitions/pb.GetDomainResponse'
+        "400":
+          description: Failed to get domain
+          schema:
+            type: string
+        "404":
+          description: Domain not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get domain.
+      tags:
+      - domain
+    put:
+      consumes:
+      - application/json
+      description: Update domain information.
+      parameters:
+      - description: Domain ID
+        in: path
+        name: domainID
+        required: true
+        type: integer
+      - description: Update params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.UpdateDomainRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Domain updated
+          schema:
+            $ref: '#/definitions/pb.Domain'
+        "400":
+          description: Failed to update domain
+          schema:
+            type: string
+        "404":
+          description: Domain not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update domain.
+      tags:
+      - domain
+  /api/v1/domain/list:
+    get:
+      consumes:
+      - application/json
+      description: List domains to which user has access.
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: Pagination limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of domains
+          schema:
+            $ref: '#/definitions/pb.ListDomainsResponse'
+        "400":
+          description: Failed to list domains
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List domains.
+      tags:
+      - domain
+  /api/v1/source/:
+    post:
+      consumes:
+      - application/json
+      description: Creates new source used for RAG vector search.
       parameters:
       - description: Input data for creating source
         in: body
         name: req
         required: true
         schema:
-          $ref: '#/definitions/pb.Source'
+          $ref: '#/definitions/pb.CreateSourceRequest'
       produces:
       - application/json
       responses:
@@ -142,8 +401,8 @@ paths:
       - ApiKeyAuth: []
       summary: Create new source.
       tags:
-      - domain
-  /api/v1/domain/{id}:
+      - source
+  /api/v1/source/{id}:
     delete:
       consumes:
       - application/json
@@ -165,11 +424,15 @@ paths:
           description: Failed to delete source
           schema:
             type: string
+        "404":
+          description: Source not found
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       summary: Delete source.
       tags:
-      - domain
+      - source
     get:
       consumes:
       - application/json
@@ -199,7 +462,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get source.
       tags:
-      - domain
+      - source
     put:
       consumes:
       - application/json
@@ -227,12 +490,16 @@ paths:
           description: Failed to update source
           schema:
             type: string
+        "404":
+          description: Source not found
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       summary: Update source.
       tags:
-      - domain
-  /api/v1/domain/list:
+      - source
+  /api/v1/source/list:
     get:
       consumes:
       - application/json
@@ -263,7 +530,7 @@ paths:
       - ApiKeyAuth: []
       summary: List sources.
       tags:
-      - domain
+      - source
   /auth/v1/login:
     post:
       consumes:
