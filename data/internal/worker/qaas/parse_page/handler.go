@@ -2,10 +2,14 @@ package parse_page
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 
-	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas/messages"
+	"github.com/larek-tech/diploma/data/internal/domain/site"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
+	"github.com/samber/lo"
+	"go.dataddo.com/pgq"
 )
 
 type Handler struct {
@@ -26,33 +30,49 @@ func New(
 	}
 }
 
-func (h Handler) Handle(ctx context.Context, job messages.PageJob) error {
+func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, error) {
+	// job qaas.PageJob
+	var job qaas.PageJob
+	err := json.Unmarshal(msg.Payload, &job)
+	if err != nil {
+		return true, fmt.Errorf("failed to unmarshal parsepage payload: %w", err)
+	}
+
 	// FIXME: find place with empty uuid and how to prevent that?
 	slog.Info("handled page job", "jon", job)
 	page := job.Payload
 	if page == nil {
-		return fmt.Errorf("failed to get page from job")
+		return true, fmt.Errorf("failed to get page from job")
 	}
 	outgoingPages, _, err := h.pageService.ParsePage(ctx, page)
 	if err != nil {
-		return fmt.Errorf("failed to handle page job: %w", err)
+		return true, fmt.Errorf("failed to handle page job: %w", err)
 	}
-	for _, nextPage := range outgoingPages {
-		err = h.publisher.Publish(ctx, messages.PageJob{
-			Type:    messages.ParsePage,
-			Payload: nextPage,
-		})
-		if err != nil {
-			slog.Error("failed to publish outgoing page", "err", err)
+	pagesToParse := lo.Map(outgoingPages, func(page *site.Page, index int) any {
+		return qaas.PageJob{
+			Payload: page,
 		}
-	}
-	err = h.publisher.Publish(ctx, messages.ResultMessage{
-		Type:  messages.WebResult,
-		ObjID: page.ID,
 	})
-	if err != nil {
-		slog.Error("failed to publish result message", "err", err)
+	publishOptions := []qaas.PublishOption{
+		qaas.WithQueue(qaas.ParsePageQueue),
 	}
 
-	return nil
+	_, err = h.publisher.Publish(ctx, pagesToParse, publishOptions...)
+	if err != nil {
+		slog.Error("failed to publish outgoing pages to qaas: %w", err)
+	}
+
+	publishOptions = []qaas.PublishOption{
+		qaas.WithQueue(qaas.ParsePageResultQueue),
+		qaas.WithSourceQueue(qaas.ParsePageQueue),
+	}
+	_, err = h.publisher.Publish(ctx, []any{qaas.PageResultJob{
+		Payload: page,
+		Delay:   0,
+	}}, publishOptions...)
+	if err != nil {
+		slog.Error("failed to publish result message for page", "err", err, "pageID", page.ID)
+	}
+
+	return true, nil
 }

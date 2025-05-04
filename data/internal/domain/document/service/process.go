@@ -6,19 +6,18 @@ import (
 	"io"
 
 	"github.com/larek-tech/diploma/data/internal/domain/document"
+	"github.com/larek-tech/diploma/data/internal/domain/site"
 	"github.com/samber/lo"
 )
 
-// web.Page
-// file
-func (s Service) Process(ctx context.Context, obj io.ReadSeeker, fileExt document.FileExtension, sourceID, objType, objID string) error {
+// TODO: remove fileExt from Process func
+func (s Service) Process(ctx context.Context, obj io.ReadSeeker, fileExt document.FileExtension, sourceObj any, sourceID string) error {
 	doc, err := s.parse(ctx, obj, fileExt)
 	if err != nil {
 		return fmt.Errorf("failed to parse document: %w", err)
 	}
 	doc.SourceID = sourceID
-	doc.ObjectID = objID
-	doc.ObjectType = document.Type(objType)
+	setDocData(doc, sourceObj)
 
 	err = s.trManager.Do(ctx, func(ctx context.Context) error {
 		txErr := s.documentStorage.Save(ctx, doc)
@@ -54,4 +53,15 @@ func (s Service) Process(ctx context.Context, obj io.ReadSeeker, fileExt documen
 		return fmt.Errorf("failed to process document: %w", err)
 	}
 	return nil
+}
+
+func setDocData(doc *document.Document, source any) {
+	switch v := source.(type) {
+	case *site.Page:
+		doc.ObjectID = v.ID
+		doc.ObjectType = document.TypePage
+	default:
+		doc.ObjectID = ""
+		doc.ObjectType = document.TypeFile
+	}
 }

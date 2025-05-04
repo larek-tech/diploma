@@ -3,17 +3,12 @@ package qaas
 import (
 	"context"
 
-	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas/messages"
+	"go.dataddo.com/pgq"
 )
 
 type (
-	pageJobHandler interface {
-		Handle(ctx context.Context, job messages.PageJob) error
-	}
-	siteJobHandler interface {
-		Handle(ctx context.Context, job messages.SiteJob) error
-	}
-	resultMessageHandler interface {
-		Handle(ctx context.Context, result messages.ResultMessage) error
+	handler interface {
+		Handle(context.Context, *pgq.MessageIncoming) (bool, error)
 	}
 )
+	

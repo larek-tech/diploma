@@ -1,27 +1,24 @@
 # Builder
 FROM golang:1.24-alpine AS builder
-RUN apk add --update make git curl
+
+RUN apk update && \
+    apk upgrade --update-cache --available && \
+    apk add --no-cache make git curl gcc musl-dev openssl librdkafka-dev
 
 ARG MODULE_NAME=github.com/larek-tech/diploma/data
 
-RUN apk upgrade --update-cache --available && \
-    apk add openssl && \
-    rm -rf /var/cache/apk/*
-COPY Makefile /home/${MODULE_NAME}/Makefile
-COPY go.mod /home/${MODULE_NAME}/go.mod
-COPY go.sum /home/${MODULE_NAME}/go.sum
-
 WORKDIR /home/${MODULE_NAME}
 
-# Only download dependencies if go.mod or go.sum changed
+COPY go.mod go.sum ./
 RUN go mod download
 
-# Now copy the rest of the source code
-COPY . /home/${MODULE_NAME}
+COPY . .
 
-RUN CGO_ENABLED=0 go build -o ./bin/main ./cmd/crawler/main.go
+ENV CGO_ENABLED=1
 
-# Service
+RUN go build -tags musl -o ./bin/main ./cmd/crawler/main.go
+
+# Runner
 FROM alpine:latest AS runner
 ARG MODULE_NAME=github.com/larek-tech/diploma/data
 

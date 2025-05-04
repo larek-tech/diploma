@@ -75,6 +75,9 @@ services:
       POSTGRES_PASSWORD: password
       OLLAMA_HOST: http://ollama_local:11434
       OLLAMA_MODEL: bge-m3:latest
+      KAFKA_SERVERS: kafka:29092
+      KAFKA_TOPIC: source_topic
+
     ports:
       - "9998:8080"
   parser:
@@ -100,16 +103,29 @@ services:
       OLLAMA_EMBEDDER_MODEL: bge-m3:latest
     ports:
       - "9999:8081"
-  kafka:
-    build:
-      context: docker/
-      dockerfile: kafka.Dockerfile
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper_local
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
-      - "9092:9092"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka_local
+    depends_on:
+      - zookeeper
     environment:
-      - ADVERTISED_HOST=localhost:9092kafka:9092
-      - NUM_PARTITIONS=2
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_INT://kafka:29092,LISTENER_EXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INT:PLAINTEXT,LISTENER_EXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
 
 
 volumes:

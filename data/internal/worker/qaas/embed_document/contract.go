@@ -10,7 +10,7 @@ import (
 
 type (
 	embeddingService interface {
-		Process(ctx context.Context, obj io.ReadSeeker, fileExt document.FileExtension, sourceID, objType, objectID string) error
+		Process(ctx context.Context, obj io.ReadSeeker, fileExt document.FileExtension, sourceObj any, sourceID string) error
 	}
 	pageStore interface {
 		GetByID(ctx context.Context, id string) (*site.Page, error)

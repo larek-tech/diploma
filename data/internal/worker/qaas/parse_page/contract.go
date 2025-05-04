@@ -2,9 +2,9 @@ package parse_page
 
 import (
 	"context"
-	"time"
 
 	"github.com/larek-tech/diploma/data/internal/domain/site"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 )
 
 type (
@@ -14,7 +14,7 @@ type (
 		GetByID(ctx context.Context, id string) (*site.Page, error)
 	}
 	publisher interface {
-		Publish(ctx context.Context, msg any, time ...*time.Time) error
+		Publish(ctx context.Context, rawMsg []any, opts ...qaas.PublishOption) ([]string, error)
 	}
 	pageService interface {
 		ParsePage(ctx context.Context, page *site.Page) ([]*site.Page, bool, error)

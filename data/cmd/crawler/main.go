@@ -24,7 +24,6 @@ import (
 	"github.com/larek-tech/diploma/data/internal/worker/kafka/create_source"
 	"github.com/larek-tech/storage/postgres"
 
-	"go.dataddo.com/pgq"
 	"go.dataddo.com/pgq/x/schema"
 )
 
@@ -36,6 +35,7 @@ func run() int {
 	ctx := context.Background()
 	slog.Info("Starting server")
 	kafkaCfg, err := getKafkaConfig()
+	slog.Info("kafka config", "cfg", *kafkaCfg)
 	if err != nil {
 		slog.Error(err.Error())
 		return -1
@@ -57,7 +57,13 @@ func run() int {
 		slog.Error("Failed to get SQL connection")
 		return 1
 	}
-	pub := qaas.NewPublisher(pgq.NewPublisher(sqlDB))
+	pub := qaas.NewPublisher(sqlDB)
+	pub.CreateAllTables([]qaas.Queue{
+		qaas.ParseSiteQueue,
+		qaas.ParsePageResultQueue,
+		qaas.ParsePageQueue,
+		qaas.EmbedResultQueue,
+	})
 
 	sourceStore := sourceStorage.New(pg)
 	srcService := sourceService.New(sourceStore, pub, trManager)
@@ -79,24 +85,24 @@ func run() int {
 	http.Handle("/test", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		slog.Info("Received test request")
 		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			logError(w, "Method not allowed", nil, http.StatusMethodNotAllowed)
 			return
 		}
 		var payload source.DataMessage
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-			http.Error(w, "Bad request", http.StatusBadRequest)
+			logError(w, "Bad request", err, http.StatusBadRequest)
 			return
 		}
 		src, err := srcService.CreateSource(ctx, payload)
 		if err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			logError(w, "Internal server error", err, http.StatusInternalServerError)
 			return
 		}
 
 		w.WriteHeader(http.StatusOK)
 		resp, err := json.Marshal(src)
 		if err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			logError(w, "Internal server error", err, http.StatusInternalServerError)
 			return
 		}
 		w.Write(resp)
@@ -240,4 +246,9 @@ func getKafkaConfig() (*kafka.Config, error) {
 		return nil, fmt.Errorf("failed to read kafka config: %w", err)
 	}
 	return &cfg, nil
+}
+
+func logError(w http.ResponseWriter, msg string, err error, code int) {
+	slog.Error(msg, "error", err)
+	http.Error(w, msg, code)
 }

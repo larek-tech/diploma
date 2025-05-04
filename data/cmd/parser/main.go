@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/jackc/pgx/v5/stdlib"
@@ -17,14 +18,12 @@ import (
 	pageStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/page"
 	questionStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/question"
 	siteStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/site"
-	"github.com/larek-tech/diploma/data/internal/worker/qaas/embed_document"
 
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
+	"github.com/larek-tech/diploma/data/internal/worker/qaas/embed_document"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/parse_page"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/parse_site"
 	"github.com/larek-tech/storage/postgres"
-	"go.dataddo.com/pgq"
-	"go.dataddo.com/pgq/x/schema"
 )
 
 func main() {
@@ -68,8 +67,13 @@ func run() int {
 		slog.Error("failed to create embedder", "error", err)
 		return -1
 	}
-
-	pub := qaas.NewPublisher(pgq.NewPublisher(sqlDB))
+	pub := qaas.NewPublisher(sqlDB)
+	pub.CreateAllTables([]qaas.Queue{
+		qaas.ParseSiteQueue,
+		qaas.ParsePageResultQueue,
+		qaas.ParsePageQueue,
+		qaas.EmbedResultQueue,
+	})
 
 	siteStore := siteStorage.New(pg)
 	documentStore := documentStorage.New(pg)
@@ -78,31 +82,43 @@ func run() int {
 	pageStore := pageStorage.New(pg)
 	pageService := crawler.New(httpClient, siteStore, pageStore, trManager)
 	embeddingService := documentService.New(documentStore, chunkStore, questionStore, embedderModel, llm, trManager)
-	consumer := qaas.NewConsumer(
-		parse_page.New(pageStore, pageService, pub),
-		parse_site.New(siteStore, pub),
-		embed_document.New(embeddingService, pageStore, siteStore),
-		sqlDB,
-	)
+	consumer := qaas.NewConsumer(sqlDB)
+	// 	parse_page.New(pageStore, pageService, pub),
+	// parse_site.New(siteStore, pub),
+	// embed_document.New(embeddingService, pageStore, siteStore),
 
 	slog.Info("Starting consumer")
-	if err = consumer.Run(ctx); err != nil {
-		slog.Error("failed to run consumer", "error", err)
-		return 1
-	}
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	// site parser
+	go func() {
+		defer wg.Done()
+		if err = consumer.Run(ctx, qaas.ParseSiteQueue, parse_site.New(siteStore, pub)); err != nil {
+			slog.Error("failed to run consumer", "error", err)
+		}
+	}()
+	// site page parser
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err = consumer.Run(ctx, qaas.ParsePageQueue, parse_page.New(pageStore, pageService, pub)); err != nil {
+			slog.Error("failed to run consumer", "error", err)
+		}
+	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err = consumer.Run(ctx, qaas.ParsePageResultQueue, embed_document.New(embeddingService, pageStore, siteStore)); err != nil {
+			slog.Error("failed to run consumer", "error", err)
+		}
+	}()
+	wg.Wait()
 	return 0
 }
 
 func getSqlCon(db *postgres.DB) *sql.DB {
 	pool := db.GetPool()
 	sqlCon := stdlib.OpenDBFromPool(pool)
-	create := schema.GenerateCreateTableQuery(qaas.QueueName)
-
-	_, err := sqlCon.Exec(create)
-	if err != nil {
-		slog.Error("Failed to create table", "error", err)
-		return nil
-	}
 	return sqlCon
 }
 

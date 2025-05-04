@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/larek-tech/diploma/data/internal/domain/site"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
-	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas/messages"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 )
 
 type Service struct {
@@ -44,17 +44,19 @@ func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (
 			if err != nil {
 				return fmt.Errorf("failed to create site: %w", err)
 			}
+			publishOptions := []qaas.PublishOption{
+				qaas.WithQueue(qaas.ParseSiteQueue),
+			}
 
-			err = s.pub.Publish(ctx, messages.SiteJob{
-				Type:    messages.ParseSite,
+			_, err = s.pub.Publish(ctx, []any{qaas.SiteJob{
 				Payload: webSource,
 				Delay:   0,
-			})
+			}}, publishOptions...)
 			if err != nil {
 				return fmt.Errorf("failed to publish site job: %w", err)
 			}
 		default:
-			return fmt.Errorf("unsupported source type: %s", src.Type)
+			return fmt.Errorf("unsupported source type: %v", src.Type)
 		}
 		return nil
 
