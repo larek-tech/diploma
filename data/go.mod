@@ -11,6 +11,7 @@ require (
 	github.com/pressly/goose/v3 v3.24.2
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/samber/lo v1.50.0
+	github.com/tmc/langchaingo v0.1.13
 	github.com/unidoc/unidoc v2.2.0+incompatible
 	go.dataddo.com/pgq v0.0.0-20250217145018-c8b263b44bb7
 )
@@ -20,6 +21,7 @@ require (
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/avito-tech/go-transaction-manager/drivers/pgxv5/v2 v2.0.0 // indirect
 	github.com/avito-tech/go-transaction-manager/trm/v2 v2.0.0 // indirect
+	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/georgysavva/scany/v2 v2.1.4 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -32,6 +34,7 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pkoukk/tiktoken-go v0.1.6 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel v1.35.0 // indirect

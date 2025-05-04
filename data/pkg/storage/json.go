@@ -2,13 +2,15 @@ package storage
 
 import (
 	"context"
-	"data-engine/document"
+
 	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/larek-tech/diploma/data/internal/domain/document"
 )
 
 type JSONStorage struct {

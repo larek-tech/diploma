@@ -1,7 +1,17 @@
 package site
 
 import (
+	"errors"
+	"fmt"
+	"net/url"
 	"time"
+
+	"github.com/google/uuid"
+)
+
+var (
+	ErrInvalidSiteID = errors.New("invalid site ID must be a valid UUID")
+	ErrInvalidURL    = errors.New("invalid URL must be a valid URL")
 )
 
 type Site struct {
@@ -23,4 +33,31 @@ type Page struct {
 	OutgoingPages []string          `db:"outgoing"`   // OutgoingPages список UUID страниц на которые ссылается текущая страница
 	CreatedAt     time.Time         `db:"created_at"` // CreatedAt время создания страницы
 	UpdatedAt     time.Time         `db:"updated_at"` // UpdatedAt время последнего обновления страницы
+}
+
+// NewPage конструктор для новой страницы, перед сохранением в хранилище
+func NewPage(siteID string, pageURL string) (*Page, error) {
+	if siteID == "" {
+		return nil, fmt.Errorf("failed to create page: %w", ErrInvalidSiteID)
+	}
+	if pageURL == "" {
+		return nil, fmt.Errorf("failed to create page: %w", ErrInvalidURL)
+	}
+	_, err := uuid.Parse(siteID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create page: %w", ErrInvalidSiteID)
+	}
+	_, err = url.Parse(pageURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create page: %w, %w", ErrInvalidURL, err)
+	}
+	page := &Page{
+		ID:            uuid.NewString(),
+		SiteID:        siteID,
+		URL:           pageURL,
+		OutgoingPages: make([]string, 0),
+		Metadata:      make(map[string]string),
+		CreatedAt:     time.Now(),
+	}
+	return page, nil
 }

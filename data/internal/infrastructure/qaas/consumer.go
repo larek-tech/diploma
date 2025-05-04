@@ -61,6 +61,16 @@ func (c *Consumer) HandleMessage(ctx context.Context, msg *pgq.MessageIncoming) 
 		if err = c.siteJobHandler.Handle(ctx, job); err != nil {
 			return true, fmt.Errorf("failed to handle site job: %w", err)
 		}
+	case messages.WebResult:
+		var result messages.ResultMessage
+		err = json.Unmarshal(msg.Payload, &result)
+		if err != nil {
+			return true, fmt.Errorf("failed to unmarshal result message payload: %w", err)
+		}
+		if err = c.resultMessageHandler.Handle(ctx, result); err != nil {
+			return true, fmt.Errorf("failed to handle result message: %w", err)
+		}
+
 	default:
 		return true, fmt.Errorf("unknown message type: %s", msgType)
 	}

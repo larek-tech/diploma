@@ -18,7 +18,7 @@ func New(db db) *Storage {
 }
 
 func (s Storage) Save(ctx context.Context, site *site.Site) error {
-	currentSite, err := s.GetByID(ctx, site.ID)
+	currentSite, err := s.GetByURL(ctx, site.URL)
 	if err != nil {
 		// if record not found, create a new one
 		if postgres.IsNoRowsError(err) {
@@ -36,6 +36,7 @@ UPDATE sites
 SET source_id = $1, url = $2, updated_at = $3
 WHERE id = $4;
 `, site.SourceID, site.URL, site.UpdatedAt, site.ID)
+		site.ID = currentSite.ID
 		if err != nil {
 			return err
 		}

@@ -45,6 +45,7 @@ func (p *Publisher) Publish(ctx context.Context, msg any, scheduledAt ...*time.T
 			return fmt.Errorf("failed to marshal result message: %w", err)
 		}
 		rawMsg = data
+		msgType = string(m.Type)
 	}
 	var ScheduledFor *time.Time
 	if len(scheduledAt) > 0 {

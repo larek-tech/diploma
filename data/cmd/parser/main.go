@@ -9,16 +9,19 @@ import (
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/jackc/pgx/v5/stdlib"
+	documentService "github.com/larek-tech/diploma/data/internal/domain/document/service"
 	"github.com/larek-tech/diploma/data/internal/domain/site/service/crawler"
-
+	chunkStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/chunk"
+	documentStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/document"
 	pageStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/page"
-
+	questionStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/question"
 	siteStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/site"
+	"github.com/larek-tech/diploma/data/internal/worker/qaas/embed_document"
+	"github.com/tmc/langchaingo/llms/ollama"
 
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/parse_page"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/parse_site"
-	"github.com/larek-tech/diploma/data/internal/worker/qaas/result_message"
 	"github.com/larek-tech/storage/postgres"
 	"go.dataddo.com/pgq"
 	"go.dataddo.com/pgq/x/schema"
@@ -34,6 +37,7 @@ func run() int {
 	if err := cleanenv.ReadEnv(&pgCfg); err != nil {
 		slog.Error("failed to read env", "error", err)
 	}
+	endpoint, model := os.Getenv("OLLAMA_ENDPOINT"), os.Getenv("OLLAMA_MODEL")
 	pg, trManager, err := postgres.New(ctx, pgCfg)
 	if err != nil {
 		slog.Error("failed to create postgres", "error", err)
@@ -53,18 +57,32 @@ func run() int {
 		},
 		Jar: nil,
 	}
+	llm, err := ollama.New(
+		ollama.WithServerURL(endpoint),
+		ollama.WithModel(model),
+	)
+	if err != nil {
+		slog.Error("failed to create LLM", "error", err)
+		return -1
+	}
+	embedder, err := ollama.New(
+		ollama.WithServerURL("http://127.0.0.1:11434"),
+		ollama.WithModel("bge-m3"),
+	)
 
 	pub := qaas.NewPublisher(pgq.NewPublisher(sqlDB))
 
 	siteStore := siteStorage.New(pg)
-
+	documentStore := documentStorage.New(pg)
+	questionStore := questionStorage.New(pg, trManager)
+	chunkStore := chunkStorage.New(pg, trManager)
 	pageStore := pageStorage.New(pg)
 	pageService := crawler.New(httpClient, siteStore, pageStore, trManager)
-
+	embeddingService := documentService.New(documentStore, chunkStore, questionStore, embedder, llm, trManager)
 	consumer := qaas.NewConsumer(
 		parse_page.New(pageStore, pageService, pub),
 		parse_site.New(siteStore, pub),
-		result_message.New(),
+		embed_document.New(embeddingService, pageStore, siteStore),
 		sqlDB,
 	)
 
