@@ -143,7 +143,15 @@ func run() int {
 	srv := server.New()
 	pb.RegisterDataServiceServer(srv.GetSrv(), vector_search.New(chunkStore, embedder))
 
-	go srv.Run()
+	go func() {
+		//slog.Info("gRPC server started")
+		grpcErr := srv.Run()
+		if grpcErr != nil {
+			slog.Error("Failed to start gRPC server", "error", grpcErr)
+			return
+		}
+
+	}()
 
 	slog.Info("Starting server on :8080")
 	if err = http.ListenAndServe(":8080", nil); err != nil {

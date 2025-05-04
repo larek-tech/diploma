@@ -49,6 +49,7 @@ VALUES ($1, $2, $3, $4, $5, $6, now(), now());
 	return nil
 }
 
+// FIXME: multiple parse_pages can return same page_url as outgoing and it goes to parse_page forever
 func (s Store) GetByURL(ctx context.Context, url string) (*site.Page, error) {
 	var page site.Page
 	err := s.db.QueryStruct(ctx, &page, `

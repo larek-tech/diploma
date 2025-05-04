@@ -85,6 +85,7 @@ func run() int {
 		sqlDB,
 	)
 
+	slog.Info("Starting consumer")
 	if err = consumer.Run(ctx); err != nil {
 		slog.Error("failed to run consumer", "error", err)
 		return 1
