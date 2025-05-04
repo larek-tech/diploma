@@ -8,19 +8,39 @@ enum ScenarioType {
   SYSTEM_PROMPT = 1;
 };
 
+
+message MultiQuery {
+  bool useMultiquery = 1;
+  int64 nQueryes = 2; // Количество перефразированных вопросов
+  optional string queryModelName = 3; // Пока не знаю нучно ли будет 
+}
+
+message Reranker {
+  bool useRerank = 1;
+  string rerankerModel = 2;
+  int64 rerankerMaxLenght = 3;
+  int64 topK = 4; // Количество чанков после реранкинга
+}
+
+message LLMMdel{
+  string modelName = 1;
+  float temprature = 2;
+  int64 topK = 3;
+  float topP = 4;
+}
+
 message Scenario {
   ScenarioType customType = 1;
   string content = 2;
-//  bool useMultiQuery = 3;
-//  bool useQuestions = 4; // hypothetical questions
-//  uint64 chunkSize = 5;
-//  uint64 topK = 6;
+  MultiQuery multiQuery = 3;
+  Reranker reranker = 4;
+  bool searchByQuery = 5;
+  LLMMdel model = 6;
 };
 
 message Query {
   int64 userId = 1;
   string content = 2;
-  string modelName = 3;
 };
 
 message ProcessQueryRequest {
