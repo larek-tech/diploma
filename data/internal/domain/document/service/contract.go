@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/larek-tech/diploma/data/internal/domain/document"
-	"github.com/tmc/langchaingo/llms"
 )
 
 type (
@@ -22,7 +21,7 @@ type (
 		CreateEmbedding(ctx context.Context, inputTexts []string) ([][]float32, error)
 	}
 	llm interface {
-		Call(ctx context.Context, prompt string, options ...llms.CallOption) (string, error)
+		Call(ctx context.Context, prompt string) (string, error)
 	}
 	trManager interface {
 		Do(context.Context, func(ctx context.Context) error) error

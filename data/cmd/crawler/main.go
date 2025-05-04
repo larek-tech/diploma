@@ -13,11 +13,12 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
 	sourceService "github.com/larek-tech/diploma/data/internal/domain/source/service"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/ollama"
 	chunkStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/chunk"
 	sourceStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/source"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 	"github.com/larek-tech/storage/postgres"
-	"github.com/tmc/langchaingo/llms/ollama"
+
 	"go.dataddo.com/pgq"
 	"go.dataddo.com/pgq/x/schema"
 )
@@ -50,11 +51,12 @@ func run() int {
 	srcService := sourceService.New(sourceStore, pub, trManager)
 
 	chunkStore := chunkStorage.New(pg, trManager)
-	host, model := getOllamaConfig()
-	embedder, err := ollama.New(
-		ollama.WithServerURL(host),
-		ollama.WithModel(model),
-	)
+	host, _ := getOllamaConfig()
+	embedder, err := ollama.New(host)
+	if err != nil {
+		slog.Error("failed to create ollama client", "error", err)
+		return 1
+	}
 
 	http.Handle("/test", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		slog.Info("Received test request")

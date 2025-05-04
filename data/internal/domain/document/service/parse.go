@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/google/uuid"
 	"github.com/larek-tech/diploma/data/internal/domain/document"
 	"github.com/russross/blackfriday/v2"
@@ -57,21 +56,6 @@ func ParseMarkdown(content io.ReadSeeker) (string, error) {
 
 	html := blackfriday.Run(rawBytes)
 	return string(html), nil
-}
-
-func ParseHTML(content io.ReadSeeker) (string, error) {
-	_, err := content.Seek(0, io.SeekStart)
-	if err != nil {
-		return "", fmt.Errorf("failed to seek HTML content: %w", err)
-	}
-
-	doc, err := goquery.NewDocumentFromReader(content)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse HTML: %w", err)
-	}
-
-	text := strings.Join(strings.Fields(doc.Text()), " ")
-	return text, nil
 }
 
 func ParsePDF(content io.ReadSeeker) (string, error) {
