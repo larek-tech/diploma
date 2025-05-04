@@ -12,3 +12,13 @@ postgres:
   ssl: false
   port: 5432
   retry_timeout: 5
+kafka:
+  offset_newest: true
+  brokers:
+    - host: "kafka"
+      port: 29092
+  topics:
+    - name: "source"
+      partitions: 1
+    - name: "status"
+      partitions: 1
