@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -32,7 +33,10 @@ func (s Service) embed(ctx context.Context, doc *document.Document) ([]*document
 		return nil, fmt.Errorf("failed to create embeddings: %w", err)
 	}
 	// TODO: add generation of questions using llm model
-
+	metadata, err := json.Marshal(doc)
+	if err != nil {
+		metadata = []byte{}
+	}
 	chunks := make([]*document.Chunk, 0, len(rawChunks))
 	for i, rawChunk := range rawChunks {
 		if len(embeddings[i]) > EmbeddingSize {
@@ -40,12 +44,15 @@ func (s Service) embed(ctx context.Context, doc *document.Document) ([]*document
 		} else if len(embeddings[i]) < EmbeddingSize {
 			return nil, fmt.Errorf("embedding at index %d is smaller than %d", i, EmbeddingSize)
 		}
+
 		chunk := &document.Chunk{
 			ID:         uuid.NewString(),
 			DocumentID: doc.ID,
+			SourceID:   doc.SourceID,
 			Content:    rawChunk,
 			Index:      i,
 			Embeddings: embeddings[i],
+			Metadata:   metadata,
 		}
 		chunks = append(chunks, chunk)
 	}
