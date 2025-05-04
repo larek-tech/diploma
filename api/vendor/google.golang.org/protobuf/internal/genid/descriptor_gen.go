@@ -1014,7 +1014,10 @@ const (
 	FeatureSet_Utf8Validation_field_name        protoreflect.Name = "utf8_validation"
 	FeatureSet_MessageEncoding_field_name       protoreflect.Name = "message_encoding"
 	FeatureSet_JsonFormat_field_name            protoreflect.Name = "json_format"
+<<<<<<< HEAD
 	FeatureSet_EnforceNamingStyle_field_name    protoreflect.Name = "enforce_naming_style"
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 
 	FeatureSet_FieldPresence_field_fullname         protoreflect.FullName = "google.protobuf.FeatureSet.field_presence"
 	FeatureSet_EnumType_field_fullname              protoreflect.FullName = "google.protobuf.FeatureSet.enum_type"
@@ -1022,7 +1025,10 @@ const (
 	FeatureSet_Utf8Validation_field_fullname        protoreflect.FullName = "google.protobuf.FeatureSet.utf8_validation"
 	FeatureSet_MessageEncoding_field_fullname       protoreflect.FullName = "google.protobuf.FeatureSet.message_encoding"
 	FeatureSet_JsonFormat_field_fullname            protoreflect.FullName = "google.protobuf.FeatureSet.json_format"
+<<<<<<< HEAD
 	FeatureSet_EnforceNamingStyle_field_fullname    protoreflect.FullName = "google.protobuf.FeatureSet.enforce_naming_style"
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 )
 
 // Field numbers for google.protobuf.FeatureSet.
@@ -1033,7 +1039,10 @@ const (
 	FeatureSet_Utf8Validation_field_number        protoreflect.FieldNumber = 4
 	FeatureSet_MessageEncoding_field_number       protoreflect.FieldNumber = 5
 	FeatureSet_JsonFormat_field_number            protoreflect.FieldNumber = 6
+<<<<<<< HEAD
 	FeatureSet_EnforceNamingStyle_field_number    protoreflect.FieldNumber = 7
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 )
 
 // Full and short names for google.protobuf.FeatureSet.FieldPresence.
@@ -1115,6 +1124,7 @@ const (
 	FeatureSet_LEGACY_BEST_EFFORT_enum_value  = 2
 )
 
+<<<<<<< HEAD
 // Full and short names for google.protobuf.FeatureSet.EnforceNamingStyle.
 const (
 	FeatureSet_EnforceNamingStyle_enum_fullname = "google.protobuf.FeatureSet.EnforceNamingStyle"
@@ -1128,6 +1138,8 @@ const (
 	FeatureSet_STYLE_LEGACY_enum_value                 = 2
 )
 
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 // Names for google.protobuf.FeatureSetDefaults.
 const (
 	FeatureSetDefaults_message_name     protoreflect.Name     = "FeatureSetDefaults"

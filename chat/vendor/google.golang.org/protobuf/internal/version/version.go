@@ -52,7 +52,11 @@ import (
 const (
 	Major      = 1
 	Minor      = 36
+<<<<<<< HEAD
 	Patch      = 6
+=======
+	Patch      = 5
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 	PreRelease = ""
 )
 

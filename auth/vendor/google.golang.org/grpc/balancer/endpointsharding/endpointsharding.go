@@ -73,7 +73,11 @@ func NewBalancer(cc balancer.ClientConn, opts balancer.BuildOptions, childBuilde
 		esOpts:       esOpts,
 		childBuilder: childBuilder,
 	}
+<<<<<<< HEAD
 	es.children.Store(resolver.NewEndpointMap[*balancerWrapper]())
+=======
+	es.children.Store(resolver.NewEndpointMap())
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 	return es
 }
 
@@ -90,7 +94,11 @@ type endpointSharding struct {
 	// calls into a child. To avoid deadlocks, do not acquire childMu while
 	// holding mu.
 	childMu  sync.Mutex
+<<<<<<< HEAD
 	children atomic.Pointer[resolver.EndpointMap[*balancerWrapper]]
+=======
+	children atomic.Pointer[resolver.EndpointMap] // endpoint -> *balancerWrapper
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 
 	// inhibitChildUpdates is set during UpdateClientConnState/ResolverError
 	// calls (calls to children will each produce an update, only want one
@@ -122,7 +130,11 @@ func (es *endpointSharding) UpdateClientConnState(state balancer.ClientConnState
 	var ret error
 
 	children := es.children.Load()
+<<<<<<< HEAD
 	newChildren := resolver.NewEndpointMap[*balancerWrapper]()
+=======
+	newChildren := resolver.NewEndpointMap()
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 
 	// Update/Create new children.
 	for _, endpoint := range state.ResolverState.Endpoints {
@@ -131,8 +143,14 @@ func (es *endpointSharding) UpdateClientConnState(state balancer.ClientConnState
 			// update.
 			continue
 		}
+<<<<<<< HEAD
 		childBalancer, ok := children.Get(endpoint)
 		if ok {
+=======
+		var childBalancer *balancerWrapper
+		if val, ok := children.Get(endpoint); ok {
+			childBalancer = val.(*balancerWrapper)
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 			// Endpoint attributes may have changed, update the stored endpoint.
 			es.mu.Lock()
 			childBalancer.childState.Endpoint = endpoint
@@ -165,7 +183,11 @@ func (es *endpointSharding) UpdateClientConnState(state balancer.ClientConnState
 	for _, e := range children.Keys() {
 		child, _ := children.Get(e)
 		if _, ok := newChildren.Get(e); !ok {
+<<<<<<< HEAD
 			child.closeLocked()
+=======
+			child.(*balancerWrapper).closeLocked()
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		}
 	}
 	es.children.Store(newChildren)
@@ -188,7 +210,11 @@ func (es *endpointSharding) ResolverError(err error) {
 	}()
 	children := es.children.Load()
 	for _, child := range children.Values() {
+<<<<<<< HEAD
 		child.resolverErrorLocked(err)
+=======
+		child.(*balancerWrapper).resolverErrorLocked(err)
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 	}
 }
 
@@ -201,7 +227,11 @@ func (es *endpointSharding) Close() {
 	defer es.childMu.Unlock()
 	children := es.children.Load()
 	for _, child := range children.Values() {
+<<<<<<< HEAD
 		child.closeLocked()
+=======
+		child.(*balancerWrapper).closeLocked()
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 	}
 }
 
@@ -221,7 +251,12 @@ func (es *endpointSharding) updateState() {
 	childStates := make([]ChildState, 0, children.Len())
 
 	for _, child := range children.Values() {
+<<<<<<< HEAD
 		childState := child.childState
+=======
+		bw := child.(*balancerWrapper)
+		childState := bw.childState
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		childStates = append(childStates, childState)
 		childPicker := childState.State.Picker
 		switch childState.State.ConnectivityState {

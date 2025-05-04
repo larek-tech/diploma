@@ -3,6 +3,7 @@ module github.com/larek-tech/diploma/chat
 go 1.24.2
 
 require (
+<<<<<<< HEAD
 	google.golang.org/genproto v0.0.0-20250428153025-10db94c68c34
 	google.golang.org/grpc v1.72.0
 	google.golang.org/protobuf v1.36.6
@@ -13,4 +14,12 @@ require (
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250425173222-7b384671a197 // indirect
+=======
+	golang.org/x/net v0.35.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250218202821-56aae31c358a // indirect
+	google.golang.org/grpc v1.72.0 // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 )
