@@ -11,8 +11,11 @@ import (
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/larek-tech/diploma/data/internal/data/pb"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
 	sourceService "github.com/larek-tech/diploma/data/internal/domain/source/service"
+	"github.com/larek-tech/diploma/data/internal/grpc/vector_search"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/grpc/server"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/ollama"
 	chunkStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/chunk"
 	sourceStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/source"
@@ -136,6 +139,11 @@ func run() int {
 		w.WriteHeader(http.StatusOK)
 		w.Write(resp)
 	}))
+
+	srv := server.New()
+	pb.RegisterDataServiceServer(srv.GetSrv(), vector_search.New(chunkStore, embedder))
+
+	go srv.Run()
 
 	slog.Info("Starting server on :8080")
 	if err = http.ListenAndServe(":8080", nil); err != nil {
