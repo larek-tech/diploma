@@ -17,7 +17,7 @@ func New(db db) *Store {
 	}
 }
 func (s Store) Save(ctx context.Context, page *site.Page) error {
-	currentPage, err := s.GetByURL(ctx, page.ID)
+	currentPage, err := s.GetByURL(ctx, page.URL)
 	if err != nil {
 		return err
 	}
@@ -26,21 +26,21 @@ func (s Store) Save(ctx context.Context, page *site.Page) error {
 UPDATE pages
 SET
     site_id = $1,
-	url = $2,
-	metadata = $3,
-	raw = $4,
-	content = $5,
-	updated_at = now()
+    url = $2,
+    metadata = $3,
+    raw = $4,
+    content = $5,
+    updated_at = now()
 WHERE id = $6;
-`, page.SiteID, page.URL, page.Metadata, page.Raw, page.Content, page.ID)
-		page.ID = currentPage.ID
+`, page.SiteID, page.URL, page.Metadata, page.Raw, page.Content, currentPage.ID)
 		if err != nil {
 			return err
 		}
+		*page = *currentPage // update all fields in the passed-in page pointer
 		return nil
 	}
 	err = s.db.Exec(ctx, `
-INSERT INTO pages (id, site_id,url, metadata, raw, content, created_at, updated_at)
+INSERT INTO pages (id, site_id, url, metadata, raw, content, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, now(), now());
 `, page.ID, page.SiteID, page.URL, page.Metadata, page.Raw, page.Content)
 	if err != nil {
