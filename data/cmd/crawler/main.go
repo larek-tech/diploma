@@ -12,6 +12,7 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/larek-tech/diploma/data/internal/data/pb"
+	sitemap "github.com/larek-tech/diploma/data/internal/domain/sitemap/service"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
 	sourceService "github.com/larek-tech/diploma/data/internal/domain/source/service"
 	"github.com/larek-tech/diploma/data/internal/grpc/vector_search"
@@ -64,7 +65,7 @@ func run() int {
 	})
 
 	sourceStore := sourceStorage.New(pg)
-	srcService := sourceService.New(sourceStore, pub, trManager)
+	srcService := sourceService.New(sourceStore, sitemap.New(), pub, trManager)
 
 	chunkStore := chunkStorage.New(pg, trManager)
 	host, _ := getOllamaConfig()

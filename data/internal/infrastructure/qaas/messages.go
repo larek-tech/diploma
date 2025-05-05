@@ -10,8 +10,9 @@ type Entity interface {
 }
 
 type DelayedJob[T Entity] struct {
-	Payload *T  `json:"payload"` // полезная нагрузка
-	Delay   int `json:"delay"`   // задержка в секундах
+	Payload  *T             `json:"payload"`  // полезная нагрузка
+	Delay    int            `json:"delay"`    // задержка в секундах
+	Metadata map[string]any `json:"metadata"` // метаданные
 }
 
 type SiteJob = DelayedJob[site.Site]

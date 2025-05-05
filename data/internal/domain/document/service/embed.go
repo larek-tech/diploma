@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"unicode/utf8"
 
 	"github.com/google/uuid"
 	"github.com/larek-tech/diploma/data/internal/domain/document"
@@ -23,7 +24,7 @@ func (s Service) embed(ctx context.Context, doc *document.Document) ([]*document
 	if err != nil {
 		return nil, fmt.Errorf("failed to validate document: %w", err)
 	}
-	content := doc.Content
+	content := cleanUTF8(doc.Content)
 	rawChunks := characterTextSplitter(content, ChunkSize, ChunkOverlap)
 	if len(rawChunks) == 0 {
 		return nil, nil
@@ -96,4 +97,22 @@ func characterTextSplitter(text string, chunkSize, overlap int) []string {
 	}
 
 	return chunks
+}
+func cleanUTF8(input string) string {
+	if utf8.ValidString(input) {
+		return input
+	}
+	// Replace invalid bytes with the Unicode replacement character �
+	valid := make([]rune, 0, len(input))
+	for i, r := range input {
+		if r == utf8.RuneError {
+			_, size := utf8.DecodeRuneInString(input[i:])
+			if size == 1 {
+				valid = append(valid, '�') // replacement character
+				continue
+			}
+		}
+		valid = append(valid, r)
+	}
+	return string(valid)
 }

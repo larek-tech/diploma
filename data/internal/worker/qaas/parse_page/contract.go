@@ -17,6 +17,6 @@ type (
 		Publish(ctx context.Context, rawMsg []any, opts ...qaas.PublishOption) ([]string, error)
 	}
 	pageService interface {
-		ParsePage(ctx context.Context, page *site.Page) ([]*site.Page, bool, error)
+		ParsePage(ctx context.Context, page *site.Page, siteJobID string) ([]*site.Page, bool, error)
 	}
 )

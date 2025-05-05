@@ -12,6 +12,10 @@ import (
 // SitemapParser handles sitemap parsing operations
 type SitemapParser struct{}
 
+func New() *SitemapParser {
+	return &SitemapParser{}
+}
+
 // GetAndParseSitemap fetches a sitemap from a URL and parses it
 func (sp *SitemapParser) GetAndParseSitemap(url string) ([]sitemap.URLResult, error) {
 	resp, err := http.Get(url)

@@ -4,22 +4,25 @@ import (
 	"context"
 	"fmt"
 	"net/url"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/larek-tech/diploma/data/internal/domain/site"
+	"github.com/larek-tech/diploma/data/internal/domain/sitemap"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
+	"github.com/samber/lo"
 )
 
 type Service struct {
+	sitemapParser sitemapParser
 	sourceStorage sourceStorage
 	pub           publisher
 	trManager     transactionalManager
 }
 
-func New(sourceStorage sourceStorage, pub publisher, trManager transactionalManager) *Service {
+func New(sourceStorage sourceStorage, sitemapParser sitemapParser, pub publisher, trManager transactionalManager) *Service {
 	return &Service{
+		sitemapParser: sitemapParser,
 		sourceStorage: sourceStorage,
 		pub:           pub,
 		trManager:     trManager,
@@ -40,7 +43,7 @@ func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (
 		switch src.Type {
 		case source.Web:
 			var webSource *site.Site
-			webSource, err = createSite(src, message)
+			webSource, err = s.createSite(src, message)
 			if err != nil {
 				return fmt.Errorf("failed to create site: %w", err)
 			}
@@ -51,6 +54,9 @@ func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (
 			_, err = s.pub.Publish(ctx, []any{qaas.SiteJob{
 				Payload: webSource,
 				Delay:   0,
+				Metadata: map[string]any{
+					"siteJobID": uuid.NewString(),
+				},
 			}}, publishOptions...)
 			if err != nil {
 				return fmt.Errorf("failed to publish site job: %w", err)
@@ -68,18 +74,21 @@ func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (
 	return src, nil
 }
 
-func createSite(src *source.Source, message source.DataMessage) (*site.Site, error) {
+func (s Service) createSite(src *source.Source, message source.DataMessage) (*site.Site, error) {
 	siteURL, err := url.Parse(string(message.Content))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse url for web source: %w", err)
 	}
+	site, err := site.NewSite(src.ID, siteURL.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to create site: %w", err)
+	}
 
-	return &site.Site{
-		ID:             uuid.NewString(),
-		SourceID:       src.ID,
-		URL:            siteURL.String(),
-		AvailablePages: nil,
-		CreatedAt:      time.Now(),
-		UpdatedAt:      time.Now(),
-	}, nil
+	availableURLs, err := s.sitemapParser.GetAndParseSitemap(siteURL.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse sitemap: %w", err)
+	}
+	site.AvailablePages = lo.Map(availableURLs, func(v sitemap.URLResult, _ int) string { return v.URL })
+
+	return site, nil
 }

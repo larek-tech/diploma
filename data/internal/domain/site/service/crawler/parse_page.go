@@ -2,22 +2,27 @@ package crawler
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log/slog"
 	"time"
 
 	"github.com/larek-tech/diploma/data/internal/domain/site"
-	"github.com/samber/lo"
 )
 
 const ParsingDelta = time.Hour * 12
 
 // ParsePage parses the page and returns a list of outgoing pages.
-func (s Service) ParsePage(ctx context.Context, page *site.Page) ([]*site.Page, bool, error) {
+func (s Service) ParsePage(ctx context.Context, page *site.Page, parseSiteJobID string) ([]*site.Page, bool, error) {
 	err := validate(page)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to validate page: %w", err)
 	}
+	if parsed, err := s.pageJobStore.IsAlreadyParsed(ctx, page.URL); err != nil {
+		return nil, false, fmt.Errorf("failed to check if page is already parsed: %w", err)
+	} else if parsed {
+		return nil, false, errors.New("page already parsed")
+	}
+
 	//oldPage, err := s.pageStore.GetByURL(ctx, page.URL)
 	//if err != nil {
 	//	slog.Debug("page not found", "err", err)
@@ -50,37 +55,20 @@ func (s Service) ParsePage(ctx context.Context, page *site.Page) ([]*site.Page, 
 		return nil, false, fmt.Errorf("url %s is not in the same domain as site %s", page.URL, siteInfo.URL)
 	}
 
-	outgoingLinks, err := s.fetchContent(ctx, page)
+	_, err = s.fetchContent(ctx, page)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to fetch content: %w", err)
 	}
-	outgoingPages := make([]*site.Page, 0, len(outgoingLinks))
-	for _, link := range outgoingLinks {
-		outgoingPage, outGoingErr := s.pageStore.GetByURL(ctx, link)
-		if outGoingErr != nil {
-			slog.Error("failed to get outgoing page", "outGoingErr", outGoingErr)
-			continue
-		}
-		if outgoingPage == nil {
-			outgoingPage, err = site.NewPage(siteInfo.ID, link)
-			if err != nil {
-				slog.Warn("failed to create outgoing page", "err", err)
-				continue
-			}
-		}
-		outgoingPages = append(outgoingPages, outgoingPage)
+	if page.Raw == "" {
+		return nil, false, fmt.Errorf("page raw content is empty")
 	}
-	outgoingIDs := lo.Map(outgoingPages, func(p *site.Page, _ int) string {
-		return p.ID
-	})
-	page.OutgoingPages = lo.Uniq(append(page.OutgoingPages, outgoingIDs...))
 
 	err = s.pageStore.Save(ctx, page)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to save page: %w", err)
 	}
 
-	return outgoingPages, true, nil
+	return nil, true, nil
 }
 
 func validate(page *site.Page) error {

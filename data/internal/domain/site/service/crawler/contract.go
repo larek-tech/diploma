@@ -24,4 +24,7 @@ type (
 		GetByURL(ctx context.Context, url string) (*site.Page, error)
 		Save(ctx context.Context, page *site.Page) error
 	}
+	pageJobStore interface {
+		IsAlreadyParsed(ctx context.Context, parseSiteJobID string) (bool, error)
+	}
 )

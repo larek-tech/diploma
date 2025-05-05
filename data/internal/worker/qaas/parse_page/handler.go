@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/larek-tech/diploma/data/internal/domain/site"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
-	"github.com/samber/lo"
 	"go.dataddo.com/pgq"
 )
 
@@ -38,31 +36,26 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 		return true, fmt.Errorf("failed to unmarshal parsepage payload: %w", err)
 	}
 
+	if job.Metadata == nil {
+		return true, fmt.Errorf("failed to get siteJobID from job")
+	}
+	siteJobID, ok := job.Metadata["siteJobID"]
+	if !ok || siteJobID == "" {
+		return true, fmt.Errorf("failed to get siteJobID from job")
+	}
+
 	// FIXME: find place with empty uuid and how to prevent that?
 	slog.Info("handled page job", "jon", job)
 	page := job.Payload
 	if page == nil {
 		return true, fmt.Errorf("failed to get page from job")
 	}
-	outgoingPages, _, err := h.pageService.ParsePage(ctx, page)
+	_, _, err = h.pageService.ParsePage(ctx, page, siteJobID.(string))
 	if err != nil {
 		return true, fmt.Errorf("failed to handle page job: %w", err)
 	}
-	pagesToParse := lo.Map(outgoingPages, func(page *site.Page, index int) any {
-		return qaas.PageJob{
-			Payload: page,
-		}
-	})
+
 	publishOptions := []qaas.PublishOption{
-		qaas.WithQueue(qaas.ParsePageQueue),
-	}
-
-	_, err = h.publisher.Publish(ctx, pagesToParse, publishOptions...)
-	if err != nil {
-		slog.Error("failed to publish outgoing pages to qaas: %w", err)
-	}
-
-	publishOptions = []qaas.PublishOption{
 		qaas.WithQueue(qaas.ParsePageResultQueue),
 		qaas.WithSourceQueue(qaas.ParsePageQueue),
 	}

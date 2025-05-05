@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 	"github.com/larek-tech/diploma/data/internal/migrations"
 	"github.com/larek-tech/storage/postgres"
-	"go.dataddo.com/pgq/x/schema"
 )
 
 func main() {
@@ -37,11 +37,13 @@ func run() int {
 		slog.Info("waiting for migration to finish")
 		time.Sleep(time.Second * 1)
 	}
-	create := schema.GenerateCreateTableQuery(qaas.QueueName)
-	if err = db.Exec(ctx, create); err != nil {
-		slog.Error("failed to create pgq", "error", err)
-		return 1
-	}
+	pub := qaas.NewPublisher(stdlib.OpenDBFromPool(db.GetPool()))
+	pub.CreateAllTables([]qaas.Queue{
+		qaas.ParseSiteQueue,
+		qaas.ParsePageResultQueue,
+		qaas.ParsePageQueue,
+		qaas.EmbedResultQueue,
+	})
 
 	slog.Info("migration finished")
 	return 0

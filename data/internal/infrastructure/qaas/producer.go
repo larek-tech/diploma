@@ -81,6 +81,7 @@ func (p *Publisher) Publish(ctx context.Context, rawMsg []any, opts ...PublishOp
 				return nil, fmt.Errorf("failed to marshal message: %w", err)
 			}
 			// TODO: move metadata keys as constants
+
 			msgs[i] = &pgq.MessageOutgoing{
 				ScheduledFor: options.ScheduledFor,
 				Payload:      payload,

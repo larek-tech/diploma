@@ -35,16 +35,16 @@ func (s Storage) Update(ctx context.Context, documentID string, chunks []*docume
 			return fmt.Errorf("failed to delete old chunks: %w", err)
 		}
 		for _, chunk := range chunks {
-			metadata, err := json.Marshal(chunk.Metadata)
-			if err != nil {
-				return fmt.Errorf("failed to marshal metadata: %w", err)
-			}
+			// metadata, err := json.Marshal(chunk.Metadata)
+			// if err != nil {
+			// 	return fmt.Errorf("failed to marshal metadata: %w", err)
+			// }
 
 			if err := s.db.Exec(
 				txCtx,
-				`INSERT INTO chunks (id, index, source_id, document_id, content, metadata, embeddings)
+				`INSERT INTO chunks (id, index, source_id, document_id, content, embeddings)
      VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-				chunk.ID, chunk.Index, chunk.SourceID, documentID, chunk.Content, metadata, prepareVector(chunk.Embeddings),
+				chunk.ID, chunk.Index, chunk.SourceID, documentID, chunk.Content, prepareVector(chunk.Embeddings),
 			); err != nil {
 				return fmt.Errorf("failed to insert chunk: %w", err)
 			}
@@ -71,8 +71,7 @@ SELECT
     index,
     source_id,
     document_id,
-    content,
-    metadata,
+    content
     1 - (embeddings <=> $1) AS cosine_similarity
 FROM chunks
 WHERE source_id = ANY($2) AND 1 - (embeddings <=> $1) > $3

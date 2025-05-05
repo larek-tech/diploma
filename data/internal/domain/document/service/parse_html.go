@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -28,6 +29,8 @@ import (
 //	if err != nil {
 //	    // обработка ошибки
 //	}
+//
+// TODO: FIXME: failed to process page in embed_document: failed to process document: failed to update chunks: failed to insert chunk: ERROR: invalid byte sequence for encoding "UTF8": 0xbd (SQLSTATE 22021)
 func ParseHTML(content io.ReadSeeker) (string, error) {
 	_, err := content.Seek(0, io.SeekStart)
 	if err != nil {
@@ -64,5 +67,24 @@ func ParseHTML(content io.ReadSeeker) (string, error) {
 	if text == "" {
 		text = strings.Join(strings.Fields(doc.Text()), " ")
 	}
-	return text, nil
+	return cleanUTF8(text), nil
+}
+
+func cleanUTF8(input string) string {
+	if utf8.ValidString(input) {
+		return input
+	}
+	// Replace invalid bytes with the Unicode replacement character �
+	valid := make([]rune, 0, len(input))
+	for i, r := range input {
+		if r == utf8.RuneError {
+			_, size := utf8.DecodeRuneInString(input[i:])
+			if size == 1 {
+				valid = append(valid, '�') // replacement character
+				continue
+			}
+		}
+		valid = append(valid, r)
+	}
+	return string(valid)
 }

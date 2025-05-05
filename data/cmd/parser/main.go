@@ -18,6 +18,7 @@ import (
 	pageStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/page"
 	questionStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/question"
 	siteStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/site"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/postgres/sitejob"
 
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/embed_document"
@@ -80,7 +81,8 @@ func run() int {
 	questionStore := questionStorage.New(pg, trManager)
 	chunkStore := chunkStorage.New(pg, trManager)
 	pageStore := pageStorage.New(pg)
-	pageService := crawler.New(httpClient, siteStore, pageStore, trManager)
+	siteJobStore := sitejob.New(pg)
+	pageService := crawler.New(httpClient, siteStore, pageStore, siteJobStore, trManager)
 	embeddingService := documentService.New(documentStore, chunkStore, questionStore, embedderModel, llm, trManager)
 	consumer := qaas.NewConsumer(sqlDB)
 	// 	parse_page.New(pageStore, pageService, pub),

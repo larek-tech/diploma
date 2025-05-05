@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/larek-tech/diploma/data/internal/domain/sitemap"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 )
@@ -18,5 +19,8 @@ type (
 	}
 	transactionalManager interface {
 		Do(context.Context, func(context.Context) error) error
+	}
+	sitemapParser interface {
+		GetAndParseSitemap(url string) ([]sitemap.URLResult, error)
 	}
 )

@@ -23,7 +23,7 @@ func (s Storage) Save(ctx context.Context, site *site.Site) error {
 		// if record not found, create a new one
 		if postgres.IsNoRowsError(err) {
 			err = s.db.Exec(ctx, `
-INSERT INTO sites (id, source_id, url, created_at, updated_at) 
+INSERT INTO sites (id, source_id, url, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5);
 `, site.ID, site.SourceID, site.URL, site.CreatedAt, site.UpdatedAt)
 			return err
@@ -51,6 +51,7 @@ SELECT
     id,
     source_id,
     url,
+	available_pages,
     created_at,
     updated_at
 FROM sites WHERE id = $1;
@@ -58,11 +59,6 @@ FROM sites WHERE id = $1;
 	if err != nil {
 		return nil, err
 	}
-	pagesIDs, err := s.fetchPagesIDs(ctx, res)
-	if err != nil {
-		return nil, err
-	}
-	res.AvailablePages = pagesIDs
 
 	return &res, nil
 }
@@ -74,6 +70,7 @@ SELECT
     id,
     source_id,
     url,
+	available_pages,
     created_at,
     updated_at
 FROM sites WHERE url = $1;
@@ -81,29 +78,6 @@ FROM sites WHERE url = $1;
 	if err != nil {
 		return nil, err
 	}
-	pagesIDs, err := s.fetchPagesIDs(ctx, res)
-	if err != nil {
-		return nil, err
-	}
-	res.AvailablePages = pagesIDs
 
 	return &res, nil
-}
-
-func (s Storage) fetchPagesIDs(ctx context.Context, site site.Site) ([]string, error) {
-	var pagesIDS []string
-	err := s.db.QueryStructs(ctx, &pagesIDS, `
-SELECT 
-	id
-FROM pages
-WHERE site_id = $1;
-`, site.ID)
-	if err != nil {
-		if !postgres.IsNoRowsError(err) {
-			return nil, err
-		}
-		// No pages found, return empty slice
-		return []string{}, nil
-	}
-	return pagesIDS, nil
 }
