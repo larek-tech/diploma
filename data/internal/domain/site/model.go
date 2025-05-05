@@ -14,6 +14,7 @@ var (
 	ErrInvalidURL    = errors.New("invalid URL must be a valid URL")
 )
 
+// TODO: add sitemap
 type Site struct {
 	ID             string    `db:"id"`              // ID uuid идентификатор сайта
 	SourceID       string    `db:"source_id"`       // SourceID идентификатор источника к которому относится сайт

@@ -30,3 +30,6 @@ venv
 .venv
 .DS_Store
 .idea
+
+
+temp/

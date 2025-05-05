@@ -23,8 +23,6 @@ import (
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 	"github.com/larek-tech/diploma/data/internal/worker/kafka/create_source"
 	"github.com/larek-tech/storage/postgres"
-
-	"go.dataddo.com/pgq/x/schema"
 )
 
 func main() {
@@ -209,13 +207,6 @@ type SearchQuery struct {
 func getSqlCon(db *postgres.DB) *sql.DB {
 	pool := db.GetPool()
 	sqlCon := stdlib.OpenDBFromPool(pool)
-	create := schema.GenerateCreateTableQuery(qaas.QueueName)
-
-	_, err := sqlCon.Exec(create)
-	if err != nil {
-		slog.Error("Failed to create table", "error", err)
-		return nil
-	}
 	return sqlCon
 }
 

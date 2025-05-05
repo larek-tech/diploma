@@ -26,6 +26,7 @@ func New(
 	}
 }
 
+// TODO: add count of currently running jobs
 func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, error) {
 	//qaas.SiteJob
 	var job qaas.SiteJob
