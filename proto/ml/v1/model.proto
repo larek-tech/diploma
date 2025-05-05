@@ -29,12 +29,18 @@ message LLMMdel{
   float topP = 4;
 }
 
+message VectorSearch {
+  int64 topN = 1; // Сколько чанков забирать при векторном поиске.
+  float threshold = 2;
+  bool searchByQuery = 3;
+}
+
 message Scenario {
   ScenarioType customType = 1;
   string content = 2;
   MultiQuery multiQuery = 3;
   Reranker reranker = 4;
-  bool searchByQuery = 5;
+  VectorSearch vectorSearch = 5;
   LLMMdel model = 6;
 };
 

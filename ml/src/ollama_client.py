@@ -70,7 +70,8 @@ class OllamaClient:
             return self._handle_regular_response(response)
 
         except requests.exceptions.RequestException as e:
-            raise RuntimeError(f"API request failed: {e}") from e
+            msg = f"API request failed: {e}"
+            raise RuntimeError(msg) from e
 
     def _handle_regular_response(self, response: requests.Response) -> str:
         """Обработка обычного (не потокового) ответа."""

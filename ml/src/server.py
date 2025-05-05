@@ -10,11 +10,10 @@ import ml.v1.service_pb2_grpc as ml_pb2_grpc
 from config import (
     DATA_SERVICE_HOST,
     DATA_SERVICE_PORT,
+    DEFAULT_RERANKER_NAME,
     DEVICE,
     OLLAMA_BASE_URL,
     RAG_PROMPT,
-    THRESHOLD,
-    TOP_K,
 )
 from data_client import DataServiceClient
 from multi_query import get_multi_questions
@@ -32,9 +31,9 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
         self.data_client = DataServiceClient(
             host=DATA_SERVICE_HOST, port=DATA_SERVICE_PORT
         )
+        self.reranker_model_name = DEFAULT_RERANKER_NAME
         self.reranker = Reranker(
-            reranker_model_name="BAAI/bge-reranker-v2-m3",
-            max_length=2048,
+            reranker_model_name=self.reranker_model_name,
             device=DEVICE,
         )
 
@@ -53,38 +52,68 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
         )
 
         try:
-            content = request.query.content
-            perefrazing_questions = get_multi_questions(
-                client=self.ollama_client,
-                user_prompt=content,
-                n_questions=5,
-                model="hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
-            )
+            questions = [request.query.content]
+            if request.scenario.multiQuery.useMultiquery:
+                questions += get_multi_questions(
+                    client=self.ollama_client,
+                    user_prompt=request.query.content,
+                    n_questions=request.scenario.multiQuery.nQueryes,
+                    model=request.scenario.multiQuery.queryModelName
+                    if request.scenario.multiQuery.queryModelName
+                    else request.scenario.model.modelName,
+                )
 
             chunk_dict = {}
-            for question in perefrazing_questions:
+            for question in questions:
                 search_result = self.data_client.vector_search(
                     query=question,
                     source_ids=request.sourceIds,
-                    top_k=TOP_K,
-                    threshold=THRESHOLD,
-                    use_questions=False,
+                    top_k=request.scenario.vectorSearch.topN,
+                    threshold=request.scenario.vectorSearch.threshold,
+                    use_questions=request.scenario.vectorSearch.searchByQuery,
                 )
                 for chunk in search_result.chunks:
-                    # TODO: Возможность добавить поля по типу similaryty
-                    chunk_dict[chunk.id] = chunk.content
-            chunks = list(chunk_dict.values())
-            rerunked_chunks = self.reranker.rerank_documents(
-                query=request.query.content,
-                documents=chunks,
-            )
+                    chunk_dict[chunk.id] = {
+                        "content": chunk.content,
+                        "similarity": chunk.similarity,
+                    }
+            chunks = [
+                chunk["content"]
+                for chunk in sorted(
+                    chunk_dict.values(),
+                    key=lambda x: x["similarity"],
+                    reverse=True,
+                )
+            ]
+            if request.scenario.reranker.useRerank:
+                if (
+                    request.scenario.reranker.rerankerModel
+                    != self.reranker_model_name
+                ):
+                    self.reranker_model_name = (
+                        request.scenario.reranker.rerankerModel
+                    )
+                    self.reranker = Reranker(
+                        reranker_model_name=self.reranker_model_name,
+                        device=DEVICE,
+                    )
+                chunks = self.reranker.rerank_documents(
+                    query=request.query.content,
+                    documents=chunks,
+                    top_k=request.scenario.reranker.topK,
+                    max_length=request.scenario.reranker.rerankerMaxLenght,
+                )
             for i, token in enumerate(
                 self.ollama_client.generate(
                     prompt=RAG_PROMPT.format(
-                        query=request.query.content, docs=rerunked_chunks
+                        query=request.query.content, docs=chunks
                     ),
-                    model="hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+                    model=request.scenario.model.modelName,
                     stream=True,
+                    temprature=request.scenario.model.temprature,
+                    top_k=request.scenario.model.topK,
+                    top_p=request.scenario.model.topP,
+                    system=request.scenario.content,
                 )
             ):
                 response = ml_pb2_model.ProcessQueryResponse(

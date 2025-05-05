@@ -1,6 +1,7 @@
 import json
-from ollama_client import OllamaClient
+
 from config import MULTI_QUESTION_PROMPT
+from ollama_client import OllamaClient
 
 
 def generate_schema(
@@ -34,7 +35,7 @@ def get_multi_questions(
     user_prompt: str,
     n_questions: int,
     model: str,
-):
+) -> list[str]:
     schema = generate_schema(
         n=n_questions,
         schema_title="{i} перефразированный вопрос пользователя.",
