@@ -22,26 +22,33 @@ _runtime_version.ValidateProtobufRuntimeVersion(
 _sym_db = _symbol_database.Default()
 
 
+from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11ml/v1/model.proto\x12\x02ml\"A\n\x08Scenario\x12$\n\ncustomType\x18\x01 \x01(\x0e\x32\x10.ml.ScenarioType\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\";\n\x05Query\x12\x0e\n\x06userId\x18\x01 \x01(\x03\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\x12\x11\n\tmodelName\x18\x03 \x01(\t\"b\n\x13ProcessQueryRequest\x12\x18\n\x05query\x18\x01 \x01(\x0b\x32\t.ml.Query\x12\x1e\n\x08scenario\x18\x02 \x01(\x0b\x32\x0c.ml.Scenario\x12\x11\n\tsourceIds\x18\x03 \x03(\t\"\x18\n\x05\x43hunk\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\t\"C\n\x14ProcessQueryResponse\x12\x18\n\x05\x63hunk\x18\x01 \x01(\x0b\x32\t.ml.Chunk\x12\x11\n\tsourceIds\x18\x02 \x03(\t*9\n\x0cScenarioType\x12\x16\n\x12UNDEFINED_SCENARIO\x10\x00\x12\x11\n\rSYSTEM_PROMPT\x10\x01\x42\x10Z\x0einternal/ml/pbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11ml/v1/model.proto\x12\x05pb.ml\x1a\x1fgoogle/protobuf/timestamp.proto\"e\n\nMultiQuery\x12\x15\n\ruseMultiquery\x18\x01 \x01(\x08\x12\x10\n\x08nQueries\x18\x02 \x01(\x03\x12\x1b\n\x0equeryModelName\x18\x03 \x01(\tH\x00\x88\x01\x01\x42\x11\n\x0f_queryModelName\"]\n\x08Reranker\x12\x11\n\tuseRerank\x18\x01 \x01(\x08\x12\x15\n\rrerankerModel\x18\x02 \x01(\t\x12\x19\n\x11rerankerMaxLength\x18\x03 \x01(\x03\x12\x0c\n\x04topK\x18\x04 \x01(\x03\"d\n\x08LlmModel\x12\x11\n\tmodelName\x18\x01 \x01(\t\x12\x13\n\x0btemperature\x18\x02 \x01(\x02\x12\x0c\n\x04topK\x18\x03 \x01(\x03\x12\x0c\n\x04topP\x18\x04 \x01(\x02\x12\x14\n\x0csystemPrompt\x18\x05 \x01(\t\"F\n\x0cVectorSearch\x12\x0c\n\x04topN\x18\x01 \x01(\x03\x12\x11\n\tthreshold\x18\x02 \x01(\x02\x12\x15\n\rsearchByQuery\x18\x03 \x01(\x08\"\xc5\x02\n\x08Scenario\x12\n\n\x02id\x18\x01 \x01(\x03\x12*\n\nmultiQuery\x18\x02 \x01(\x0b\x32\x11.pb.ml.MultiQueryH\x00\x88\x01\x01\x12&\n\x08reranker\x18\x03 \x01(\x0b\x32\x0f.pb.ml.RerankerH\x01\x88\x01\x01\x12.\n\x0cvectorSearch\x18\x04 \x01(\x0b\x32\x13.pb.ml.VectorSearchH\x02\x88\x01\x01\x12\x1e\n\x05model\x18\x05 \x01(\x0b\x32\x0f.pb.ml.LlmModel\x12-\n\tcreatedAt\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12-\n\tupdatedAt\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\r\n\x0b_multiQueryB\x0b\n\t_rerankerB\x0f\n\r_vectorSearch\"4\n\x05Query\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0e\n\x06userId\x18\x02 \x01(\x03\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"h\n\x13ProcessQueryRequest\x12\x1b\n\x05query\x18\x01 \x01(\x0b\x32\x0c.pb.ml.Query\x12!\n\x08scenario\x18\x02 \x01(\x0b\x32\x0f.pb.ml.Scenario\x12\x11\n\tsourceIds\x18\x03 \x03(\t\"\x18\n\x05\x43hunk\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\t\"F\n\x14ProcessQueryResponse\x12\x1b\n\x05\x63hunk\x18\x01 \x01(\x0b\x32\x0c.pb.ml.Chunk\x12\x11\n\tsourceIds\x18\x02 \x03(\tB\x14Z\x12internal/domain/pbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'ml.v1.model_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
-  _globals['DESCRIPTOR']._serialized_options = b'Z\016internal/ml/pb'
-  _globals['_SCENARIOTYPE']._serialized_start=348
-  _globals['_SCENARIOTYPE']._serialized_end=405
-  _globals['_SCENARIO']._serialized_start=25
-  _globals['_SCENARIO']._serialized_end=90
-  _globals['_QUERY']._serialized_start=92
-  _globals['_QUERY']._serialized_end=151
-  _globals['_PROCESSQUERYREQUEST']._serialized_start=153
-  _globals['_PROCESSQUERYREQUEST']._serialized_end=251
-  _globals['_CHUNK']._serialized_start=253
-  _globals['_CHUNK']._serialized_end=277
-  _globals['_PROCESSQUERYRESPONSE']._serialized_start=279
-  _globals['_PROCESSQUERYRESPONSE']._serialized_end=346
+  _globals['DESCRIPTOR']._serialized_options = b'Z\022internal/domain/pb'
+  _globals['_MULTIQUERY']._serialized_start=61
+  _globals['_MULTIQUERY']._serialized_end=162
+  _globals['_RERANKER']._serialized_start=164
+  _globals['_RERANKER']._serialized_end=257
+  _globals['_LLMMODEL']._serialized_start=259
+  _globals['_LLMMODEL']._serialized_end=359
+  _globals['_VECTORSEARCH']._serialized_start=361
+  _globals['_VECTORSEARCH']._serialized_end=431
+  _globals['_SCENARIO']._serialized_start=434
+  _globals['_SCENARIO']._serialized_end=759
+  _globals['_QUERY']._serialized_start=761
+  _globals['_QUERY']._serialized_end=813
+  _globals['_PROCESSQUERYREQUEST']._serialized_start=815
+  _globals['_PROCESSQUERYREQUEST']._serialized_end=919
+  _globals['_CHUNK']._serialized_start=921
+  _globals['_CHUNK']._serialized_end=945
+  _globals['_PROCESSQUERYRESPONSE']._serialized_start=947
+  _globals['_PROCESSQUERYRESPONSE']._serialized_end=1017
 # @@protoc_insertion_point(module_scope)

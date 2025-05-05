@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package ml;
-option go_package = "internal/ml/pb";
+package pb.ml;
+option go_package="internal/domain/pb";
 
 import "ml/v1/model.proto";
 

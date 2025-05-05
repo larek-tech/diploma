@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package domain.v1;
+option go_package = "internal/domain/pb";
+
+import "google/protobuf/empty.proto";
+import "domain/v1/scenario_model.proto";
+import "ml/v1/model.proto";
+
+service ScenarioService {
+  rpc CreateScenario(CreateScenarioRequest) returns (pb.ml.Scenario) {};
+  rpc GetScenario(GetScenarioRequest) returns (GetScenarioResponse) {};
+  rpc UpdateScenario(UpdateScenarioRequest) returns (pb.ml.Scenario) {};
+  rpc DeleteScenario(DeleteScenarioRequest) returns (google.protobuf.Empty) {};
+  rpc ListScenarios(ListScenariosRequest) returns(ListScenariosResponse) {};
+};

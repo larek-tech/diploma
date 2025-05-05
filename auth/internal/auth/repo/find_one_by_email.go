@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+
 	"github.com/larek-tech/diploma/auth/internal/auth/model"
 	"github.com/yogenyslav/pkg/errs"
 )
@@ -9,7 +10,8 @@ import (
 const findOneByEmail = `
 	select id, email, hash_password, created_at, updated_at, is_deleted
 	from auth.user
-	where email = $1;
+	where email = $1
+		and is_deleted = false;
 `
 
 // FindOneByEmail returns a user filtered by email.

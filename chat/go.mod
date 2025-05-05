@@ -3,7 +3,6 @@ module github.com/larek-tech/diploma/chat
 go 1.24.2
 
 require (
-	google.golang.org/genproto v0.0.0-20250428153025-10db94c68c34
 	google.golang.org/grpc v1.72.0
 	google.golang.org/protobuf v1.36.6
 )

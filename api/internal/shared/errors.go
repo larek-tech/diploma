@@ -35,6 +35,12 @@ var (
 	ErrUnauthorized = errors.New("unauthorized")
 )
 
+// 403
+var (
+	// ErrForbidden is an error when user tries to access forbidden resource.
+	ErrForbidden = errors.New("forbidden")
+)
+
 // 404
 var (
 	// ErrSourceNotFound is an error when no source was found.

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package domain.v1;
+option go_package = "internal/domain/pb";
+
+import "domain/v1/admin_model.proto";
+
+service AdminService {
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {};
+}

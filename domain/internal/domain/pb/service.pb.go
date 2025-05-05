@@ -2,14 +2,13 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: domain/v1/service.proto
+// source: ml/v1/service.proto
 
 package pb
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	unsafe "unsafe"
 )
@@ -21,91 +20,48 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-var File_domain_v1_service_proto protoreflect.FileDescriptor
+var File_ml_v1_service_proto protoreflect.FileDescriptor
 
-const file_domain_v1_service_proto_rawDesc = "" +
+const file_ml_v1_service_proto_rawDesc = "" +
 	"\n" +
-	"\x17domain/v1/service.proto\x12\tdomain.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x15domain/v1/model.proto2\xfd\x02\n" +
-	"\rSourceService\x12C\n" +
-	"\fCreateSource\x12\x1e.domain.v1.CreateSourceRequest\x1a\x11.domain.v1.Source\"\x00\x12H\n" +
-	"\tGetSource\x12\x1b.domain.v1.GetSourceRequest\x1a\x1c.domain.v1.GetSourceResponse\"\x00\x12C\n" +
-	"\fUpdateSource\x12\x1e.domain.v1.UpdateSourceRequest\x1a\x11.domain.v1.Source\"\x00\x12H\n" +
-	"\fDeleteSource\x12\x1e.domain.v1.DeleteSourceRequest\x1a\x16.google.protobuf.Empty\"\x00\x12N\n" +
-	"\vListSources\x12\x1d.domain.v1.ListSourcesRequest\x1a\x1e.domain.v1.ListSourcesResponse\"\x002\xfd\x02\n" +
-	"\rDomainService\x12C\n" +
-	"\fCreateDomain\x12\x1e.domain.v1.CreateDomainRequest\x1a\x11.domain.v1.Domain\"\x00\x12H\n" +
-	"\tGetDomain\x12\x1b.domain.v1.GetDomainRequest\x1a\x1c.domain.v1.GetDomainResponse\"\x00\x12C\n" +
-	"\fUpdateDomain\x12\x1e.domain.v1.UpdateDomainRequest\x1a\x11.domain.v1.Domain\"\x00\x12H\n" +
-	"\fDeleteDomain\x12\x1e.domain.v1.DeleteDomainRequest\x1a\x16.google.protobuf.Empty\"\x00\x12N\n" +
-	"\vListDomains\x12\x1d.domain.v1.ListDomainsRequest\x1a\x1e.domain.v1.ListDomainsResponse\"\x00B\x14Z\x12internal/domain/pbb\x06proto3"
+	"\x13ml/v1/service.proto\x12\x05pb.ml\x1a\x11ml/v1/model.proto2X\n" +
+	"\tMLService\x12K\n" +
+	"\fProcessQuery\x12\x1a.pb.ml.ProcessQueryRequest\x1a\x1b.pb.ml.ProcessQueryResponse\"\x000\x01B\x14Z\x12internal/domain/pbb\x06proto3"
 
-var file_domain_v1_service_proto_goTypes = []any{
-	(*CreateSourceRequest)(nil), // 0: domain.v1.CreateSourceRequest
-	(*GetSourceRequest)(nil),    // 1: domain.v1.GetSourceRequest
-	(*UpdateSourceRequest)(nil), // 2: domain.v1.UpdateSourceRequest
-	(*DeleteSourceRequest)(nil), // 3: domain.v1.DeleteSourceRequest
-	(*ListSourcesRequest)(nil),  // 4: domain.v1.ListSourcesRequest
-	(*CreateDomainRequest)(nil), // 5: domain.v1.CreateDomainRequest
-	(*GetDomainRequest)(nil),    // 6: domain.v1.GetDomainRequest
-	(*UpdateDomainRequest)(nil), // 7: domain.v1.UpdateDomainRequest
-	(*DeleteDomainRequest)(nil), // 8: domain.v1.DeleteDomainRequest
-	(*ListDomainsRequest)(nil),  // 9: domain.v1.ListDomainsRequest
-	(*Source)(nil),              // 10: domain.v1.Source
-	(*GetSourceResponse)(nil),   // 11: domain.v1.GetSourceResponse
-	(*emptypb.Empty)(nil),       // 12: google.protobuf.Empty
-	(*ListSourcesResponse)(nil), // 13: domain.v1.ListSourcesResponse
-	(*Domain)(nil),              // 14: domain.v1.Domain
-	(*GetDomainResponse)(nil),   // 15: domain.v1.GetDomainResponse
-	(*ListDomainsResponse)(nil), // 16: domain.v1.ListDomainsResponse
+var file_ml_v1_service_proto_goTypes = []any{
+	(*ProcessQueryRequest)(nil),  // 0: pb.ml.ProcessQueryRequest
+	(*ProcessQueryResponse)(nil), // 1: pb.ml.ProcessQueryResponse
 }
-var file_domain_v1_service_proto_depIdxs = []int32{
-	0,  // 0: domain.v1.SourceService.CreateSource:input_type -> domain.v1.CreateSourceRequest
-	1,  // 1: domain.v1.SourceService.GetSource:input_type -> domain.v1.GetSourceRequest
-	2,  // 2: domain.v1.SourceService.UpdateSource:input_type -> domain.v1.UpdateSourceRequest
-	3,  // 3: domain.v1.SourceService.DeleteSource:input_type -> domain.v1.DeleteSourceRequest
-	4,  // 4: domain.v1.SourceService.ListSources:input_type -> domain.v1.ListSourcesRequest
-	5,  // 5: domain.v1.DomainService.CreateDomain:input_type -> domain.v1.CreateDomainRequest
-	6,  // 6: domain.v1.DomainService.GetDomain:input_type -> domain.v1.GetDomainRequest
-	7,  // 7: domain.v1.DomainService.UpdateDomain:input_type -> domain.v1.UpdateDomainRequest
-	8,  // 8: domain.v1.DomainService.DeleteDomain:input_type -> domain.v1.DeleteDomainRequest
-	9,  // 9: domain.v1.DomainService.ListDomains:input_type -> domain.v1.ListDomainsRequest
-	10, // 10: domain.v1.SourceService.CreateSource:output_type -> domain.v1.Source
-	11, // 11: domain.v1.SourceService.GetSource:output_type -> domain.v1.GetSourceResponse
-	10, // 12: domain.v1.SourceService.UpdateSource:output_type -> domain.v1.Source
-	12, // 13: domain.v1.SourceService.DeleteSource:output_type -> google.protobuf.Empty
-	13, // 14: domain.v1.SourceService.ListSources:output_type -> domain.v1.ListSourcesResponse
-	14, // 15: domain.v1.DomainService.CreateDomain:output_type -> domain.v1.Domain
-	15, // 16: domain.v1.DomainService.GetDomain:output_type -> domain.v1.GetDomainResponse
-	14, // 17: domain.v1.DomainService.UpdateDomain:output_type -> domain.v1.Domain
-	12, // 18: domain.v1.DomainService.DeleteDomain:output_type -> google.protobuf.Empty
-	16, // 19: domain.v1.DomainService.ListDomains:output_type -> domain.v1.ListDomainsResponse
-	10, // [10:20] is the sub-list for method output_type
-	0,  // [0:10] is the sub-list for method input_type
-	0,  // [0:0] is the sub-list for extension type_name
-	0,  // [0:0] is the sub-list for extension extendee
-	0,  // [0:0] is the sub-list for field type_name
+var file_ml_v1_service_proto_depIdxs = []int32{
+	0, // 0: pb.ml.MLService.ProcessQuery:input_type -> pb.ml.ProcessQueryRequest
+	1, // 1: pb.ml.MLService.ProcessQuery:output_type -> pb.ml.ProcessQueryResponse
+	1, // [1:2] is the sub-list for method output_type
+	0, // [0:1] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_domain_v1_service_proto_init() }
-func file_domain_v1_service_proto_init() {
-	if File_domain_v1_service_proto != nil {
+func init() { file_ml_v1_service_proto_init() }
+func file_ml_v1_service_proto_init() {
+	if File_ml_v1_service_proto != nil {
 		return
 	}
-	file_domain_v1_model_proto_init()
+	file_ml_v1_model_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_domain_v1_service_proto_rawDesc), len(file_domain_v1_service_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ml_v1_service_proto_rawDesc), len(file_ml_v1_service_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   0,
 			NumExtensions: 0,
-			NumServices:   2,
+			NumServices:   1,
 		},
-		GoTypes:           file_domain_v1_service_proto_goTypes,
-		DependencyIndexes: file_domain_v1_service_proto_depIdxs,
+		GoTypes:           file_ml_v1_service_proto_goTypes,
+		DependencyIndexes: file_ml_v1_service_proto_depIdxs,
 	}.Build()
-	File_domain_v1_service_proto = out.File
-	file_domain_v1_service_proto_goTypes = nil
-	file_domain_v1_service_proto_depIdxs = nil
+	File_ml_v1_service_proto = out.File
+	file_ml_v1_service_proto_goTypes = nil
+	file_ml_v1_service_proto_depIdxs = nil
 }

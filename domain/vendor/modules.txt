@@ -385,9 +385,6 @@ golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/width
-# google.golang.org/genproto v0.0.0-20250428153025-10db94c68c34
-## explicit; go 1.23.0
-google.golang.org/genproto/googleapis/type/datetime
 # google.golang.org/genproto/googleapis/api v0.0.0-20250428153025-10db94c68c34
 ## explicit; go 1.23.0
 google.golang.org/genproto/googleapis/api/httpbody

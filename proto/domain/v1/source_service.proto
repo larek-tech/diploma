@@ -4,7 +4,8 @@ package domain.v1;
 option go_package = "internal/domain/pb";
 
 import "google/protobuf/empty.proto";
-import "domain/v1/model.proto";
+import "domain/v1/source_model.proto";
+import "domain/v1/common_model.proto";
 
 service SourceService {
   rpc CreateSource(CreateSourceRequest) returns (Source) {};
@@ -12,12 +13,9 @@ service SourceService {
   rpc UpdateSource(UpdateSourceRequest) returns (Source) {};
   rpc DeleteSource(DeleteSourceRequest) returns (google.protobuf.Empty) {};
   rpc ListSources(ListSourcesRequest) returns(ListSourcesResponse) {};
-};
 
-service DomainService {
-  rpc CreateDomain(CreateDomainRequest) returns (Domain) {};
-  rpc GetDomain(GetDomainRequest) returns (GetDomainResponse) {};
-  rpc UpdateDomain(UpdateDomainRequest) returns (Domain) {};
-  rpc DeleteDomain(DeleteDomainRequest) returns (google.protobuf.Empty) {};
-  rpc ListDomains(ListDomainsRequest) returns(ListDomainsResponse) {};
+  rpc GetPermittedUsers(GetResourcePermissionsRequest) returns (PermittedUsers) {};
+  rpc UpdatePermittedUsers(PermittedUsers) returns (PermittedUsers) {};
+  rpc GetPermittedRoles(GetResourcePermissionsRequest) returns (PermittedRoles) {};
+  rpc UpdatePermittedRoles(PermittedRoles) returns (PermittedRoles) {};
 };

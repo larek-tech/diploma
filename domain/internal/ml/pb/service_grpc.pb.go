@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MLService_ProcessQuery_FullMethodName = "/ml.MLService/ProcessQuery"
+	MLService_ProcessQuery_FullMethodName = "/pb.ml.MLService/ProcessQuery"
 )
 
 // MLServiceClient is the client API for MLService service.
@@ -110,7 +110,7 @@ type MLService_ProcessQueryServer = grpc.ServerStreamingServer[ProcessQueryRespo
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var MLService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ml.MLService",
+	ServiceName: "pb.ml.MLService",
 	HandlerType: (*MLServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{

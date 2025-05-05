@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package domain.v1;
+option go_package = "internal/domain/pb";
+
+import "domain/v1/common_model.proto";
+
+message ListUsersRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+}
+
+message ListUsersResponse {
+  repeated User users = 1;
+}

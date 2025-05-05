@@ -24,17 +24,17 @@ var File_ml_v1_service_proto protoreflect.FileDescriptor
 
 const file_ml_v1_service_proto_rawDesc = "" +
 	"\n" +
-	"\x13ml/v1/service.proto\x12\x02ml\x1a\x11ml/v1/model.proto2R\n" +
-	"\tMLService\x12E\n" +
-	"\fProcessQuery\x12\x17.ml.ProcessQueryRequest\x1a\x18.ml.ProcessQueryResponse\"\x000\x01B\x10Z\x0einternal/ml/pbb\x06proto3"
+	"\x13ml/v1/service.proto\x12\x05pb.ml\x1a\x11ml/v1/model.proto2X\n" +
+	"\tMLService\x12K\n" +
+	"\fProcessQuery\x12\x1a.pb.ml.ProcessQueryRequest\x1a\x1b.pb.ml.ProcessQueryResponse\"\x000\x01B\x12Z\x10./internal/ml/pbb\x06proto3"
 
 var file_ml_v1_service_proto_goTypes = []any{
-	(*ProcessQueryRequest)(nil),  // 0: ml.ProcessQueryRequest
-	(*ProcessQueryResponse)(nil), // 1: ml.ProcessQueryResponse
+	(*ProcessQueryRequest)(nil),  // 0: pb.ml.ProcessQueryRequest
+	(*ProcessQueryResponse)(nil), // 1: pb.ml.ProcessQueryResponse
 }
 var file_ml_v1_service_proto_depIdxs = []int32{
-	0, // 0: ml.MLService.ProcessQuery:input_type -> ml.ProcessQueryRequest
-	1, // 1: ml.MLService.ProcessQuery:output_type -> ml.ProcessQueryResponse
+	0, // 0: pb.ml.MLService.ProcessQuery:input_type -> pb.ml.ProcessQueryRequest
+	1, // 1: pb.ml.MLService.ProcessQuery:output_type -> pb.ml.ProcessQueryResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

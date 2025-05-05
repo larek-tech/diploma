@@ -9,6 +9,7 @@ package pb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -21,63 +22,286 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ScenarioType int32
+type MultiQuery struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	UseMultiquery  bool                   `protobuf:"varint,1,opt,name=useMultiquery,proto3" json:"useMultiquery,omitempty"`
+	NQueries       int64                  `protobuf:"varint,2,opt,name=nQueries,proto3" json:"nQueries,omitempty"`                  // Количество перефразированных вопросов
+	QueryModelName *string                `protobuf:"bytes,3,opt,name=queryModelName,proto3,oneof" json:"queryModelName,omitempty"` // Пока не знаю нучно ли будет
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
 
-const (
-	ScenarioType_UNDEFINED_SCENARIO ScenarioType = 0
-	ScenarioType_SYSTEM_PROMPT      ScenarioType = 1
-)
+func (x *MultiQuery) Reset() {
+	*x = MultiQuery{}
+	mi := &file_ml_v1_model_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
 
-// Enum value maps for ScenarioType.
-var (
-	ScenarioType_name = map[int32]string{
-		0: "UNDEFINED_SCENARIO",
-		1: "SYSTEM_PROMPT",
+func (x *MultiQuery) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MultiQuery) ProtoMessage() {}
+
+func (x *MultiQuery) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
 	}
-	ScenarioType_value = map[string]int32{
-		"UNDEFINED_SCENARIO": 0,
-		"SYSTEM_PROMPT":      1,
-	}
-)
-
-func (x ScenarioType) Enum() *ScenarioType {
-	p := new(ScenarioType)
-	*p = x
-	return p
+	return mi.MessageOf(x)
 }
 
-func (x ScenarioType) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ScenarioType) Descriptor() protoreflect.EnumDescriptor {
-	return file_ml_v1_model_proto_enumTypes[0].Descriptor()
-}
-
-func (ScenarioType) Type() protoreflect.EnumType {
-	return &file_ml_v1_model_proto_enumTypes[0]
-}
-
-func (x ScenarioType) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ScenarioType.Descriptor instead.
-func (ScenarioType) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use MultiQuery.ProtoReflect.Descriptor instead.
+func (*MultiQuery) Descriptor() ([]byte, []int) {
 	return file_ml_v1_model_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *MultiQuery) GetUseMultiquery() bool {
+	if x != nil {
+		return x.UseMultiquery
+	}
+	return false
+}
+
+func (x *MultiQuery) GetNQueries() int64 {
+	if x != nil {
+		return x.NQueries
+	}
+	return 0
+}
+
+func (x *MultiQuery) GetQueryModelName() string {
+	if x != nil && x.QueryModelName != nil {
+		return *x.QueryModelName
+	}
+	return ""
+}
+
+type Reranker struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	UseRerank         bool                   `protobuf:"varint,1,opt,name=useRerank,proto3" json:"useRerank,omitempty"`
+	RerankerModel     string                 `protobuf:"bytes,2,opt,name=rerankerModel,proto3" json:"rerankerModel,omitempty"`
+	RerankerMaxLength int64                  `protobuf:"varint,3,opt,name=rerankerMaxLength,proto3" json:"rerankerMaxLength,omitempty"`
+	TopK              int64                  `protobuf:"varint,4,opt,name=topK,proto3" json:"topK,omitempty"` // Количество чанков после реранкинга
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *Reranker) Reset() {
+	*x = Reranker{}
+	mi := &file_ml_v1_model_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Reranker) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Reranker) ProtoMessage() {}
+
+func (x *Reranker) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Reranker.ProtoReflect.Descriptor instead.
+func (*Reranker) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Reranker) GetUseRerank() bool {
+	if x != nil {
+		return x.UseRerank
+	}
+	return false
+}
+
+func (x *Reranker) GetRerankerModel() string {
+	if x != nil {
+		return x.RerankerModel
+	}
+	return ""
+}
+
+func (x *Reranker) GetRerankerMaxLength() int64 {
+	if x != nil {
+		return x.RerankerMaxLength
+	}
+	return 0
+}
+
+func (x *Reranker) GetTopK() int64 {
+	if x != nil {
+		return x.TopK
+	}
+	return 0
+}
+
+type LlmModel struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ModelName     string                 `protobuf:"bytes,1,opt,name=modelName,proto3" json:"modelName,omitempty"`
+	Temperature   float32                `protobuf:"fixed32,2,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	TopK          int64                  `protobuf:"varint,3,opt,name=topK,proto3" json:"topK,omitempty"`
+	TopP          float32                `protobuf:"fixed32,4,opt,name=topP,proto3" json:"topP,omitempty"`
+	SystemPrompt  string                 `protobuf:"bytes,5,opt,name=systemPrompt,proto3" json:"systemPrompt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LlmModel) Reset() {
+	*x = LlmModel{}
+	mi := &file_ml_v1_model_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LlmModel) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LlmModel) ProtoMessage() {}
+
+func (x *LlmModel) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LlmModel.ProtoReflect.Descriptor instead.
+func (*LlmModel) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *LlmModel) GetModelName() string {
+	if x != nil {
+		return x.ModelName
+	}
+	return ""
+}
+
+func (x *LlmModel) GetTemperature() float32 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+func (x *LlmModel) GetTopK() int64 {
+	if x != nil {
+		return x.TopK
+	}
+	return 0
+}
+
+func (x *LlmModel) GetTopP() float32 {
+	if x != nil {
+		return x.TopP
+	}
+	return 0
+}
+
+func (x *LlmModel) GetSystemPrompt() string {
+	if x != nil {
+		return x.SystemPrompt
+	}
+	return ""
+}
+
+type VectorSearch struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TopN          int64                  `protobuf:"varint,1,opt,name=topN,proto3" json:"topN,omitempty"` // Сколько чанков забирать при векторном поиске.
+	Threshold     float32                `protobuf:"fixed32,2,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	SearchByQuery bool                   `protobuf:"varint,3,opt,name=searchByQuery,proto3" json:"searchByQuery,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VectorSearch) Reset() {
+	*x = VectorSearch{}
+	mi := &file_ml_v1_model_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VectorSearch) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VectorSearch) ProtoMessage() {}
+
+func (x *VectorSearch) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VectorSearch.ProtoReflect.Descriptor instead.
+func (*VectorSearch) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *VectorSearch) GetTopN() int64 {
+	if x != nil {
+		return x.TopN
+	}
+	return 0
+}
+
+func (x *VectorSearch) GetThreshold() float32 {
+	if x != nil {
+		return x.Threshold
+	}
+	return 0
+}
+
+func (x *VectorSearch) GetSearchByQuery() bool {
+	if x != nil {
+		return x.SearchByQuery
+	}
+	return false
 }
 
 type Scenario struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CustomType    ScenarioType           `protobuf:"varint,1,opt,name=customType,proto3,enum=ml.ScenarioType" json:"customType,omitempty"`
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	MultiQuery    *MultiQuery            `protobuf:"bytes,2,opt,name=multiQuery,proto3,oneof" json:"multiQuery,omitempty"`
+	Reranker      *Reranker              `protobuf:"bytes,3,opt,name=reranker,proto3,oneof" json:"reranker,omitempty"`
+	VectorSearch  *VectorSearch          `protobuf:"bytes,4,opt,name=vectorSearch,proto3,oneof" json:"vectorSearch,omitempty"`
+	Model         *LlmModel              `protobuf:"bytes,5,opt,name=model,proto3" json:"model,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Scenario) Reset() {
 	*x = Scenario{}
-	mi := &file_ml_v1_model_proto_msgTypes[0]
+	mi := &file_ml_v1_model_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -89,7 +313,7 @@ func (x *Scenario) String() string {
 func (*Scenario) ProtoMessage() {}
 
 func (x *Scenario) ProtoReflect() protoreflect.Message {
-	mi := &file_ml_v1_model_proto_msgTypes[0]
+	mi := &file_ml_v1_model_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -102,35 +326,70 @@ func (x *Scenario) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Scenario.ProtoReflect.Descriptor instead.
 func (*Scenario) Descriptor() ([]byte, []int) {
-	return file_ml_v1_model_proto_rawDescGZIP(), []int{0}
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *Scenario) GetCustomType() ScenarioType {
+func (x *Scenario) GetId() int64 {
 	if x != nil {
-		return x.CustomType
+		return x.Id
 	}
-	return ScenarioType_UNDEFINED_SCENARIO
+	return 0
 }
 
-func (x *Scenario) GetContent() string {
+func (x *Scenario) GetMultiQuery() *MultiQuery {
 	if x != nil {
-		return x.Content
+		return x.MultiQuery
 	}
-	return ""
+	return nil
+}
+
+func (x *Scenario) GetReranker() *Reranker {
+	if x != nil {
+		return x.Reranker
+	}
+	return nil
+}
+
+func (x *Scenario) GetVectorSearch() *VectorSearch {
+	if x != nil {
+		return x.VectorSearch
+	}
+	return nil
+}
+
+func (x *Scenario) GetModel() *LlmModel {
+	if x != nil {
+		return x.Model
+	}
+	return nil
+}
+
+func (x *Scenario) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *Scenario) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
 }
 
 type Query struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        int64                  `protobuf:"varint,1,opt,name=userId,proto3" json:"userId,omitempty"`
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	ModelName     string                 `protobuf:"bytes,3,opt,name=modelName,proto3" json:"modelName,omitempty"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        int64                  `protobuf:"varint,2,opt,name=userId,proto3" json:"userId,omitempty"`
+	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Query) Reset() {
 	*x = Query{}
-	mi := &file_ml_v1_model_proto_msgTypes[1]
+	mi := &file_ml_v1_model_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -142,7 +401,7 @@ func (x *Query) String() string {
 func (*Query) ProtoMessage() {}
 
 func (x *Query) ProtoReflect() protoreflect.Message {
-	mi := &file_ml_v1_model_proto_msgTypes[1]
+	mi := &file_ml_v1_model_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -155,7 +414,14 @@ func (x *Query) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Query.ProtoReflect.Descriptor instead.
 func (*Query) Descriptor() ([]byte, []int) {
-	return file_ml_v1_model_proto_rawDescGZIP(), []int{1}
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *Query) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
 }
 
 func (x *Query) GetUserId() int64 {
@@ -172,13 +438,6 @@ func (x *Query) GetContent() string {
 	return ""
 }
 
-func (x *Query) GetModelName() string {
-	if x != nil {
-		return x.ModelName
-	}
-	return ""
-}
-
 type ProcessQueryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Query         *Query                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
@@ -190,7 +449,7 @@ type ProcessQueryRequest struct {
 
 func (x *ProcessQueryRequest) Reset() {
 	*x = ProcessQueryRequest{}
-	mi := &file_ml_v1_model_proto_msgTypes[2]
+	mi := &file_ml_v1_model_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -202,7 +461,7 @@ func (x *ProcessQueryRequest) String() string {
 func (*ProcessQueryRequest) ProtoMessage() {}
 
 func (x *ProcessQueryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ml_v1_model_proto_msgTypes[2]
+	mi := &file_ml_v1_model_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -215,7 +474,7 @@ func (x *ProcessQueryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProcessQueryRequest.ProtoReflect.Descriptor instead.
 func (*ProcessQueryRequest) Descriptor() ([]byte, []int) {
-	return file_ml_v1_model_proto_rawDescGZIP(), []int{2}
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ProcessQueryRequest) GetQuery() *Query {
@@ -248,7 +507,7 @@ type Chunk struct {
 
 func (x *Chunk) Reset() {
 	*x = Chunk{}
-	mi := &file_ml_v1_model_proto_msgTypes[3]
+	mi := &file_ml_v1_model_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -260,7 +519,7 @@ func (x *Chunk) String() string {
 func (*Chunk) ProtoMessage() {}
 
 func (x *Chunk) ProtoReflect() protoreflect.Message {
-	mi := &file_ml_v1_model_proto_msgTypes[3]
+	mi := &file_ml_v1_model_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -273,7 +532,7 @@ func (x *Chunk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Chunk.ProtoReflect.Descriptor instead.
 func (*Chunk) Descriptor() ([]byte, []int) {
-	return file_ml_v1_model_proto_rawDescGZIP(), []int{3}
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Chunk) GetContent() string {
@@ -293,7 +552,7 @@ type ProcessQueryResponse struct {
 
 func (x *ProcessQueryResponse) Reset() {
 	*x = ProcessQueryResponse{}
-	mi := &file_ml_v1_model_proto_msgTypes[4]
+	mi := &file_ml_v1_model_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -305,7 +564,7 @@ func (x *ProcessQueryResponse) String() string {
 func (*ProcessQueryResponse) ProtoMessage() {}
 
 func (x *ProcessQueryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ml_v1_model_proto_msgTypes[4]
+	mi := &file_ml_v1_model_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -318,7 +577,7 @@ func (x *ProcessQueryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProcessQueryResponse.ProtoReflect.Descriptor instead.
 func (*ProcessQueryResponse) Descriptor() ([]byte, []int) {
-	return file_ml_v1_model_proto_rawDescGZIP(), []int{4}
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ProcessQueryResponse) GetChunk() *Chunk {
@@ -339,28 +598,54 @@ var File_ml_v1_model_proto protoreflect.FileDescriptor
 
 const file_ml_v1_model_proto_rawDesc = "" +
 	"\n" +
-	"\x11ml/v1/model.proto\x12\x02ml\"V\n" +
-	"\bScenario\x120\n" +
+	"\x11ml/v1/model.proto\x12\x05pb.ml\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8e\x01\n" +
 	"\n" +
-	"customType\x18\x01 \x01(\x0e2\x10.ml.ScenarioTypeR\n" +
-	"customType\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\"W\n" +
-	"\x05Query\x12\x16\n" +
-	"\x06userId\x18\x01 \x01(\x03R\x06userId\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\x12\x1c\n" +
-	"\tmodelName\x18\x03 \x01(\tR\tmodelName\"~\n" +
-	"\x13ProcessQueryRequest\x12\x1f\n" +
-	"\x05query\x18\x01 \x01(\v2\t.ml.QueryR\x05query\x12(\n" +
-	"\bscenario\x18\x02 \x01(\v2\f.ml.ScenarioR\bscenario\x12\x1c\n" +
+	"MultiQuery\x12$\n" +
+	"\ruseMultiquery\x18\x01 \x01(\bR\ruseMultiquery\x12\x1a\n" +
+	"\bnQueries\x18\x02 \x01(\x03R\bnQueries\x12+\n" +
+	"\x0equeryModelName\x18\x03 \x01(\tH\x00R\x0equeryModelName\x88\x01\x01B\x11\n" +
+	"\x0f_queryModelName\"\x90\x01\n" +
+	"\bReranker\x12\x1c\n" +
+	"\tuseRerank\x18\x01 \x01(\bR\tuseRerank\x12$\n" +
+	"\rrerankerModel\x18\x02 \x01(\tR\rrerankerModel\x12,\n" +
+	"\x11rerankerMaxLength\x18\x03 \x01(\x03R\x11rerankerMaxLength\x12\x12\n" +
+	"\x04topK\x18\x04 \x01(\x03R\x04topK\"\x96\x01\n" +
+	"\bLlmModel\x12\x1c\n" +
+	"\tmodelName\x18\x01 \x01(\tR\tmodelName\x12 \n" +
+	"\vtemperature\x18\x02 \x01(\x02R\vtemperature\x12\x12\n" +
+	"\x04topK\x18\x03 \x01(\x03R\x04topK\x12\x12\n" +
+	"\x04topP\x18\x04 \x01(\x02R\x04topP\x12\"\n" +
+	"\fsystemPrompt\x18\x05 \x01(\tR\fsystemPrompt\"f\n" +
+	"\fVectorSearch\x12\x12\n" +
+	"\x04topN\x18\x01 \x01(\x03R\x04topN\x12\x1c\n" +
+	"\tthreshold\x18\x02 \x01(\x02R\tthreshold\x12$\n" +
+	"\rsearchByQuery\x18\x03 \x01(\bR\rsearchByQuery\"\x8a\x03\n" +
+	"\bScenario\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x126\n" +
+	"\n" +
+	"multiQuery\x18\x02 \x01(\v2\x11.pb.ml.MultiQueryH\x00R\n" +
+	"multiQuery\x88\x01\x01\x120\n" +
+	"\breranker\x18\x03 \x01(\v2\x0f.pb.ml.RerankerH\x01R\breranker\x88\x01\x01\x12<\n" +
+	"\fvectorSearch\x18\x04 \x01(\v2\x13.pb.ml.VectorSearchH\x02R\fvectorSearch\x88\x01\x01\x12%\n" +
+	"\x05model\x18\x05 \x01(\v2\x0f.pb.ml.LlmModelR\x05model\x128\n" +
+	"\tcreatedAt\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
+	"\tupdatedAt\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\r\n" +
+	"\v_multiQueryB\v\n" +
+	"\t_rerankerB\x0f\n" +
+	"\r_vectorSearch\"I\n" +
+	"\x05Query\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
+	"\x06userId\x18\x02 \x01(\x03R\x06userId\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\"\x84\x01\n" +
+	"\x13ProcessQueryRequest\x12\"\n" +
+	"\x05query\x18\x01 \x01(\v2\f.pb.ml.QueryR\x05query\x12+\n" +
+	"\bscenario\x18\x02 \x01(\v2\x0f.pb.ml.ScenarioR\bscenario\x12\x1c\n" +
 	"\tsourceIds\x18\x03 \x03(\tR\tsourceIds\"!\n" +
 	"\x05Chunk\x12\x18\n" +
-	"\acontent\x18\x01 \x01(\tR\acontent\"U\n" +
-	"\x14ProcessQueryResponse\x12\x1f\n" +
-	"\x05chunk\x18\x01 \x01(\v2\t.ml.ChunkR\x05chunk\x12\x1c\n" +
-	"\tsourceIds\x18\x02 \x03(\tR\tsourceIds*9\n" +
-	"\fScenarioType\x12\x16\n" +
-	"\x12UNDEFINED_SCENARIO\x10\x00\x12\x11\n" +
-	"\rSYSTEM_PROMPT\x10\x01B\x10Z\x0einternal/ml/pbb\x06proto3"
+	"\acontent\x18\x01 \x01(\tR\acontent\"X\n" +
+	"\x14ProcessQueryResponse\x12\"\n" +
+	"\x05chunk\x18\x01 \x01(\v2\f.pb.ml.ChunkR\x05chunk\x12\x1c\n" +
+	"\tsourceIds\x18\x02 \x03(\tR\tsourceIdsB\x12Z\x10./internal/ml/pbb\x06proto3"
 
 var (
 	file_ml_v1_model_proto_rawDescOnce sync.Once
@@ -374,26 +659,34 @@ func file_ml_v1_model_proto_rawDescGZIP() []byte {
 	return file_ml_v1_model_proto_rawDescData
 }
 
-var file_ml_v1_model_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_ml_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_ml_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_ml_v1_model_proto_goTypes = []any{
-	(ScenarioType)(0),            // 0: ml.ScenarioType
-	(*Scenario)(nil),             // 1: ml.Scenario
-	(*Query)(nil),                // 2: ml.Query
-	(*ProcessQueryRequest)(nil),  // 3: ml.ProcessQueryRequest
-	(*Chunk)(nil),                // 4: ml.Chunk
-	(*ProcessQueryResponse)(nil), // 5: ml.ProcessQueryResponse
+	(*MultiQuery)(nil),            // 0: pb.ml.MultiQuery
+	(*Reranker)(nil),              // 1: pb.ml.Reranker
+	(*LlmModel)(nil),              // 2: pb.ml.LlmModel
+	(*VectorSearch)(nil),          // 3: pb.ml.VectorSearch
+	(*Scenario)(nil),              // 4: pb.ml.Scenario
+	(*Query)(nil),                 // 5: pb.ml.Query
+	(*ProcessQueryRequest)(nil),   // 6: pb.ml.ProcessQueryRequest
+	(*Chunk)(nil),                 // 7: pb.ml.Chunk
+	(*ProcessQueryResponse)(nil),  // 8: pb.ml.ProcessQueryResponse
+	(*timestamppb.Timestamp)(nil), // 9: google.protobuf.Timestamp
 }
 var file_ml_v1_model_proto_depIdxs = []int32{
-	0, // 0: ml.Scenario.customType:type_name -> ml.ScenarioType
-	2, // 1: ml.ProcessQueryRequest.query:type_name -> ml.Query
-	1, // 2: ml.ProcessQueryRequest.scenario:type_name -> ml.Scenario
-	4, // 3: ml.ProcessQueryResponse.chunk:type_name -> ml.Chunk
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	0, // 0: pb.ml.Scenario.multiQuery:type_name -> pb.ml.MultiQuery
+	1, // 1: pb.ml.Scenario.reranker:type_name -> pb.ml.Reranker
+	3, // 2: pb.ml.Scenario.vectorSearch:type_name -> pb.ml.VectorSearch
+	2, // 3: pb.ml.Scenario.model:type_name -> pb.ml.LlmModel
+	9, // 4: pb.ml.Scenario.createdAt:type_name -> google.protobuf.Timestamp
+	9, // 5: pb.ml.Scenario.updatedAt:type_name -> google.protobuf.Timestamp
+	5, // 6: pb.ml.ProcessQueryRequest.query:type_name -> pb.ml.Query
+	4, // 7: pb.ml.ProcessQueryRequest.scenario:type_name -> pb.ml.Scenario
+	7, // 8: pb.ml.ProcessQueryResponse.chunk:type_name -> pb.ml.Chunk
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_ml_v1_model_proto_init() }
@@ -401,19 +694,20 @@ func file_ml_v1_model_proto_init() {
 	if File_ml_v1_model_proto != nil {
 		return
 	}
+	file_ml_v1_model_proto_msgTypes[0].OneofWrappers = []any{}
+	file_ml_v1_model_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ml_v1_model_proto_rawDesc), len(file_ml_v1_model_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   5,
+			NumEnums:      0,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_ml_v1_model_proto_goTypes,
 		DependencyIndexes: file_ml_v1_model_proto_depIdxs,
-		EnumInfos:         file_ml_v1_model_proto_enumTypes,
 		MessageInfos:      file_ml_v1_model_proto_msgTypes,
 	}.Build()
 	File_ml_v1_model_proto = out.File

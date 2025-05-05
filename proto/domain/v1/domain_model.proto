@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package domain.v1;
+option go_package = "internal/domain/pb";
+
+import "google/protobuf/timestamp.proto";
+
+message Domain {
+  int64 id = 1;
+  string title = 2;
+  repeated int64 sourceIds = 3;
+  google.protobuf.Timestamp createdAt = 4;
+  google.protobuf.Timestamp updatedAt = 5;
+};
+
+message CreateDomainRequest {
+  string title = 1;
+  repeated int64 sourceIds = 2;
+};
+
+message GetDomainRequest {
+  int64 domainId = 1;
+}
+
+message GetDomainResponse {
+  Domain domain = 1;
+};
+
+message UpdateDomainRequest {
+  int64 domainId = 1;
+  string title = 2;
+  repeated int64 sourceIds = 3;
+};
+
+message DeleteDomainRequest {
+  int64 domainId = 1;
+};
+
+message ListDomainsRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+};
+
+message ListDomainsResponse {
+  repeated Domain domains = 1;
+};

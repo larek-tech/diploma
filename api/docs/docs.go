@@ -114,6 +114,192 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/domain/permissions/roles/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns list of roles permitted to domain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Get permitted roles.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested domain ID",
+                        "name": "domainID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permitted roles",
+                        "schema": {
+                            "$ref": "#/definitions/pb.GetDomainResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates list of roles permitted to domain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Update permitted roles.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested domain ID",
+                        "name": "domainID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New list of permitted roles",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedRoles"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated roles permissions",
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedRoles"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/domain/permissions/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns list of users permitted to domain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Get permitted users.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested domain ID",
+                        "name": "domainID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permitted users",
+                        "schema": {
+                            "$ref": "#/definitions/pb.GetDomainResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates list of users permitted to domain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Update permitted users.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested domain ID",
+                        "name": "domainID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New list of permitted users",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedUsers"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated users permissions",
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedUsers"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/domain/{id}": {
             "get": {
                 "security": [
@@ -354,6 +540,192 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Failed to list sources",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/source/permissions/roles/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns list of roles permitted to source.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "Get permitted roles.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested source ID",
+                        "name": "sourceID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permitted roles",
+                        "schema": {
+                            "$ref": "#/definitions/pb.GetSourceResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates list of roles permitted to source.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "Update permitted roles.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested source ID",
+                        "name": "sourceID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New list of permitted roles",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedRoles"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated roles permissions",
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedRoles"
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/source/permissions/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns list of users permitted to source.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "Get permitted users.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested source ID",
+                        "name": "sourceID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permitted users",
+                        "schema": {
+                            "$ref": "#/definitions/pb.GetSourceResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates list of users permitted to source.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "Update permitted users.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested source ID",
+                        "name": "sourceID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New list of permitted users",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedUsers"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated users permissions",
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedUsers"
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
                         "schema": {
                             "type": "string"
                         }
@@ -698,6 +1070,34 @@ const docTemplate = `{
                 },
                 "type": {
                     "type": "string"
+                }
+            }
+        },
+        "pb.PermittedRoles": {
+            "type": "object",
+            "properties": {
+                "resourceId": {
+                    "type": "integer"
+                },
+                "roleIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "pb.PermittedUsers": {
+            "type": "object",
+            "properties": {
+                "resourceId": {
+                    "type": "integer"
+                },
+                "userIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

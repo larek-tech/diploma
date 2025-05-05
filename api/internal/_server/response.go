@@ -54,6 +54,11 @@ var (
 			Msg:    "unauthorized",
 			Status: fiber.StatusUnauthorized,
 		},
+		// 403
+		shared.ErrForbidden: {
+			Msg:    "user has no access to the resource",
+			Status: fiber.StatusForbidden,
+		},
 		// 404
 		shared.ErrSourceNotFound: {
 			Msg:    "source not found",

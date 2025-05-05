@@ -1,26 +1,51 @@
 syntax = "proto3";
 
-package ml;
-option go_package = "internal/ml/pb";
+package pb.ml;
+option go_package="internal/domain/pb";
 
-enum ScenarioType {
-  UNDEFINED_SCENARIO = 0;
-  SYSTEM_PROMPT = 1;
-};
+import "google/protobuf/timestamp.proto";
+
+message MultiQuery {
+  bool useMultiquery = 1;
+  int64 nQueries = 2; // Количество перефразированных вопросов
+  optional string queryModelName = 3; // Пока не знаю нучно ли будет
+}
+
+message Reranker {
+  bool useRerank = 1;
+  string rerankerModel = 2;
+  int64 rerankerMaxLength = 3;
+  int64 topK = 4; // Количество чанков после реранкинга
+}
+
+message LlmModel{
+  string modelName = 1;
+  float temperature = 2;
+  int64 topK = 3;
+  float topP = 4;
+  string systemPrompt = 5;
+}
+
+message VectorSearch {
+  int64 topN = 1; // Сколько чанков забирать при векторном поиске.
+  float threshold = 2;
+  bool searchByQuery = 3;
+}
 
 message Scenario {
-  ScenarioType customType = 1;
-  string content = 2;
-//  bool useMultiQuery = 3;
-//  bool useQuestions = 4; // hypothetical questions
-//  uint64 chunkSize = 5;
-//  uint64 topK = 6;
+  int64 id = 1;
+  optional MultiQuery multiQuery = 2;
+  optional Reranker reranker = 3;
+  optional VectorSearch vectorSearch = 4;
+  LlmModel model = 5;
+  google.protobuf.Timestamp createdAt = 6;
+  google.protobuf.Timestamp updatedAt = 7;
 };
 
 message Query {
-  int64 userId = 1;
-  string content = 2;
-  string modelName = 3;
+  int64 id = 1;
+  int64 userId = 2;
+  string content = 3;
 };
 
 message ProcessQueryRequest {

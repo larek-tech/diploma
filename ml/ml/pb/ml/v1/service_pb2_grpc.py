@@ -35,7 +35,7 @@ class MLServiceStub(object):
             channel: A grpc.Channel.
         """
         self.ProcessQuery = channel.unary_stream(
-                '/ml.MLService/ProcessQuery',
+                '/pb.ml.MLService/ProcessQuery',
                 request_serializer=ml_dot_v1_dot_model__pb2.ProcessQueryRequest.SerializeToString,
                 response_deserializer=ml_dot_v1_dot_model__pb2.ProcessQueryResponse.FromString,
                 _registered_method=True)
@@ -60,9 +60,9 @@ def add_MLServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'ml.MLService', rpc_method_handlers)
+            'pb.ml.MLService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('ml.MLService', rpc_method_handlers)
+    server.add_registered_method_handlers('pb.ml.MLService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -83,7 +83,7 @@ class MLService(object):
         return grpc.experimental.unary_stream(
             request,
             target,
-            '/ml.MLService/ProcessQuery',
+            '/pb.ml.MLService/ProcessQuery',
             ml_dot_v1_dot_model__pb2.ProcessQueryRequest.SerializeToString,
             ml_dot_v1_dot_model__pb2.ProcessQueryResponse.FromString,
             options,

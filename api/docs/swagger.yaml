@@ -94,6 +94,24 @@ definitions:
       type:
         type: string
     type: object
+  pb.PermittedRoles:
+    properties:
+      resourceId:
+        type: integer
+      roleIds:
+        items:
+          type: integer
+        type: array
+    type: object
+  pb.PermittedUsers:
+    properties:
+      resourceId:
+        type: integer
+      userIds:
+        items:
+          type: integer
+        type: array
+    type: object
   pb.Source:
     properties:
       content:
@@ -374,6 +392,124 @@ paths:
       summary: List domains.
       tags:
       - domain
+  /api/v1/domain/permissions/roles/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Returns list of roles permitted to domain.
+      parameters:
+      - description: Requested domain ID
+        in: path
+        name: domainID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Permitted roles
+          schema:
+            $ref: '#/definitions/pb.GetDomainResponse'
+        "404":
+          description: Domain not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get permitted roles.
+      tags:
+      - domain
+    put:
+      consumes:
+      - application/json
+      description: Updates list of roles permitted to domain.
+      parameters:
+      - description: Requested domain ID
+        in: path
+        name: domainID
+        required: true
+        type: integer
+      - description: New list of permitted roles
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.PermittedRoles'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated roles permissions
+          schema:
+            $ref: '#/definitions/pb.PermittedRoles'
+        "404":
+          description: Domain not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update permitted roles.
+      tags:
+      - domain
+  /api/v1/domain/permissions/users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Returns list of users permitted to domain.
+      parameters:
+      - description: Requested domain ID
+        in: path
+        name: domainID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Permitted users
+          schema:
+            $ref: '#/definitions/pb.GetDomainResponse'
+        "404":
+          description: Domain not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get permitted users.
+      tags:
+      - domain
+    put:
+      consumes:
+      - application/json
+      description: Updates list of users permitted to domain.
+      parameters:
+      - description: Requested domain ID
+        in: path
+        name: domainID
+        required: true
+        type: integer
+      - description: New list of permitted users
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.PermittedUsers'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated users permissions
+          schema:
+            $ref: '#/definitions/pb.PermittedUsers'
+        "404":
+          description: Domain not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update permitted users.
+      tags:
+      - domain
   /api/v1/source/:
     post:
       consumes:
@@ -529,6 +665,124 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: List sources.
+      tags:
+      - source
+  /api/v1/source/permissions/roles/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Returns list of roles permitted to source.
+      parameters:
+      - description: Requested source ID
+        in: path
+        name: sourceID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Permitted roles
+          schema:
+            $ref: '#/definitions/pb.GetSourceResponse'
+        "404":
+          description: Source not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get permitted roles.
+      tags:
+      - source
+    put:
+      consumes:
+      - application/json
+      description: Updates list of roles permitted to source.
+      parameters:
+      - description: Requested source ID
+        in: path
+        name: sourceID
+        required: true
+        type: integer
+      - description: New list of permitted roles
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.PermittedRoles'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated roles permissions
+          schema:
+            $ref: '#/definitions/pb.PermittedRoles'
+        "404":
+          description: Source not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update permitted roles.
+      tags:
+      - source
+  /api/v1/source/permissions/users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Returns list of users permitted to source.
+      parameters:
+      - description: Requested source ID
+        in: path
+        name: sourceID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Permitted users
+          schema:
+            $ref: '#/definitions/pb.GetSourceResponse'
+        "404":
+          description: Source not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get permitted users.
+      tags:
+      - source
+    put:
+      consumes:
+      - application/json
+      description: Updates list of users permitted to source.
+      parameters:
+      - description: Requested source ID
+        in: path
+        name: sourceID
+        required: true
+        type: integer
+      - description: New list of permitted users
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.PermittedUsers'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated users permissions
+          schema:
+            $ref: '#/definitions/pb.PermittedUsers'
+        "404":
+          description: Source not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update permitted users.
       tags:
       - source
   /auth/v1/login:

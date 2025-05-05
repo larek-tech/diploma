@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: domain/v1/model.proto
+// source: ml/v1/model.proto
 
 package pb
 
@@ -22,139 +22,30 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type SourceType int32
-
-const (
-	SourceType_TYPE_UNDEFINED        SourceType = 0
-	SourceType_TYPE_WEB              SourceType = 1
-	SourceType_TYPE_SINGLE_FILE      SourceType = 2
-	SourceType_TYPE_ARCHIVED_FILES   SourceType = 3
-	SourceType_TYPE_WITH_CREDENTIALS SourceType = 4
-)
-
-// Enum value maps for SourceType.
-var (
-	SourceType_name = map[int32]string{
-		0: "TYPE_UNDEFINED",
-		1: "TYPE_WEB",
-		2: "TYPE_SINGLE_FILE",
-		3: "TYPE_ARCHIVED_FILES",
-		4: "TYPE_WITH_CREDENTIALS",
-	}
-	SourceType_value = map[string]int32{
-		"TYPE_UNDEFINED":        0,
-		"TYPE_WEB":              1,
-		"TYPE_SINGLE_FILE":      2,
-		"TYPE_ARCHIVED_FILES":   3,
-		"TYPE_WITH_CREDENTIALS": 4,
-	}
-)
-
-func (x SourceType) Enum() *SourceType {
-	p := new(SourceType)
-	*p = x
-	return p
+type MultiQuery struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	UseMultiquery  bool                   `protobuf:"varint,1,opt,name=useMultiquery,proto3" json:"useMultiquery,omitempty"`
+	NQueries       int64                  `protobuf:"varint,2,opt,name=nQueries,proto3" json:"nQueries,omitempty"`                  // Количество перефразированных вопросов
+	QueryModelName *string                `protobuf:"bytes,3,opt,name=queryModelName,proto3,oneof" json:"queryModelName,omitempty"` // Пока не знаю нучно ли будет
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
-func (x SourceType) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (SourceType) Descriptor() protoreflect.EnumDescriptor {
-	return file_domain_v1_model_proto_enumTypes[0].Descriptor()
-}
-
-func (SourceType) Type() protoreflect.EnumType {
-	return &file_domain_v1_model_proto_enumTypes[0]
-}
-
-func (x SourceType) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use SourceType.Descriptor instead.
-func (SourceType) EnumDescriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{0}
-}
-
-type SourceStatus int32
-
-const (
-	SourceStatus_STATUS_UNDEFINED SourceStatus = 0
-	SourceStatus_STATUS_READY     SourceStatus = 1
-	SourceStatus_STATUS_PARSING   SourceStatus = 2
-	SourceStatus_STATUS_FAILED    SourceStatus = 3
-)
-
-// Enum value maps for SourceStatus.
-var (
-	SourceStatus_name = map[int32]string{
-		0: "STATUS_UNDEFINED",
-		1: "STATUS_READY",
-		2: "STATUS_PARSING",
-		3: "STATUS_FAILED",
-	}
-	SourceStatus_value = map[string]int32{
-		"STATUS_UNDEFINED": 0,
-		"STATUS_READY":     1,
-		"STATUS_PARSING":   2,
-		"STATUS_FAILED":    3,
-	}
-)
-
-func (x SourceStatus) Enum() *SourceStatus {
-	p := new(SourceStatus)
-	*p = x
-	return p
-}
-
-func (x SourceStatus) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (SourceStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_domain_v1_model_proto_enumTypes[1].Descriptor()
-}
-
-func (SourceStatus) Type() protoreflect.EnumType {
-	return &file_domain_v1_model_proto_enumTypes[1]
-}
-
-func (x SourceStatus) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use SourceStatus.Descriptor instead.
-func (SourceStatus) EnumDescriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{1}
-}
-
-type CronFormat struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Minute        int32                  `protobuf:"varint,1,opt,name=minute,proto3" json:"minute,omitempty"`
-	Hour          int32                  `protobuf:"varint,2,opt,name=hour,proto3" json:"hour,omitempty"`
-	DayOfMonth    int32                  `protobuf:"varint,3,opt,name=dayOfMonth,proto3" json:"dayOfMonth,omitempty"`
-	Month         int32                  `protobuf:"varint,4,opt,name=month,proto3" json:"month,omitempty"`
-	DayOfWeek     int32                  `protobuf:"varint,5,opt,name=dayOfWeek,proto3" json:"dayOfWeek,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CronFormat) Reset() {
-	*x = CronFormat{}
-	mi := &file_domain_v1_model_proto_msgTypes[0]
+func (x *MultiQuery) Reset() {
+	*x = MultiQuery{}
+	mi := &file_ml_v1_model_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CronFormat) String() string {
+func (x *MultiQuery) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CronFormat) ProtoMessage() {}
+func (*MultiQuery) ProtoMessage() {}
 
-func (x *CronFormat) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[0]
+func (x *MultiQuery) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -165,69 +56,57 @@ func (x *CronFormat) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CronFormat.ProtoReflect.Descriptor instead.
-func (*CronFormat) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{0}
+// Deprecated: Use MultiQuery.ProtoReflect.Descriptor instead.
+func (*MultiQuery) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CronFormat) GetMinute() int32 {
+func (x *MultiQuery) GetUseMultiquery() bool {
 	if x != nil {
-		return x.Minute
+		return x.UseMultiquery
+	}
+	return false
+}
+
+func (x *MultiQuery) GetNQueries() int64 {
+	if x != nil {
+		return x.NQueries
 	}
 	return 0
 }
 
-func (x *CronFormat) GetHour() int32 {
-	if x != nil {
-		return x.Hour
+func (x *MultiQuery) GetQueryModelName() string {
+	if x != nil && x.QueryModelName != nil {
+		return *x.QueryModelName
 	}
-	return 0
+	return ""
 }
 
-func (x *CronFormat) GetDayOfMonth() int32 {
-	if x != nil {
-		return x.DayOfMonth
-	}
-	return 0
+type Reranker struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	UseRerank         bool                   `protobuf:"varint,1,opt,name=useRerank,proto3" json:"useRerank,omitempty"`
+	RerankerModel     string                 `protobuf:"bytes,2,opt,name=rerankerModel,proto3" json:"rerankerModel,omitempty"`
+	RerankerMaxLength int64                  `protobuf:"varint,3,opt,name=rerankerMaxLength,proto3" json:"rerankerMaxLength,omitempty"`
+	TopK              int64                  `protobuf:"varint,4,opt,name=topK,proto3" json:"topK,omitempty"` // Количество чанков после реранкинга
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
-func (x *CronFormat) GetMonth() int32 {
-	if x != nil {
-		return x.Month
-	}
-	return 0
-}
-
-func (x *CronFormat) GetDayOfWeek() int32 {
-	if x != nil {
-		return x.DayOfWeek
-	}
-	return 0
-}
-
-type UpdateParams struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	EveryPeriod   *int64                 `protobuf:"varint,1,opt,name=everyPeriod,proto3,oneof" json:"everyPeriod,omitempty"`
-	Cron          *CronFormat            `protobuf:"bytes,2,opt,name=cron,proto3,oneof" json:"cron,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateParams) Reset() {
-	*x = UpdateParams{}
-	mi := &file_domain_v1_model_proto_msgTypes[1]
+func (x *Reranker) Reset() {
+	*x = Reranker{}
+	mi := &file_ml_v1_model_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpdateParams) String() string {
+func (x *Reranker) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpdateParams) ProtoMessage() {}
+func (*Reranker) ProtoMessage() {}
 
-func (x *UpdateParams) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[1]
+func (x *Reranker) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -238,56 +117,203 @@ func (x *UpdateParams) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateParams.ProtoReflect.Descriptor instead.
-func (*UpdateParams) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{1}
+// Deprecated: Use Reranker.ProtoReflect.Descriptor instead.
+func (*Reranker) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *UpdateParams) GetEveryPeriod() int64 {
-	if x != nil && x.EveryPeriod != nil {
-		return *x.EveryPeriod
+func (x *Reranker) GetUseRerank() bool {
+	if x != nil {
+		return x.UseRerank
+	}
+	return false
+}
+
+func (x *Reranker) GetRerankerModel() string {
+	if x != nil {
+		return x.RerankerModel
+	}
+	return ""
+}
+
+func (x *Reranker) GetRerankerMaxLength() int64 {
+	if x != nil {
+		return x.RerankerMaxLength
 	}
 	return 0
 }
 
-func (x *UpdateParams) GetCron() *CronFormat {
+func (x *Reranker) GetTopK() int64 {
 	if x != nil {
-		return x.Cron
+		return x.TopK
 	}
-	return nil
+	return 0
 }
 
-type Source struct {
+type LlmModel struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ModelName     string                 `protobuf:"bytes,1,opt,name=modelName,proto3" json:"modelName,omitempty"`
+	Temperature   float32                `protobuf:"fixed32,2,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	TopK          int64                  `protobuf:"varint,3,opt,name=topK,proto3" json:"topK,omitempty"`
+	TopP          float32                `protobuf:"fixed32,4,opt,name=topP,proto3" json:"topP,omitempty"`
+	SystemPrompt  string                 `protobuf:"bytes,5,opt,name=systemPrompt,proto3" json:"systemPrompt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LlmModel) Reset() {
+	*x = LlmModel{}
+	mi := &file_ml_v1_model_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LlmModel) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LlmModel) ProtoMessage() {}
+
+func (x *LlmModel) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LlmModel.ProtoReflect.Descriptor instead.
+func (*LlmModel) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *LlmModel) GetModelName() string {
+	if x != nil {
+		return x.ModelName
+	}
+	return ""
+}
+
+func (x *LlmModel) GetTemperature() float32 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+func (x *LlmModel) GetTopK() int64 {
+	if x != nil {
+		return x.TopK
+	}
+	return 0
+}
+
+func (x *LlmModel) GetTopP() float32 {
+	if x != nil {
+		return x.TopP
+	}
+	return 0
+}
+
+func (x *LlmModel) GetSystemPrompt() string {
+	if x != nil {
+		return x.SystemPrompt
+	}
+	return ""
+}
+
+type VectorSearch struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TopN          int64                  `protobuf:"varint,1,opt,name=topN,proto3" json:"topN,omitempty"` // Сколько чанков забирать при векторном поиске.
+	Threshold     float32                `protobuf:"fixed32,2,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	SearchByQuery bool                   `protobuf:"varint,3,opt,name=searchByQuery,proto3" json:"searchByQuery,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VectorSearch) Reset() {
+	*x = VectorSearch{}
+	mi := &file_ml_v1_model_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VectorSearch) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VectorSearch) ProtoMessage() {}
+
+func (x *VectorSearch) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VectorSearch.ProtoReflect.Descriptor instead.
+func (*VectorSearch) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *VectorSearch) GetTopN() int64 {
+	if x != nil {
+		return x.TopN
+	}
+	return 0
+}
+
+func (x *VectorSearch) GetThreshold() float32 {
+	if x != nil {
+		return x.Threshold
+	}
+	return 0
+}
+
+func (x *VectorSearch) GetSearchByQuery() bool {
+	if x != nil {
+		return x.SearchByQuery
+	}
+	return false
+}
+
+type Scenario struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	UserId        int64                  `protobuf:"varint,2,opt,name=userId,proto3" json:"userId,omitempty"`
-	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
-	Content       []byte                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`
-	Typ           SourceType             `protobuf:"varint,5,opt,name=typ,proto3,enum=domain.v1.SourceType" json:"typ,omitempty"`
-	UpdateParams  *UpdateParams          `protobuf:"bytes,6,opt,name=updateParams,proto3,oneof" json:"updateParams,omitempty"`
-	Credentials   []byte                 `protobuf:"bytes,7,opt,name=credentials,proto3,oneof" json:"credentials,omitempty"`
-	Status        SourceStatus           `protobuf:"varint,8,opt,name=status,proto3,enum=domain.v1.SourceStatus" json:"status,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	MultiQuery    *MultiQuery            `protobuf:"bytes,2,opt,name=multiQuery,proto3,oneof" json:"multiQuery,omitempty"`
+	Reranker      *Reranker              `protobuf:"bytes,3,opt,name=reranker,proto3,oneof" json:"reranker,omitempty"`
+	VectorSearch  *VectorSearch          `protobuf:"bytes,4,opt,name=vectorSearch,proto3,oneof" json:"vectorSearch,omitempty"`
+	Model         *LlmModel              `protobuf:"bytes,5,opt,name=model,proto3" json:"model,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Source) Reset() {
-	*x = Source{}
-	mi := &file_domain_v1_model_proto_msgTypes[2]
+func (x *Scenario) Reset() {
+	*x = Scenario{}
+	mi := &file_ml_v1_model_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Source) String() string {
+func (x *Scenario) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Source) ProtoMessage() {}
+func (*Scenario) ProtoMessage() {}
 
-func (x *Source) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[2]
+func (x *Scenario) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -298,179 +324,144 @@ func (x *Source) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Source.ProtoReflect.Descriptor instead.
-func (*Source) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{2}
+// Deprecated: Use Scenario.ProtoReflect.Descriptor instead.
+func (*Scenario) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *Source) GetId() int64 {
+func (x *Scenario) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
 	return 0
 }
 
-func (x *Source) GetUserId() int64 {
+func (x *Scenario) GetMultiQuery() *MultiQuery {
+	if x != nil {
+		return x.MultiQuery
+	}
+	return nil
+}
+
+func (x *Scenario) GetReranker() *Reranker {
+	if x != nil {
+		return x.Reranker
+	}
+	return nil
+}
+
+func (x *Scenario) GetVectorSearch() *VectorSearch {
+	if x != nil {
+		return x.VectorSearch
+	}
+	return nil
+}
+
+func (x *Scenario) GetModel() *LlmModel {
+	if x != nil {
+		return x.Model
+	}
+	return nil
+}
+
+func (x *Scenario) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *Scenario) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type Query struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        int64                  `protobuf:"varint,2,opt,name=userId,proto3" json:"userId,omitempty"`
+	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Query) Reset() {
+	*x = Query{}
+	mi := &file_ml_v1_model_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Query) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Query) ProtoMessage() {}
+
+func (x *Query) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Query.ProtoReflect.Descriptor instead.
+func (*Query) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *Query) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *Query) GetUserId() int64 {
 	if x != nil {
 		return x.UserId
 	}
 	return 0
 }
 
-func (x *Source) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-func (x *Source) GetContent() []byte {
+func (x *Query) GetContent() string {
 	if x != nil {
 		return x.Content
 	}
-	return nil
-}
-
-func (x *Source) GetTyp() SourceType {
-	if x != nil {
-		return x.Typ
-	}
-	return SourceType_TYPE_UNDEFINED
-}
-
-func (x *Source) GetUpdateParams() *UpdateParams {
-	if x != nil {
-		return x.UpdateParams
-	}
-	return nil
-}
-
-func (x *Source) GetCredentials() []byte {
-	if x != nil {
-		return x.Credentials
-	}
-	return nil
-}
-
-func (x *Source) GetStatus() SourceStatus {
-	if x != nil {
-		return x.Status
-	}
-	return SourceStatus_STATUS_UNDEFINED
-}
-
-func (x *Source) GetCreatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return nil
-}
-
-func (x *Source) GetUpdatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return nil
-}
-
-type CreateSourceRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
-	Content       []byte                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	Typ           SourceType             `protobuf:"varint,3,opt,name=typ,proto3,enum=domain.v1.SourceType" json:"typ,omitempty"`
-	UpdateParams  *UpdateParams          `protobuf:"bytes,4,opt,name=updateParams,proto3,oneof" json:"updateParams,omitempty"`
-	Credentials   []byte                 `protobuf:"bytes,5,opt,name=credentials,proto3,oneof" json:"credentials,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateSourceRequest) Reset() {
-	*x = CreateSourceRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateSourceRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateSourceRequest) ProtoMessage() {}
-
-func (x *CreateSourceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateSourceRequest.ProtoReflect.Descriptor instead.
-func (*CreateSourceRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *CreateSourceRequest) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
 	return ""
 }
 
-func (x *CreateSourceRequest) GetContent() []byte {
-	if x != nil {
-		return x.Content
-	}
-	return nil
-}
-
-func (x *CreateSourceRequest) GetTyp() SourceType {
-	if x != nil {
-		return x.Typ
-	}
-	return SourceType_TYPE_UNDEFINED
-}
-
-func (x *CreateSourceRequest) GetUpdateParams() *UpdateParams {
-	if x != nil {
-		return x.UpdateParams
-	}
-	return nil
-}
-
-func (x *CreateSourceRequest) GetCredentials() []byte {
-	if x != nil {
-		return x.Credentials
-	}
-	return nil
-}
-
-type GetSourceRequest struct {
+type ProcessQueryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SourceId      int64                  `protobuf:"varint,1,opt,name=sourceId,proto3" json:"sourceId,omitempty"`
+	Query         *Query                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	Scenario      *Scenario              `protobuf:"bytes,2,opt,name=scenario,proto3" json:"scenario,omitempty"`
+	SourceIds     []string               `protobuf:"bytes,3,rep,name=sourceIds,proto3" json:"sourceIds,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetSourceRequest) Reset() {
-	*x = GetSourceRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[4]
+func (x *ProcessQueryRequest) Reset() {
+	*x = ProcessQueryRequest{}
+	mi := &file_ml_v1_model_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetSourceRequest) String() string {
+func (x *ProcessQueryRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetSourceRequest) ProtoMessage() {}
+func (*ProcessQueryRequest) ProtoMessage() {}
 
-func (x *GetSourceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[4]
+func (x *ProcessQueryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -481,377 +472,54 @@ func (x *GetSourceRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSourceRequest.ProtoReflect.Descriptor instead.
-func (*GetSourceRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{4}
+// Deprecated: Use ProcessQueryRequest.ProtoReflect.Descriptor instead.
+func (*ProcessQueryRequest) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *GetSourceRequest) GetSourceId() int64 {
+func (x *ProcessQueryRequest) GetQuery() *Query {
 	if x != nil {
-		return x.SourceId
-	}
-	return 0
-}
-
-type GetSourceResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Source        *Source                `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetSourceResponse) Reset() {
-	*x = GetSourceResponse{}
-	mi := &file_domain_v1_model_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetSourceResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetSourceResponse) ProtoMessage() {}
-
-func (x *GetSourceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetSourceResponse.ProtoReflect.Descriptor instead.
-func (*GetSourceResponse) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *GetSourceResponse) GetSource() *Source {
-	if x != nil {
-		return x.Source
+		return x.Query
 	}
 	return nil
 }
 
-type UpdateSourceRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SourceId      int64                  `protobuf:"varint,1,opt,name=sourceId,proto3" json:"sourceId,omitempty"`
-	Title         *string                `protobuf:"bytes,2,opt,name=title,proto3,oneof" json:"title,omitempty"`
-	Content       []byte                 `protobuf:"bytes,3,opt,name=content,proto3,oneof" json:"content,omitempty"`
-	UpdateParams  *UpdateParams          `protobuf:"bytes,4,opt,name=updateParams,proto3,oneof" json:"updateParams,omitempty"`
-	Credentials   []byte                 `protobuf:"bytes,5,opt,name=credentials,proto3,oneof" json:"credentials,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateSourceRequest) Reset() {
-	*x = UpdateSourceRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateSourceRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateSourceRequest) ProtoMessage() {}
-
-func (x *UpdateSourceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[6]
+func (x *ProcessQueryRequest) GetScenario() *Scenario {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateSourceRequest.ProtoReflect.Descriptor instead.
-func (*UpdateSourceRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *UpdateSourceRequest) GetSourceId() int64 {
-	if x != nil {
-		return x.SourceId
-	}
-	return 0
-}
-
-func (x *UpdateSourceRequest) GetTitle() string {
-	if x != nil && x.Title != nil {
-		return *x.Title
-	}
-	return ""
-}
-
-func (x *UpdateSourceRequest) GetContent() []byte {
-	if x != nil {
-		return x.Content
+		return x.Scenario
 	}
 	return nil
 }
 
-func (x *UpdateSourceRequest) GetUpdateParams() *UpdateParams {
-	if x != nil {
-		return x.UpdateParams
-	}
-	return nil
-}
-
-func (x *UpdateSourceRequest) GetCredentials() []byte {
-	if x != nil {
-		return x.Credentials
-	}
-	return nil
-}
-
-type DeleteSourceRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SourceId      int64                  `protobuf:"varint,1,opt,name=sourceId,proto3" json:"sourceId,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteSourceRequest) Reset() {
-	*x = DeleteSourceRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteSourceRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteSourceRequest) ProtoMessage() {}
-
-func (x *DeleteSourceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteSourceRequest.ProtoReflect.Descriptor instead.
-func (*DeleteSourceRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *DeleteSourceRequest) GetSourceId() int64 {
-	if x != nil {
-		return x.SourceId
-	}
-	return 0
-}
-
-type ListSourcesRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Offset        uint64                 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
-	Limit         uint64                 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListSourcesRequest) Reset() {
-	*x = ListSourcesRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListSourcesRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListSourcesRequest) ProtoMessage() {}
-
-func (x *ListSourcesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListSourcesRequest.ProtoReflect.Descriptor instead.
-func (*ListSourcesRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *ListSourcesRequest) GetOffset() uint64 {
-	if x != nil {
-		return x.Offset
-	}
-	return 0
-}
-
-func (x *ListSourcesRequest) GetLimit() uint64 {
-	if x != nil {
-		return x.Limit
-	}
-	return 0
-}
-
-type ListSourcesResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Sources       []*Source              `protobuf:"bytes,1,rep,name=sources,proto3" json:"sources,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListSourcesResponse) Reset() {
-	*x = ListSourcesResponse{}
-	mi := &file_domain_v1_model_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListSourcesResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListSourcesResponse) ProtoMessage() {}
-
-func (x *ListSourcesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListSourcesResponse.ProtoReflect.Descriptor instead.
-func (*ListSourcesResponse) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *ListSourcesResponse) GetSources() []*Source {
-	if x != nil {
-		return x.Sources
-	}
-	return nil
-}
-
-type Domain struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	SourceIds     []int64                `protobuf:"varint,3,rep,packed,name=sourceIds,proto3" json:"sourceIds,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Domain) Reset() {
-	*x = Domain{}
-	mi := &file_domain_v1_model_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Domain) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Domain) ProtoMessage() {}
-
-func (x *Domain) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Domain.ProtoReflect.Descriptor instead.
-func (*Domain) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *Domain) GetId() int64 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-func (x *Domain) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-func (x *Domain) GetSourceIds() []int64 {
+func (x *ProcessQueryRequest) GetSourceIds() []string {
 	if x != nil {
 		return x.SourceIds
 	}
 	return nil
 }
 
-func (x *Domain) GetCreatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return nil
-}
-
-func (x *Domain) GetUpdatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return nil
-}
-
-type CreateDomainRequest struct {
+type Chunk struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
-	SourceIds     []int64                `protobuf:"varint,2,rep,packed,name=sourceIds,proto3" json:"sourceIds,omitempty"`
+	Content       string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateDomainRequest) Reset() {
-	*x = CreateDomainRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[11]
+func (x *Chunk) Reset() {
+	*x = Chunk{}
+	mi := &file_ml_v1_model_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateDomainRequest) String() string {
+func (x *Chunk) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateDomainRequest) ProtoMessage() {}
+func (*Chunk) ProtoMessage() {}
 
-func (x *CreateDomainRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[11]
+func (x *Chunk) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -862,498 +530,187 @@ func (x *CreateDomainRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateDomainRequest.ProtoReflect.Descriptor instead.
-func (*CreateDomainRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{11}
+// Deprecated: Use Chunk.ProtoReflect.Descriptor instead.
+func (*Chunk) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *CreateDomainRequest) GetTitle() string {
+func (x *Chunk) GetContent() string {
 	if x != nil {
-		return x.Title
+		return x.Content
 	}
 	return ""
 }
 
-func (x *CreateDomainRequest) GetSourceIds() []int64 {
+type ProcessQueryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Chunk         *Chunk                 `protobuf:"bytes,1,opt,name=chunk,proto3" json:"chunk,omitempty"`
+	SourceIds     []string               `protobuf:"bytes,2,rep,name=sourceIds,proto3" json:"sourceIds,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ProcessQueryResponse) Reset() {
+	*x = ProcessQueryResponse{}
+	mi := &file_ml_v1_model_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProcessQueryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProcessQueryResponse) ProtoMessage() {}
+
+func (x *ProcessQueryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProcessQueryResponse.ProtoReflect.Descriptor instead.
+func (*ProcessQueryResponse) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ProcessQueryResponse) GetChunk() *Chunk {
+	if x != nil {
+		return x.Chunk
+	}
+	return nil
+}
+
+func (x *ProcessQueryResponse) GetSourceIds() []string {
 	if x != nil {
 		return x.SourceIds
 	}
 	return nil
 }
 
-type GetDomainRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	DomainId      int64                  `protobuf:"varint,1,opt,name=domainId,proto3" json:"domainId,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
+var File_ml_v1_model_proto protoreflect.FileDescriptor
 
-func (x *GetDomainRequest) Reset() {
-	*x = GetDomainRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetDomainRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetDomainRequest) ProtoMessage() {}
-
-func (x *GetDomainRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetDomainRequest.ProtoReflect.Descriptor instead.
-func (*GetDomainRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *GetDomainRequest) GetDomainId() int64 {
-	if x != nil {
-		return x.DomainId
-	}
-	return 0
-}
-
-type GetDomainResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Domain        *Domain                `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetDomainResponse) Reset() {
-	*x = GetDomainResponse{}
-	mi := &file_domain_v1_model_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetDomainResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetDomainResponse) ProtoMessage() {}
-
-func (x *GetDomainResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetDomainResponse.ProtoReflect.Descriptor instead.
-func (*GetDomainResponse) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *GetDomainResponse) GetDomain() *Domain {
-	if x != nil {
-		return x.Domain
-	}
-	return nil
-}
-
-type UpdateDomainRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	DomainId      int64                  `protobuf:"varint,1,opt,name=domainId,proto3" json:"domainId,omitempty"`
-	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	SourceIds     []int64                `protobuf:"varint,3,rep,packed,name=sourceIds,proto3" json:"sourceIds,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateDomainRequest) Reset() {
-	*x = UpdateDomainRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateDomainRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateDomainRequest) ProtoMessage() {}
-
-func (x *UpdateDomainRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateDomainRequest.ProtoReflect.Descriptor instead.
-func (*UpdateDomainRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{14}
-}
-
-func (x *UpdateDomainRequest) GetDomainId() int64 {
-	if x != nil {
-		return x.DomainId
-	}
-	return 0
-}
-
-func (x *UpdateDomainRequest) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-func (x *UpdateDomainRequest) GetSourceIds() []int64 {
-	if x != nil {
-		return x.SourceIds
-	}
-	return nil
-}
-
-type DeleteDomainRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	DomainId      int64                  `protobuf:"varint,1,opt,name=domainId,proto3" json:"domainId,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteDomainRequest) Reset() {
-	*x = DeleteDomainRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[15]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteDomainRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteDomainRequest) ProtoMessage() {}
-
-func (x *DeleteDomainRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[15]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteDomainRequest.ProtoReflect.Descriptor instead.
-func (*DeleteDomainRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{15}
-}
-
-func (x *DeleteDomainRequest) GetDomainId() int64 {
-	if x != nil {
-		return x.DomainId
-	}
-	return 0
-}
-
-type ListDomainsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Offset        uint64                 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
-	Limit         uint64                 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListDomainsRequest) Reset() {
-	*x = ListDomainsRequest{}
-	mi := &file_domain_v1_model_proto_msgTypes[16]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListDomainsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListDomainsRequest) ProtoMessage() {}
-
-func (x *ListDomainsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[16]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListDomainsRequest.ProtoReflect.Descriptor instead.
-func (*ListDomainsRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{16}
-}
-
-func (x *ListDomainsRequest) GetOffset() uint64 {
-	if x != nil {
-		return x.Offset
-	}
-	return 0
-}
-
-func (x *ListDomainsRequest) GetLimit() uint64 {
-	if x != nil {
-		return x.Limit
-	}
-	return 0
-}
-
-type ListDomainsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Domains       []*Domain              `protobuf:"bytes,1,rep,name=domains,proto3" json:"domains,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListDomainsResponse) Reset() {
-	*x = ListDomainsResponse{}
-	mi := &file_domain_v1_model_proto_msgTypes[17]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListDomainsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListDomainsResponse) ProtoMessage() {}
-
-func (x *ListDomainsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_model_proto_msgTypes[17]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListDomainsResponse.ProtoReflect.Descriptor instead.
-func (*ListDomainsResponse) Descriptor() ([]byte, []int) {
-	return file_domain_v1_model_proto_rawDescGZIP(), []int{17}
-}
-
-func (x *ListDomainsResponse) GetDomains() []*Domain {
-	if x != nil {
-		return x.Domains
-	}
-	return nil
-}
-
-var File_domain_v1_model_proto protoreflect.FileDescriptor
-
-const file_domain_v1_model_proto_rawDesc = "" +
+const file_ml_v1_model_proto_rawDesc = "" +
 	"\n" +
-	"\x15domain/v1/model.proto\x12\tdomain.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8c\x01\n" +
+	"\x11ml/v1/model.proto\x12\x05pb.ml\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8e\x01\n" +
 	"\n" +
-	"CronFormat\x12\x16\n" +
-	"\x06minute\x18\x01 \x01(\x05R\x06minute\x12\x12\n" +
-	"\x04hour\x18\x02 \x01(\x05R\x04hour\x12\x1e\n" +
+	"MultiQuery\x12$\n" +
+	"\ruseMultiquery\x18\x01 \x01(\bR\ruseMultiquery\x12\x1a\n" +
+	"\bnQueries\x18\x02 \x01(\x03R\bnQueries\x12+\n" +
+	"\x0equeryModelName\x18\x03 \x01(\tH\x00R\x0equeryModelName\x88\x01\x01B\x11\n" +
+	"\x0f_queryModelName\"\x90\x01\n" +
+	"\bReranker\x12\x1c\n" +
+	"\tuseRerank\x18\x01 \x01(\bR\tuseRerank\x12$\n" +
+	"\rrerankerModel\x18\x02 \x01(\tR\rrerankerModel\x12,\n" +
+	"\x11rerankerMaxLength\x18\x03 \x01(\x03R\x11rerankerMaxLength\x12\x12\n" +
+	"\x04topK\x18\x04 \x01(\x03R\x04topK\"\x96\x01\n" +
+	"\bLlmModel\x12\x1c\n" +
+	"\tmodelName\x18\x01 \x01(\tR\tmodelName\x12 \n" +
+	"\vtemperature\x18\x02 \x01(\x02R\vtemperature\x12\x12\n" +
+	"\x04topK\x18\x03 \x01(\x03R\x04topK\x12\x12\n" +
+	"\x04topP\x18\x04 \x01(\x02R\x04topP\x12\"\n" +
+	"\fsystemPrompt\x18\x05 \x01(\tR\fsystemPrompt\"f\n" +
+	"\fVectorSearch\x12\x12\n" +
+	"\x04topN\x18\x01 \x01(\x03R\x04topN\x12\x1c\n" +
+	"\tthreshold\x18\x02 \x01(\x02R\tthreshold\x12$\n" +
+	"\rsearchByQuery\x18\x03 \x01(\bR\rsearchByQuery\"\x8a\x03\n" +
+	"\bScenario\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x126\n" +
 	"\n" +
-	"dayOfMonth\x18\x03 \x01(\x05R\n" +
-	"dayOfMonth\x12\x14\n" +
-	"\x05month\x18\x04 \x01(\x05R\x05month\x12\x1c\n" +
-	"\tdayOfWeek\x18\x05 \x01(\x05R\tdayOfWeek\"~\n" +
-	"\fUpdateParams\x12%\n" +
-	"\veveryPeriod\x18\x01 \x01(\x03H\x00R\veveryPeriod\x88\x01\x01\x12.\n" +
-	"\x04cron\x18\x02 \x01(\v2\x15.domain.v1.CronFormatH\x01R\x04cron\x88\x01\x01B\x0e\n" +
-	"\f_everyPeriodB\a\n" +
-	"\x05_cron\"\xb8\x03\n" +
-	"\x06Source\x12\x0e\n" +
+	"multiQuery\x18\x02 \x01(\v2\x11.pb.ml.MultiQueryH\x00R\n" +
+	"multiQuery\x88\x01\x01\x120\n" +
+	"\breranker\x18\x03 \x01(\v2\x0f.pb.ml.RerankerH\x01R\breranker\x88\x01\x01\x12<\n" +
+	"\fvectorSearch\x18\x04 \x01(\v2\x13.pb.ml.VectorSearchH\x02R\fvectorSearch\x88\x01\x01\x12%\n" +
+	"\x05model\x18\x05 \x01(\v2\x0f.pb.ml.LlmModelR\x05model\x128\n" +
+	"\tcreatedAt\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
+	"\tupdatedAt\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\r\n" +
+	"\v_multiQueryB\v\n" +
+	"\t_rerankerB\x0f\n" +
+	"\r_vectorSearch\"I\n" +
+	"\x05Query\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
-	"\x06userId\x18\x02 \x01(\x03R\x06userId\x12\x14\n" +
-	"\x05title\x18\x03 \x01(\tR\x05title\x12\x18\n" +
-	"\acontent\x18\x04 \x01(\fR\acontent\x12'\n" +
-	"\x03typ\x18\x05 \x01(\x0e2\x15.domain.v1.SourceTypeR\x03typ\x12@\n" +
-	"\fupdateParams\x18\x06 \x01(\v2\x17.domain.v1.UpdateParamsH\x00R\fupdateParams\x88\x01\x01\x12%\n" +
-	"\vcredentials\x18\a \x01(\fH\x01R\vcredentials\x88\x01\x01\x12/\n" +
-	"\x06status\x18\b \x01(\x0e2\x17.domain.v1.SourceStatusR\x06status\x128\n" +
-	"\tcreatedAt\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
-	"\tupdatedAt\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\x0f\n" +
-	"\r_updateParamsB\x0e\n" +
-	"\f_credentials\"\xf8\x01\n" +
-	"\x13CreateSourceRequest\x12\x14\n" +
-	"\x05title\x18\x01 \x01(\tR\x05title\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\fR\acontent\x12'\n" +
-	"\x03typ\x18\x03 \x01(\x0e2\x15.domain.v1.SourceTypeR\x03typ\x12@\n" +
-	"\fupdateParams\x18\x04 \x01(\v2\x17.domain.v1.UpdateParamsH\x00R\fupdateParams\x88\x01\x01\x12%\n" +
-	"\vcredentials\x18\x05 \x01(\fH\x01R\vcredentials\x88\x01\x01B\x0f\n" +
-	"\r_updateParamsB\x0e\n" +
-	"\f_credentials\".\n" +
-	"\x10GetSourceRequest\x12\x1a\n" +
-	"\bsourceId\x18\x01 \x01(\x03R\bsourceId\">\n" +
-	"\x11GetSourceResponse\x12)\n" +
-	"\x06source\x18\x01 \x01(\v2\x11.domain.v1.SourceR\x06source\"\x8b\x02\n" +
-	"\x13UpdateSourceRequest\x12\x1a\n" +
-	"\bsourceId\x18\x01 \x01(\x03R\bsourceId\x12\x19\n" +
-	"\x05title\x18\x02 \x01(\tH\x00R\x05title\x88\x01\x01\x12\x1d\n" +
-	"\acontent\x18\x03 \x01(\fH\x01R\acontent\x88\x01\x01\x12@\n" +
-	"\fupdateParams\x18\x04 \x01(\v2\x17.domain.v1.UpdateParamsH\x02R\fupdateParams\x88\x01\x01\x12%\n" +
-	"\vcredentials\x18\x05 \x01(\fH\x03R\vcredentials\x88\x01\x01B\b\n" +
-	"\x06_titleB\n" +
-	"\n" +
-	"\b_contentB\x0f\n" +
-	"\r_updateParamsB\x0e\n" +
-	"\f_credentials\"1\n" +
-	"\x13DeleteSourceRequest\x12\x1a\n" +
-	"\bsourceId\x18\x01 \x01(\x03R\bsourceId\"B\n" +
-	"\x12ListSourcesRequest\x12\x16\n" +
-	"\x06offset\x18\x01 \x01(\x04R\x06offset\x12\x14\n" +
-	"\x05limit\x18\x02 \x01(\x04R\x05limit\"B\n" +
-	"\x13ListSourcesResponse\x12+\n" +
-	"\asources\x18\x01 \x03(\v2\x11.domain.v1.SourceR\asources\"\xc0\x01\n" +
-	"\x06Domain\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x14\n" +
-	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1c\n" +
-	"\tsourceIds\x18\x03 \x03(\x03R\tsourceIds\x128\n" +
-	"\tcreatedAt\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
-	"\tupdatedAt\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"I\n" +
-	"\x13CreateDomainRequest\x12\x14\n" +
-	"\x05title\x18\x01 \x01(\tR\x05title\x12\x1c\n" +
-	"\tsourceIds\x18\x02 \x03(\x03R\tsourceIds\".\n" +
-	"\x10GetDomainRequest\x12\x1a\n" +
-	"\bdomainId\x18\x01 \x01(\x03R\bdomainId\">\n" +
-	"\x11GetDomainResponse\x12)\n" +
-	"\x06domain\x18\x01 \x01(\v2\x11.domain.v1.DomainR\x06domain\"e\n" +
-	"\x13UpdateDomainRequest\x12\x1a\n" +
-	"\bdomainId\x18\x01 \x01(\x03R\bdomainId\x12\x14\n" +
-	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1c\n" +
-	"\tsourceIds\x18\x03 \x03(\x03R\tsourceIds\"1\n" +
-	"\x13DeleteDomainRequest\x12\x1a\n" +
-	"\bdomainId\x18\x01 \x01(\x03R\bdomainId\"B\n" +
-	"\x12ListDomainsRequest\x12\x16\n" +
-	"\x06offset\x18\x01 \x01(\x04R\x06offset\x12\x14\n" +
-	"\x05limit\x18\x02 \x01(\x04R\x05limit\"B\n" +
-	"\x13ListDomainsResponse\x12+\n" +
-	"\adomains\x18\x01 \x03(\v2\x11.domain.v1.DomainR\adomains*x\n" +
-	"\n" +
-	"SourceType\x12\x12\n" +
-	"\x0eTYPE_UNDEFINED\x10\x00\x12\f\n" +
-	"\bTYPE_WEB\x10\x01\x12\x14\n" +
-	"\x10TYPE_SINGLE_FILE\x10\x02\x12\x17\n" +
-	"\x13TYPE_ARCHIVED_FILES\x10\x03\x12\x19\n" +
-	"\x15TYPE_WITH_CREDENTIALS\x10\x04*]\n" +
-	"\fSourceStatus\x12\x14\n" +
-	"\x10STATUS_UNDEFINED\x10\x00\x12\x10\n" +
-	"\fSTATUS_READY\x10\x01\x12\x12\n" +
-	"\x0eSTATUS_PARSING\x10\x02\x12\x11\n" +
-	"\rSTATUS_FAILED\x10\x03B\x14Z\x12internal/domain/pbb\x06proto3"
+	"\x06userId\x18\x02 \x01(\x03R\x06userId\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\"\x84\x01\n" +
+	"\x13ProcessQueryRequest\x12\"\n" +
+	"\x05query\x18\x01 \x01(\v2\f.pb.ml.QueryR\x05query\x12+\n" +
+	"\bscenario\x18\x02 \x01(\v2\x0f.pb.ml.ScenarioR\bscenario\x12\x1c\n" +
+	"\tsourceIds\x18\x03 \x03(\tR\tsourceIds\"!\n" +
+	"\x05Chunk\x12\x18\n" +
+	"\acontent\x18\x01 \x01(\tR\acontent\"X\n" +
+	"\x14ProcessQueryResponse\x12\"\n" +
+	"\x05chunk\x18\x01 \x01(\v2\f.pb.ml.ChunkR\x05chunk\x12\x1c\n" +
+	"\tsourceIds\x18\x02 \x03(\tR\tsourceIdsB\x14Z\x12internal/domain/pbb\x06proto3"
 
 var (
-	file_domain_v1_model_proto_rawDescOnce sync.Once
-	file_domain_v1_model_proto_rawDescData []byte
+	file_ml_v1_model_proto_rawDescOnce sync.Once
+	file_ml_v1_model_proto_rawDescData []byte
 )
 
-func file_domain_v1_model_proto_rawDescGZIP() []byte {
-	file_domain_v1_model_proto_rawDescOnce.Do(func() {
-		file_domain_v1_model_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_domain_v1_model_proto_rawDesc), len(file_domain_v1_model_proto_rawDesc)))
+func file_ml_v1_model_proto_rawDescGZIP() []byte {
+	file_ml_v1_model_proto_rawDescOnce.Do(func() {
+		file_ml_v1_model_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_ml_v1_model_proto_rawDesc), len(file_ml_v1_model_proto_rawDesc)))
 	})
-	return file_domain_v1_model_proto_rawDescData
+	return file_ml_v1_model_proto_rawDescData
 }
 
-var file_domain_v1_model_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_domain_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
-var file_domain_v1_model_proto_goTypes = []any{
-	(SourceType)(0),               // 0: domain.v1.SourceType
-	(SourceStatus)(0),             // 1: domain.v1.SourceStatus
-	(*CronFormat)(nil),            // 2: domain.v1.CronFormat
-	(*UpdateParams)(nil),          // 3: domain.v1.UpdateParams
-	(*Source)(nil),                // 4: domain.v1.Source
-	(*CreateSourceRequest)(nil),   // 5: domain.v1.CreateSourceRequest
-	(*GetSourceRequest)(nil),      // 6: domain.v1.GetSourceRequest
-	(*GetSourceResponse)(nil),     // 7: domain.v1.GetSourceResponse
-	(*UpdateSourceRequest)(nil),   // 8: domain.v1.UpdateSourceRequest
-	(*DeleteSourceRequest)(nil),   // 9: domain.v1.DeleteSourceRequest
-	(*ListSourcesRequest)(nil),    // 10: domain.v1.ListSourcesRequest
-	(*ListSourcesResponse)(nil),   // 11: domain.v1.ListSourcesResponse
-	(*Domain)(nil),                // 12: domain.v1.Domain
-	(*CreateDomainRequest)(nil),   // 13: domain.v1.CreateDomainRequest
-	(*GetDomainRequest)(nil),      // 14: domain.v1.GetDomainRequest
-	(*GetDomainResponse)(nil),     // 15: domain.v1.GetDomainResponse
-	(*UpdateDomainRequest)(nil),   // 16: domain.v1.UpdateDomainRequest
-	(*DeleteDomainRequest)(nil),   // 17: domain.v1.DeleteDomainRequest
-	(*ListDomainsRequest)(nil),    // 18: domain.v1.ListDomainsRequest
-	(*ListDomainsResponse)(nil),   // 19: domain.v1.ListDomainsResponse
-	(*timestamppb.Timestamp)(nil), // 20: google.protobuf.Timestamp
+var file_ml_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_ml_v1_model_proto_goTypes = []any{
+	(*MultiQuery)(nil),            // 0: pb.ml.MultiQuery
+	(*Reranker)(nil),              // 1: pb.ml.Reranker
+	(*LlmModel)(nil),              // 2: pb.ml.LlmModel
+	(*VectorSearch)(nil),          // 3: pb.ml.VectorSearch
+	(*Scenario)(nil),              // 4: pb.ml.Scenario
+	(*Query)(nil),                 // 5: pb.ml.Query
+	(*ProcessQueryRequest)(nil),   // 6: pb.ml.ProcessQueryRequest
+	(*Chunk)(nil),                 // 7: pb.ml.Chunk
+	(*ProcessQueryResponse)(nil),  // 8: pb.ml.ProcessQueryResponse
+	(*timestamppb.Timestamp)(nil), // 9: google.protobuf.Timestamp
 }
-var file_domain_v1_model_proto_depIdxs = []int32{
-	2,  // 0: domain.v1.UpdateParams.cron:type_name -> domain.v1.CronFormat
-	0,  // 1: domain.v1.Source.typ:type_name -> domain.v1.SourceType
-	3,  // 2: domain.v1.Source.updateParams:type_name -> domain.v1.UpdateParams
-	1,  // 3: domain.v1.Source.status:type_name -> domain.v1.SourceStatus
-	20, // 4: domain.v1.Source.createdAt:type_name -> google.protobuf.Timestamp
-	20, // 5: domain.v1.Source.updatedAt:type_name -> google.protobuf.Timestamp
-	0,  // 6: domain.v1.CreateSourceRequest.typ:type_name -> domain.v1.SourceType
-	3,  // 7: domain.v1.CreateSourceRequest.updateParams:type_name -> domain.v1.UpdateParams
-	4,  // 8: domain.v1.GetSourceResponse.source:type_name -> domain.v1.Source
-	3,  // 9: domain.v1.UpdateSourceRequest.updateParams:type_name -> domain.v1.UpdateParams
-	4,  // 10: domain.v1.ListSourcesResponse.sources:type_name -> domain.v1.Source
-	20, // 11: domain.v1.Domain.createdAt:type_name -> google.protobuf.Timestamp
-	20, // 12: domain.v1.Domain.updatedAt:type_name -> google.protobuf.Timestamp
-	12, // 13: domain.v1.GetDomainResponse.domain:type_name -> domain.v1.Domain
-	12, // 14: domain.v1.ListDomainsResponse.domains:type_name -> domain.v1.Domain
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+var file_ml_v1_model_proto_depIdxs = []int32{
+	0, // 0: pb.ml.Scenario.multiQuery:type_name -> pb.ml.MultiQuery
+	1, // 1: pb.ml.Scenario.reranker:type_name -> pb.ml.Reranker
+	3, // 2: pb.ml.Scenario.vectorSearch:type_name -> pb.ml.VectorSearch
+	2, // 3: pb.ml.Scenario.model:type_name -> pb.ml.LlmModel
+	9, // 4: pb.ml.Scenario.createdAt:type_name -> google.protobuf.Timestamp
+	9, // 5: pb.ml.Scenario.updatedAt:type_name -> google.protobuf.Timestamp
+	5, // 6: pb.ml.ProcessQueryRequest.query:type_name -> pb.ml.Query
+	4, // 7: pb.ml.ProcessQueryRequest.scenario:type_name -> pb.ml.Scenario
+	7, // 8: pb.ml.ProcessQueryResponse.chunk:type_name -> pb.ml.Chunk
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
-func init() { file_domain_v1_model_proto_init() }
-func file_domain_v1_model_proto_init() {
-	if File_domain_v1_model_proto != nil {
+func init() { file_ml_v1_model_proto_init() }
+func file_ml_v1_model_proto_init() {
+	if File_ml_v1_model_proto != nil {
 		return
 	}
-	file_domain_v1_model_proto_msgTypes[1].OneofWrappers = []any{}
-	file_domain_v1_model_proto_msgTypes[2].OneofWrappers = []any{}
-	file_domain_v1_model_proto_msgTypes[3].OneofWrappers = []any{}
-	file_domain_v1_model_proto_msgTypes[6].OneofWrappers = []any{}
+	file_ml_v1_model_proto_msgTypes[0].OneofWrappers = []any{}
+	file_ml_v1_model_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_domain_v1_model_proto_rawDesc), len(file_domain_v1_model_proto_rawDesc)),
-			NumEnums:      2,
-			NumMessages:   18,
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ml_v1_model_proto_rawDesc), len(file_ml_v1_model_proto_rawDesc)),
+			NumEnums:      0,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_domain_v1_model_proto_goTypes,
-		DependencyIndexes: file_domain_v1_model_proto_depIdxs,
-		EnumInfos:         file_domain_v1_model_proto_enumTypes,
-		MessageInfos:      file_domain_v1_model_proto_msgTypes,
+		GoTypes:           file_ml_v1_model_proto_goTypes,
+		DependencyIndexes: file_ml_v1_model_proto_depIdxs,
+		MessageInfos:      file_ml_v1_model_proto_msgTypes,
 	}.Build()
-	File_domain_v1_model_proto = out.File
-	file_domain_v1_model_proto_goTypes = nil
-	file_domain_v1_model_proto_depIdxs = nil
+	File_ml_v1_model_proto = out.File
+	file_ml_v1_model_proto_goTypes = nil
+	file_ml_v1_model_proto_depIdxs = nil
 }

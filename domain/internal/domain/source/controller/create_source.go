@@ -35,7 +35,7 @@ func (ctrl *Controller) CreateSource(ctx context.Context, req *pb.CreateSourceRe
 		Content:     req.GetContent(),
 		Type:        model.SourceType(req.GetTyp()),
 		Credentials: req.GetCredentials(),
-		Status:      model.StatusReady,
+		Status:      model.StatusParsing,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}

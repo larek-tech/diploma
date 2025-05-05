@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package domain.v1;
+option go_package = "internal/domain/pb";
+
+import "ml/v1/model.proto";
+
+message CreateScenarioRequest {
+  optional pb.ml.MultiQuery multiQuery = 1;
+  optional pb.ml.Reranker reranker = 2;
+  optional pb.ml.VectorSearch vectorSearch = 3;
+  pb.ml.LlmModel model = 4;
+};
+
+message GetScenarioRequest {
+  int64 scenarioId = 1;
+};
+
+message GetScenarioResponse {
+  pb.ml.Scenario scenario = 1;
+};
+
+message UpdateScenarioRequest {
+  int64 scenarioId = 1;
+  optional bool useMultiquery = 2;
+  optional int64 nQueries = 3; // Количество перефразированных вопросов
+  optional string queryModelName = 4; // Пока не знаю нучно ли будет
+  optional bool useRerank = 5;
+  optional string rerankerModel = 6;
+  optional int64 rerankerMaxLength = 7;
+  optional int64 rerankerTopK = 8; // Количество чанков после реранкинга
+  optional string modelName = 9;
+  optional float temperature = 10;
+  optional int64 modelTopK = 11;
+  optional float topP = 12;
+  optional string systemPrompt = 13;
+  optional int64 topN = 14; // Сколько чанков забирать при векторном поиске.
+  optional float threshold = 15;
+  optional bool searchByQuery = 16;
+};
+
+message DeleteScenarioRequest {
+  int64 scenarioId = 1;
+};
+
+message ListScenariosRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+};
+
+message ListScenariosResponse {
+  repeated pb.ml.Scenario scenarios = 1;
+};

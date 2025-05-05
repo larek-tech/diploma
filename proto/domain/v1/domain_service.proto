@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package domain.v1;
+option go_package = "internal/domain/pb";
+
+import "google/protobuf/empty.proto";
+import "domain/v1/domain_model.proto";
+import "domain/v1/common_model.proto";
+
+service DomainService {
+  rpc CreateDomain(CreateDomainRequest) returns (Domain) {};
+  rpc GetDomain(GetDomainRequest) returns (GetDomainResponse) {};
+  rpc UpdateDomain(UpdateDomainRequest) returns (Domain) {};
+  rpc DeleteDomain(DeleteDomainRequest) returns (google.protobuf.Empty) {};
+  rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {};
+  // TODO: нужна ли ручка GetDomainSources() или сделать несколько вызовов GetSourceByID()?
+
+  rpc GetPermittedUsers(GetResourcePermissionsRequest) returns (PermittedUsers) {};
+  rpc UpdatePermittedUsers(PermittedUsers) returns (PermittedUsers) {};
+  rpc GetPermittedRoles(GetResourcePermissionsRequest) returns (PermittedRoles) {};
+  rpc UpdatePermittedRoles(PermittedRoles) returns (PermittedRoles) {};
+};

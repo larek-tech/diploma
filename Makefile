@@ -122,7 +122,11 @@ proto-domain:
 	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
 		echo "Generating stubs in $$dir";\
 		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
-			$(DOMAIN_PROTO_SRC)/service.proto $(DOMAIN_PROTO_SRC)/model.proto \
+			$(DOMAIN_PROTO_SRC)/source_service.proto $(DOMAIN_PROTO_SRC)/source_model.proto \
+			$(DOMAIN_PROTO_SRC)/domain_service.proto $(DOMAIN_PROTO_SRC)/domain_model.proto \
+			$(DOMAIN_PROTO_SRC)/scenario_service.proto $(DOMAIN_PROTO_SRC)/scenario_model.proto \
+			$(DOMAIN_PROTO_SRC)/admin_service.proto $(DOMAIN_PROTO_SRC)/admin_model.proto \
+			$(DOMAIN_PROTO_SRC)/common_model.proto \
 			$(PROTO_SRC)/google/protobuf/timestamp.proto; \
 	done
 	@echo "Protobuf stubs for domain service generated\n"
