@@ -43,7 +43,7 @@ func (s Storage) Update(ctx context.Context, documentID string, chunks []*docume
 			if err := s.db.Exec(
 				txCtx,
 				`INSERT INTO chunks (id, index, source_id, document_id, content, embeddings)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+     VALUES ($1, $2, $3, $4, $5, $6)`,
 				chunk.ID, chunk.Index, chunk.SourceID, documentID, chunk.Content, prepareVector(chunk.Embeddings),
 			); err != nil {
 				return fmt.Errorf("failed to insert chunk: %w", err)
@@ -71,7 +71,7 @@ SELECT
     index,
     source_id,
     document_id,
-    content
+    content,
     1 - (embeddings <=> $1) AS cosine_similarity
 FROM chunks
 WHERE source_id = ANY($2) AND 1 - (embeddings <=> $1) > $3
