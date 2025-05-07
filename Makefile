@@ -127,9 +127,20 @@ proto-domain:
 			$(DOMAIN_PROTO_SRC)/scenario_service.proto $(DOMAIN_PROTO_SRC)/scenario_model.proto \
 			$(DOMAIN_PROTO_SRC)/admin_service.proto $(DOMAIN_PROTO_SRC)/admin_model.proto \
 			$(DOMAIN_PROTO_SRC)/common_model.proto \
-			$(PROTO_SRC)/google/protobuf/timestamp.proto; \
+			$(PROTO_SRC)/google/protobuf/timestamp.proto $(PROTO_SRC)/google/protobuf/empty.proto; \
 	done
 	@echo "Protobuf stubs for domain service generated\n"
+
+.PHONY: proto-chat
+proto-chat: CHAT_PROTO_SRC=$(PROTO_SRC)/chat/v1
+proto-chat:
+	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
+		echo "Generating stubs in $$dir";\
+		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
+			$(CHAT_PROTO_SRC)/service.proto $(CHAT_PROTO_SRC)/model.proto \
+			$(PROTO_SRC)/google/protobuf/timestamp.proto $(PROTO_SRC)/google/protobuf/empty.proto; \
+	done
+	@echo "Protobuf stubs for chat service generated\n"
 
 .PHONY: proto
 proto: proto-auth proto-ml proto-data proto-domain

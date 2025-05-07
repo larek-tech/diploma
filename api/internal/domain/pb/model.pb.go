@@ -26,7 +26,7 @@ type MultiQuery struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	UseMultiquery  bool                   `protobuf:"varint,1,opt,name=useMultiquery,proto3" json:"useMultiquery,omitempty"`
 	NQueries       int64                  `protobuf:"varint,2,opt,name=nQueries,proto3" json:"nQueries,omitempty"`                  // Количество перефразированных вопросов
-	QueryModelName *string                `protobuf:"bytes,3,opt,name=queryModelName,proto3,oneof" json:"queryModelName,omitempty"` // Пока не знаю нучно ли будет
+	QueryModelName *string                `protobuf:"bytes,3,opt,name=queryModelName,proto3,oneof" json:"queryModelName,omitempty"` //
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }

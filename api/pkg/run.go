@@ -104,7 +104,7 @@ func Run() error {
 	// Api routes with JWT middleware
 	apiRouter := srv.GetSrv().Group("/api/v1")
 	apiRouter.Use(middleware.Jwt(authService))
-	api.SetupRoutes(apiRouter, tracer, domainConn.Conn())
+	api.SetupRoutes(apiRouter, domainConn.Conn())
 
 	srv.Start()
 

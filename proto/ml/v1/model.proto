@@ -8,7 +8,7 @@ import "google/protobuf/timestamp.proto";
 message MultiQuery {
   bool useMultiquery = 1;
   int64 nQueries = 2; // Количество перефразированных вопросов
-  optional string queryModelName = 3; // Пока не знаю нучно ли будет
+  optional string queryModelName = 3; //
 }
 
 message Reranker {

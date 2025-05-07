@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package chat.v1;
+option go_package = "internal/chat/pb";
+
+import "chat/v1/model.proto";
+import "google/protobuf/empty.proto";
+
+service ChatService {
+  rpc CreateChat(chat.v1.CreateChatRequest) returns (chat.v1.Chat) {};
+  rpc GetChat(chat.v1.GetChatRequest) returns (chat.v1.Chat) {};
+  rpc RenameChat(chat.v1.RenameChatRequest) returns (chat.v1.Chat) {};
+  rpc DeleteChat(chat.v1.DeleteChatRequest) returns (google.protobuf.Empty) {};
+  rpc ListChats(chat.v1.ListChatsRequest) returns (chat.v1.ListChatsResponse) {};
+  rpc ProcessQuery(chat.v1.Query) returns (stream chat.v1.ChunkedResponse);
+}

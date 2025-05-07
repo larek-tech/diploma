@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package chat.v1;
+option go_package = "internal/chat/pb";
+
+import "ml/v1/model.proto";
+import "google/protobuf/timestamp.proto";
+
+enum ResponseStatus {
+  RESPONSE_UNDEFINED = 0;
+  RESPONSE_CREATED = 1;
+  RESPONSE_PROCESSING = 2;
+  RESPONSE_SUCCESS = 3;
+  RESPONSE_ERROR = 4;
+  RESPONSE_CANCELED = 5;
+};
+
+message Query {
+  int64 id = 1;
+  int64 userId = 2;
+  string chatId = 3;
+  string content = 4;
+  optional int64 domainId = 5;
+  repeated string sourceIds = 6;
+  optional int64 scenarioId = 7;
+  optional bytes metadata = 8;
+  google.protobuf.Timestamp createdAt = 9;
+};
+
+message Response {
+  int64 id = 1;
+  int64 queryId = 2;
+  string chatId = 3;
+  string content = 4;
+  ResponseStatus status = 5;
+  optional bytes metadata = 6;
+  google.protobuf.Timestamp createdAt = 7;
+  google.protobuf.Timestamp updatedAt = 8;
+};
+
+message Content {
+  Query query = 1;
+  Response response = 2;
+};
+
+message Chat {
+  string id = 1;
+  int64 userId = 2;
+  string title = 3;
+  repeated Content content = 4;
+  google.protobuf.Timestamp createdAt = 5;
+  google.protobuf.Timestamp updatedAt = 6;
+};
+
+message ChunkedResponse {
+  int64 queryId = 1;
+  string content = 2;
+  repeated string sourceIds = 3;
+};
+
+message CreateChatRequest{
+  int64 userId = 1;
+};
+
+message GetChatRequest {
+  string chatId = 1;
+};
+
+message RenameChatRequest {
+  string chatId = 1;
+  string title = 2;
+};
+
+message DeleteChatRequest {
+  string chatId = 1;
+}
+
+message ListChatsRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+}
+
+message ListChatsResponse {
+  repeated Chat chats = 1;
+}
