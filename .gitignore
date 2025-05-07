@@ -33,3 +33,4 @@ venv
 config.yaml
 requests
 google.golang.org
+temp/
