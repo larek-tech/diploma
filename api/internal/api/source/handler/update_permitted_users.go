@@ -2,8 +2,6 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/larek-tech/diploma/api/internal/auth"
-	authpb "github.com/larek-tech/diploma/api/internal/auth/pb"
 	"github.com/larek-tech/diploma/api/internal/domain/pb"
 	"github.com/larek-tech/diploma/api/internal/shared"
 	"github.com/yogenyslav/pkg/errs"
@@ -36,20 +34,7 @@ func (h *Handler) UpdatePermittedUsers(c *fiber.Ctx) error {
 	}
 	req.ResourceId = int64(sourceID)
 
-	userID, ok := c.Locals(shared.UserIDKey).(int64)
-	if !ok {
-		return errs.WrapErr(shared.ErrUnauthorized, "no user ID in context")
-	}
-	userRoleIDs, ok := c.Locals(shared.UserRolesKey).([]int64)
-	if !ok {
-		return errs.WrapErr(shared.ErrUnauthorized, "no user users in context")
-	}
-	ctx := auth.PushUserMeta(c.UserContext(), &authpb.UserAuthMetadata{
-		UserId: userID,
-		Roles:  userRoleIDs,
-	})
-
-	resp, err := h.sourceService.UpdatePermittedUsers(ctx, &req)
+	resp, err := h.sourceService.UpdatePermittedUsers(c.UserContext(), &req)
 	if err != nil {
 		if status.Code(err) == codes.PermissionDenied {
 			return errs.WrapErr(shared.ErrForbidden, err.Error())

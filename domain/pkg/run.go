@@ -12,6 +12,9 @@ import (
 	dh "github.com/larek-tech/diploma/domain/internal/domain/domain/handler"
 	dr "github.com/larek-tech/diploma/domain/internal/domain/domain/repo"
 	"github.com/larek-tech/diploma/domain/internal/domain/pb"
+	scc "github.com/larek-tech/diploma/domain/internal/domain/scenario/controller"
+	sch "github.com/larek-tech/diploma/domain/internal/domain/scenario/handler"
+	scr "github.com/larek-tech/diploma/domain/internal/domain/scenario/repo"
 	sc "github.com/larek-tech/diploma/domain/internal/domain/source/controller"
 	sh "github.com/larek-tech/diploma/domain/internal/domain/source/handler"
 	sr "github.com/larek-tech/diploma/domain/internal/domain/source/repo"
@@ -121,6 +124,12 @@ func Run() error {
 	domainController := dc.New(domainRepo, tracer)
 	domainHandler := dh.New(domainController, tracer)
 	pb.RegisterDomainServiceServer(srv.GetSrv(), domainHandler)
+
+	// Setup scenario module
+	scenarioRepo := scr.New(pg)
+	scenarioController := scc.New(scenarioRepo, tracer)
+	scenarioHandler := sch.New(scenarioController, tracer)
+	pb.RegisterScenarioServiceServer(srv.GetSrv(), scenarioHandler)
 
 	srv.Start()
 

@@ -9,6 +9,17 @@ definitions:
       title:
         type: string
     type: object
+  pb.CreateScenarioRequest:
+    properties:
+      model:
+        $ref: '#/definitions/pb.LlmModel'
+      multiQuery:
+        $ref: '#/definitions/pb.MultiQuery'
+      reranker:
+        $ref: '#/definitions/pb.Reranker'
+      vectorSearch:
+        $ref: '#/definitions/pb.VectorSearch'
+    type: object
   pb.CreateSourceRequest:
     properties:
       content:
@@ -59,6 +70,11 @@ definitions:
       domain:
         $ref: '#/definitions/pb.Domain'
     type: object
+  pb.GetScenarioResponse:
+    properties:
+      scenario:
+        $ref: '#/definitions/pb.Scenario'
+    type: object
   pb.GetSourceResponse:
     properties:
       source:
@@ -71,12 +87,32 @@ definitions:
           $ref: '#/definitions/pb.Domain'
         type: array
     type: object
+  pb.ListScenariosResponse:
+    properties:
+      scenarios:
+        items:
+          $ref: '#/definitions/pb.Scenario'
+        type: array
+    type: object
   pb.ListSourcesResponse:
     properties:
       sources:
         items:
           $ref: '#/definitions/pb.Source'
         type: array
+    type: object
+  pb.LlmModel:
+    properties:
+      modelName:
+        type: string
+      systemPrompt:
+        type: string
+      temperature:
+        type: number
+      topK:
+        type: integer
+      topP:
+        type: number
     type: object
   pb.LoginRequest:
     properties:
@@ -93,6 +129,17 @@ definitions:
         type: string
       type:
         type: string
+    type: object
+  pb.MultiQuery:
+    properties:
+      nQueries:
+        description: Количество перефразированных вопросов
+        type: integer
+      queryModelName:
+        description: Пока не знаю нучно ли будет
+        type: string
+      useMultiquery:
+        type: boolean
     type: object
   pb.PermittedRoles:
     properties:
@@ -111,6 +158,35 @@ definitions:
         items:
           type: integer
         type: array
+    type: object
+  pb.Reranker:
+    properties:
+      rerankerMaxLength:
+        type: integer
+      rerankerModel:
+        type: string
+      topK:
+        description: Количество чанков после реранкинга
+        type: integer
+      useRerank:
+        type: boolean
+    type: object
+  pb.Scenario:
+    properties:
+      createdAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      id:
+        type: integer
+      model:
+        $ref: '#/definitions/pb.LlmModel'
+      multiQuery:
+        $ref: '#/definitions/pb.MultiQuery'
+      reranker:
+        $ref: '#/definitions/pb.Reranker'
+      updatedAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      vectorSearch:
+        $ref: '#/definitions/pb.VectorSearch'
     type: object
   pb.Source:
     properties:
@@ -183,6 +259,45 @@ definitions:
       everyPeriod:
         type: integer
     type: object
+  pb.UpdateScenarioRequest:
+    properties:
+      modelName:
+        type: string
+      modelTopK:
+        type: integer
+      nQueries:
+        description: Количество перефразированных вопросов
+        type: integer
+      queryModelName:
+        description: Пока не знаю нучно ли будет
+        type: string
+      rerankerMaxLength:
+        type: integer
+      rerankerModel:
+        type: string
+      rerankerTopK:
+        description: Количество чанков после реранкинга
+        type: integer
+      scenarioId:
+        type: integer
+      searchByQuery:
+        type: boolean
+      systemPrompt:
+        type: string
+      temperature:
+        type: number
+      threshold:
+        type: number
+      topN:
+        description: Сколько чанков забирать при векторном поиске.
+        type: integer
+      topP:
+        type: number
+      useMultiquery:
+        type: boolean
+      useRerank:
+        type: boolean
+    type: object
   pb.UpdateSourceRequest:
     properties:
       content:
@@ -207,6 +322,16 @@ definitions:
           type: integer
         type: array
       userId:
+        type: integer
+    type: object
+  pb.VectorSearch:
+    properties:
+      searchByQuery:
+        type: boolean
+      threshold:
+        type: number
+      topN:
+        description: Сколько чанков забирать при векторном поиске.
         type: integer
     type: object
   timestamppb.Timestamp:
@@ -510,6 +635,163 @@ paths:
       summary: Update permitted users.
       tags:
       - domain
+  /api/v1/scenario/:
+    post:
+      consumes:
+      - application/json
+      description: Creates new scenario (group of sources used for RAG vector search).
+      parameters:
+      - description: Input data for creating scenario
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.CreateScenarioRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Scenario successfully created
+          schema:
+            $ref: '#/definitions/pb.Scenario'
+        "400":
+          description: Failed to create scenario
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create new scenario.
+      tags:
+      - scenario
+  /api/v1/scenario/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete scenario by ID.
+      parameters:
+      - description: Scenario ID
+        in: path
+        name: scenarioID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Scenario deleted
+          schema:
+            type: string
+        "400":
+          description: Failed to delete scenario
+          schema:
+            type: string
+        "404":
+          description: Scenario not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete scenario.
+      tags:
+      - scenario
+    get:
+      consumes:
+      - application/json
+      description: Returns information about scenario.
+      parameters:
+      - description: Requested scenario ID
+        in: path
+        name: scenarioID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Scenario
+          schema:
+            $ref: '#/definitions/pb.GetScenarioResponse'
+        "400":
+          description: Failed to get scenario
+          schema:
+            type: string
+        "404":
+          description: Scenario not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get scenario.
+      tags:
+      - scenario
+    put:
+      consumes:
+      - application/json
+      description: Update scenario information.
+      parameters:
+      - description: Scenario ID
+        in: path
+        name: scenarioID
+        required: true
+        type: integer
+      - description: Update params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.UpdateScenarioRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Scenario updated
+          schema:
+            $ref: '#/definitions/pb.Scenario'
+        "400":
+          description: Failed to update scenario
+          schema:
+            type: string
+        "404":
+          description: Scenario not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update scenario.
+      tags:
+      - scenario
+  /api/v1/scenario/list:
+    get:
+      consumes:
+      - application/json
+      description: List scenarios to which user has access.
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: Pagination limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of scenarios
+          schema:
+            $ref: '#/definitions/pb.ListScenariosResponse'
+        "400":
+          description: Failed to list scenarios
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List scenarios.
+      tags:
+      - scenario
   /api/v1/source/:
     post:
       consumes:

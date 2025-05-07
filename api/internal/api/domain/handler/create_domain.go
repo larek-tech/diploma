@@ -2,8 +2,6 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/larek-tech/diploma/api/internal/auth"
-	authpb "github.com/larek-tech/diploma/api/internal/auth/pb"
 	"github.com/larek-tech/diploma/api/internal/domain/pb"
 	"github.com/larek-tech/diploma/api/internal/shared"
 	"github.com/yogenyslav/pkg/errs"
@@ -27,20 +25,7 @@ func (h *Handler) CreateDomain(c *fiber.Ctx) error {
 		return errs.WrapErr(shared.ErrInvalidBody, err.Error())
 	}
 
-	userID, ok := c.Locals(shared.UserIDKey).(int64)
-	if !ok {
-		return errs.WrapErr(shared.ErrUnauthorized, "no user ID in context")
-	}
-	userRoleIDs, ok := c.Locals(shared.UserRolesKey).([]int64)
-	if !ok {
-		return errs.WrapErr(shared.ErrUnauthorized, "no user roles in context")
-	}
-	ctx := auth.PushUserMeta(c.UserContext(), &authpb.UserAuthMetadata{
-		UserId: userID,
-		Roles:  userRoleIDs,
-	})
-
-	resp, err := h.domainService.CreateDomain(ctx, &req)
+	resp, err := h.domainService.CreateDomain(c.UserContext(), &req)
 	if err != nil {
 		return errs.WrapErr(shared.ErrCreateDomain, err.Error())
 	}

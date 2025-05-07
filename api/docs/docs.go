@@ -452,6 +452,253 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/scenario/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates new scenario (group of sources used for RAG vector search).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scenario"
+                ],
+                "summary": "Create new scenario.",
+                "parameters": [
+                    {
+                        "description": "Input data for creating scenario",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.CreateScenarioRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Scenario successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Scenario"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to create scenario",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/scenario/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List scenarios to which user has access.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scenario"
+                ],
+                "summary": "List scenarios.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of scenarios",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListScenariosResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list scenarios",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/scenario/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns information about scenario.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scenario"
+                ],
+                "summary": "Get scenario.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested scenario ID",
+                        "name": "scenarioID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Scenario",
+                        "schema": {
+                            "$ref": "#/definitions/pb.GetScenarioResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to get scenario",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Scenario not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update scenario information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scenario"
+                ],
+                "summary": "Update scenario.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Scenario ID",
+                        "name": "scenarioID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.UpdateScenarioRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Scenario updated",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Scenario"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to update scenario",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Scenario not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete scenario by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scenario"
+                ],
+                "summary": "Delete scenario.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Scenario ID",
+                        "name": "scenarioID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Scenario deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to delete scenario",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Scenario not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/source/": {
             "post": {
                 "security": [
@@ -941,6 +1188,23 @@ const docTemplate = `{
                 }
             }
         },
+        "pb.CreateScenarioRequest": {
+            "type": "object",
+            "properties": {
+                "model": {
+                    "$ref": "#/definitions/pb.LlmModel"
+                },
+                "multiQuery": {
+                    "$ref": "#/definitions/pb.MultiQuery"
+                },
+                "reranker": {
+                    "$ref": "#/definitions/pb.Reranker"
+                },
+                "vectorSearch": {
+                    "$ref": "#/definitions/pb.VectorSearch"
+                }
+            }
+        },
         "pb.CreateSourceRequest": {
             "type": "object",
             "properties": {
@@ -1018,6 +1282,14 @@ const docTemplate = `{
                 }
             }
         },
+        "pb.GetScenarioResponse": {
+            "type": "object",
+            "properties": {
+                "scenario": {
+                    "$ref": "#/definitions/pb.Scenario"
+                }
+            }
+        },
         "pb.GetSourceResponse": {
             "type": "object",
             "properties": {
@@ -1037,6 +1309,17 @@ const docTemplate = `{
                 }
             }
         },
+        "pb.ListScenariosResponse": {
+            "type": "object",
+            "properties": {
+                "scenarios": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.Scenario"
+                    }
+                }
+            }
+        },
         "pb.ListSourcesResponse": {
             "type": "object",
             "properties": {
@@ -1045,6 +1328,26 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/pb.Source"
                     }
+                }
+            }
+        },
+        "pb.LlmModel": {
+            "type": "object",
+            "properties": {
+                "modelName": {
+                    "type": "string"
+                },
+                "systemPrompt": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "number"
+                },
+                "topK": {
+                    "type": "integer"
+                },
+                "topP": {
+                    "type": "number"
                 }
             }
         },
@@ -1073,6 +1376,22 @@ const docTemplate = `{
                 }
             }
         },
+        "pb.MultiQuery": {
+            "type": "object",
+            "properties": {
+                "nQueries": {
+                    "description": "Количество перефразированных вопросов",
+                    "type": "integer"
+                },
+                "queryModelName": {
+                    "description": "Пока не знаю нучно ли будет",
+                    "type": "string"
+                },
+                "useMultiquery": {
+                    "type": "boolean"
+                }
+            }
+        },
         "pb.PermittedRoles": {
             "type": "object",
             "properties": {
@@ -1098,6 +1417,50 @@ const docTemplate = `{
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "pb.Reranker": {
+            "type": "object",
+            "properties": {
+                "rerankerMaxLength": {
+                    "type": "integer"
+                },
+                "rerankerModel": {
+                    "type": "string"
+                },
+                "topK": {
+                    "description": "Количество чанков после реранкинга",
+                    "type": "integer"
+                },
+                "useRerank": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "pb.Scenario": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "model": {
+                    "$ref": "#/definitions/pb.LlmModel"
+                },
+                "multiQuery": {
+                    "$ref": "#/definitions/pb.MultiQuery"
+                },
+                "reranker": {
+                    "$ref": "#/definitions/pb.Reranker"
+                },
+                "updatedAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "vectorSearch": {
+                    "$ref": "#/definitions/pb.VectorSearch"
                 }
             }
         },
@@ -1202,6 +1565,63 @@ const docTemplate = `{
                 }
             }
         },
+        "pb.UpdateScenarioRequest": {
+            "type": "object",
+            "properties": {
+                "modelName": {
+                    "type": "string"
+                },
+                "modelTopK": {
+                    "type": "integer"
+                },
+                "nQueries": {
+                    "description": "Количество перефразированных вопросов",
+                    "type": "integer"
+                },
+                "queryModelName": {
+                    "description": "Пока не знаю нучно ли будет",
+                    "type": "string"
+                },
+                "rerankerMaxLength": {
+                    "type": "integer"
+                },
+                "rerankerModel": {
+                    "type": "string"
+                },
+                "rerankerTopK": {
+                    "description": "Количество чанков после реранкинга",
+                    "type": "integer"
+                },
+                "scenarioId": {
+                    "type": "integer"
+                },
+                "searchByQuery": {
+                    "type": "boolean"
+                },
+                "systemPrompt": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "number"
+                },
+                "threshold": {
+                    "type": "number"
+                },
+                "topN": {
+                    "description": "Сколько чанков забирать при векторном поиске.",
+                    "type": "integer"
+                },
+                "topP": {
+                    "type": "number"
+                },
+                "useMultiquery": {
+                    "type": "boolean"
+                },
+                "useRerank": {
+                    "type": "boolean"
+                }
+            }
+        },
         "pb.UpdateSourceRequest": {
             "type": "object",
             "properties": {
@@ -1238,6 +1658,21 @@ const docTemplate = `{
                     }
                 },
                 "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pb.VectorSearch": {
+            "type": "object",
+            "properties": {
+                "searchByQuery": {
+                    "type": "boolean"
+                },
+                "threshold": {
+                    "type": "number"
+                },
+                "topN": {
+                    "description": "Сколько чанков забирать при векторном поиске.",
                     "type": "integer"
                 }
             }

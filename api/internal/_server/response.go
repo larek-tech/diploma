@@ -49,6 +49,26 @@ var (
 			Msg:    "failed listing available domains",
 			Status: fiber.StatusBadRequest,
 		},
+		shared.ErrCreateScenario: {
+			Msg:    "failed creating scenario",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrGetScenario: {
+			Msg:    "failed getting scenario",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrUpdateScenario: {
+			Msg:    "failed updating scenario",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrDeleteScenario: {
+			Msg:    "failed deleting scenario",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrListScenarios: {
+			Msg:    "failed listing available scenarios",
+			Status: fiber.StatusBadRequest,
+		},
 		// 401
 		shared.ErrUnauthorized: {
 			Msg:    "unauthorized",
@@ -66,6 +86,10 @@ var (
 		},
 		shared.ErrDomainNotFound: {
 			Msg:    "domain not found",
+			Status: fiber.StatusNotFound,
+		},
+		shared.ErrScenarioNotFound: {
+			Msg:    "scenario not found",
 			Status: fiber.StatusNotFound,
 		},
 		// 422

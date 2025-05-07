@@ -17,8 +17,8 @@ var (
 	// ErrListSources is an error when failed to list sources.
 	ErrListSources = errors.New("failed to list sources")
 
-	// ErrCreateDomain is an error when failed to create source.
-	ErrCreateDomain = errors.New("failed to create source")
+	// ErrCreateDomain is an error when failed to create domain.
+	ErrCreateDomain = errors.New("failed to create domain")
 	// ErrGetDomain is an error when failed to get domain.
 	ErrGetDomain = errors.New("failed to get domain")
 	// ErrUpdateDomain is an error when failed to update domain.
@@ -27,6 +27,17 @@ var (
 	ErrDeleteDomain = errors.New("failed to delete domain")
 	// ErrListDomains is an error when failed to list domains.
 	ErrListDomains = errors.New("failed to list domains")
+
+	// ErrCreateScenario is an error when failed to create scenario.
+	ErrCreateScenario = errors.New("failed to create scenario")
+	// ErrGetScenario is an error when failed to get scenario.
+	ErrGetScenario = errors.New("failed to get scenario")
+	// ErrUpdateScenario is an error when failed to update scenario.
+	ErrUpdateScenario = errors.New("failed to update scenario")
+	// ErrDeleteScenario is an error when failed to delete scenario.
+	ErrDeleteScenario = errors.New("failed to delete scenario")
+	// ErrListScenarios is an error when failed to list scenarios.
+	ErrListScenarios = errors.New("failed to list scenarios")
 )
 
 // 401
@@ -45,8 +56,10 @@ var (
 var (
 	// ErrSourceNotFound is an error when no source was found.
 	ErrSourceNotFound = errors.New("source not found")
-	// ErrDomainNotFound is an error when no source was found.
+	// ErrDomainNotFound is an error when no scenario was found.
 	ErrDomainNotFound = errors.New("domain not found")
+	// ErrScenarioNotFound is an error when no scenario was found.
+	ErrScenarioNotFound = errors.New("scenario not found")
 )
 
 // 422

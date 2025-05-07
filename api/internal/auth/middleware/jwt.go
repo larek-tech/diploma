@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/larek-tech/diploma/api/internal/auth"
 	"github.com/larek-tech/diploma/api/internal/auth/pb"
 	"github.com/larek-tech/diploma/api/internal/shared"
 	"github.com/yogenyslav/pkg/errs"
@@ -29,8 +30,18 @@ func Jwt(authService pb.AuthServiceClient) fiber.Handler {
 		}
 
 		meta := resp.GetMeta()
-		c.Locals(shared.UserIDKey, meta.GetUserId())
-		c.Locals(shared.UserRolesKey, meta.GetRoles())
+		userID := meta.GetUserId()
+		roles := meta.GetRoles()
+
+		c.Locals(shared.UserIDKey, userID)
+		c.Locals(shared.UserRolesKey, roles)
+
+		ctx := auth.PushUserMeta(c.UserContext(), &pb.UserAuthMetadata{
+			UserId: userID,
+			Roles:  roles,
+		})
+
+		c.SetUserContext(ctx)
 
 		return c.Next()
 	}
