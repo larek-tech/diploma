@@ -1,5 +1,7 @@
 volumes:
   pg_data:
+  postgres_data:
+  ollama_data:
   jaeger_data:
   zoo_data_log:
   zoo_data_secrets:
@@ -29,11 +31,12 @@ services:
       - "4318:4318"
     restart: unless-stopped
 
-  postgres:
+  pg:
     image: postgres:17
     restart: always
     ports:
-      - "5432:5432"
+      - "5433:5433"
+    command: -p 5433
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-pguser}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pgpass}
@@ -84,6 +87,111 @@ services:
       - kafka_data:/var/lib/kafka/data
       - kafka_data_secrets:/etc/kafka/secrets
 
+  postgres:
+    build:
+      context: data
+      dockerfile: docker/postgres.Dockerfile
+    container_name: postgres_local
+    restart: unless-stopped
+    env_file:
+      - data/local.env
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: master
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrator:
+    build:
+      context: data
+      dockerfile: docker/migrator.Dockerfile
+    container_name: migrator_local
+    depends_on:
+      - postgres
+    env_file:
+        - data/local.env
+    environment:
+      POSTGRES_DB: master
+      POSTGRES_HOST: postgres_local
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+
+  ollama:
+    build:
+        context: data
+        dockerfile: docker/ollama.Dockerfile
+    container_name: ollama_local
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+        - ollama_data:/root/.ollama
+    env_file:
+        - data/local.env
+    environment:
+      OLLAMA_KEEP_ALIVE: 24h
+      # OLLAMA_CONTEXT_LENGTH: 8192 can be used in order to control the context length for all models otherwise set up in embedder / llm related configs
+    healthcheck:
+      test: "bash -c 'cat < /dev/null > /dev/tcp/localhost/11434'"
+      interval: 5s
+
+  crawler:
+    build:
+      context: data
+      dockerfile: docker/crawler.Dockerfile
+    container_name: crawler_local
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    env_file:
+        - data/local.env
+    environment:
+      POSTGRES_DB: master
+      POSTGRES_HOST: postgres_local
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      OLLAMA_HOST: http://ollama_local:11434
+      OLLAMA_MODEL: bge-m3:latest
+      KAFKA_SERVERS: kafka:29092
+    ports:
+      - "9998:8080"
+
+  parser:
+    build:
+      context: data
+      dockerfile: docker/parser.Dockerfile
+    container_name: parser_local
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - ollama
+    env_file:
+        - data/local.env
+    environment:
+      KAFKA_SERVERS: kafka:29092
+      POSTGRES_DB: master
+      POSTGRES_HOST: postgres_local
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      OLLAMA_LLM_ENDPOINT: http://ollama_local:11434
+      OLLAMA_LLM_MODEL: llama3.2
+      OLLAMA_EMBEDDER_ENDPOINT: http://ollama_local:11434
+      OLLAMA_EMBEDDER_MODEL: bge-m3:latest
+    ports:
+      - "9999:8081"
+
   api:
     build:
       context: api
@@ -93,7 +201,7 @@ services:
       - "9000:9000"
     depends_on:
       - jaeger
-      - postgres
+      - pg
       - auth
       - domain
 
@@ -106,7 +214,7 @@ services:
       - "9001:9001"
     depends_on:
       - jaeger
-      - postgres
+      - pg
 
   chat:
     build:
@@ -125,6 +233,6 @@ services:
       - "9003:9003"
     depends_on:
       - jaeger
-      - postgres
+      - pg
       - zookeeper
       - kafka
