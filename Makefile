@@ -50,7 +50,7 @@ lint:
 
 .PHONY: vendor
 vendor:
-	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
+	@for dir in $(shell find . -type f -name go.mod -not -path "./data/*" -exec dirname {} \;); do \
 		echo "Vendoring $$dir"; \
 		cd $$dir; \
 		go mod tidy; \
