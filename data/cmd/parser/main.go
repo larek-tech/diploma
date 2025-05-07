@@ -12,6 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	documentService "github.com/larek-tech/diploma/data/internal/domain/document/service"
 	"github.com/larek-tech/diploma/data/internal/domain/site/service/crawler"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/kafka"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/ollama"
 	chunkStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/chunk"
 	documentStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/document"
@@ -24,6 +25,7 @@ import (
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/embed_document"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/parse_page"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/parse_site"
+	"github.com/larek-tech/diploma/data/internal/worker/qaas/parse_site_status"
 	"github.com/larek-tech/storage/postgres"
 )
 
@@ -49,6 +51,17 @@ func run() int {
 		slog.Error("Failed to get SQL connection")
 		return 1
 	}
+	var kafkaCfg kafka.Config
+	if err := cleanenv.ReadEnv(&kafkaCfg); err != nil {
+		slog.Error("failed to read env", "error", err)
+		return -1
+	}
+	kafkaProducer, err := kafka.NewProducer(kafkaCfg)
+	if err != nil {
+		slog.Error("failed to create kafka producer", "error", err)
+		return -1
+	}
+
 	httpClient := &http.Client{
 		Transport: nil,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -74,6 +87,7 @@ func run() int {
 		qaas.ParsePageResultQueue,
 		qaas.ParsePageQueue,
 		qaas.EmbedResultQueue,
+		qaas.ParseSiteStatusQueue,
 	})
 
 	siteStore := siteStorage.New(pg)
@@ -85,9 +99,6 @@ func run() int {
 	pageService := crawler.New(httpClient, siteStore, pageStore, siteJobStore, trManager)
 	embeddingService := documentService.New(documentStore, chunkStore, questionStore, embedderModel, llm, trManager)
 	consumer := qaas.NewConsumer(sqlDB)
-	// 	parse_page.New(pageStore, pageService, pub),
-	// parse_site.New(siteStore, pub),
-	// embed_document.New(embeddingService, pageStore, siteStore),
 
 	slog.Info("Starting consumer")
 	wg := &sync.WaitGroup{}
@@ -95,7 +106,8 @@ func run() int {
 	// site parser
 	go func() {
 		defer wg.Done()
-		if err = consumer.Run(ctx, qaas.ParseSiteQueue, parse_site.New(siteStore, pub)); err != nil {
+		err = consumer.Run(ctx, qaas.ParseSiteQueue, parse_site.New(siteStore, pub))
+		if err != nil {
 			slog.Error("failed to run consumer", "error", err)
 		}
 	}()
@@ -103,17 +115,28 @@ func run() int {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err = consumer.Run(ctx, qaas.ParsePageQueue, parse_page.New(pageStore, pageService, pub)); err != nil {
+		err = consumer.Run(ctx, qaas.ParsePageQueue, parse_page.New(pageStore, pageService, pub))
+		if err != nil {
 			slog.Error("failed to run consumer", "error", err)
 		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err = consumer.Run(ctx, qaas.ParsePageResultQueue, embed_document.New(embeddingService, pageStore, siteStore)); err != nil {
+		err = consumer.Run(ctx, qaas.ParsePageResultQueue, embed_document.New(embeddingService, pageStore, siteStore))
+		if err != nil {
 			slog.Error("failed to run consumer", "error", err)
 		}
 	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = consumer.Run(ctx, qaas.ParseSiteStatusQueue, parse_site_status.New(pub, siteJobStore, kafkaProducer))
+		if err != nil {
+			slog.Error("failed to run consumer", "error", err)
+		}
+	}()
+
 	wg.Wait()
 	return 0
 }

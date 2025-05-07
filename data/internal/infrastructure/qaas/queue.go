@@ -4,9 +4,11 @@ package qaas
 type Queue string
 
 const (
-	ParseSiteQueue       Queue = "web_parse_site"
+	ParseSiteQueue Queue = "web_parse_site"
+
 	ParsePageQueue       Queue = "web_parse_page"
 	ParsePageResultQueue Queue = "web_parse_page_result" // replacement for WebResult
 
-	EmbedResultQueue Queue = "document_embed_result"
+	ParseSiteStatusQueue Queue = "web_parse_site_status" // job for collecting parsing status
+	EmbedResultQueue     Queue = "document_embed_result"
 )

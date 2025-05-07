@@ -10,6 +10,7 @@ import (
 	kafka2 "github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/kafka"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/ptr"
 )
 
 func main() {
@@ -24,7 +25,7 @@ func main() {
 		slog.Error("failed to create kafka producer: %w", err)
 		return
 	}
-	str := "https://gitflic.com"
+	str := "https://gitflic.com/sitemap.xml"
 	content := base64.StdEncoding.EncodeToString([]byte(str))
 	testPayload := &DataMessage{
 		Title:        "gitflic",
@@ -41,7 +42,7 @@ func main() {
 
 	err = producer.Produce(ctx, &kafka2.Message{
 		TopicPartition: kafka2.TopicPartition{
-			Topic:       &kafkaCfg.Topic,
+			Topic:       ptr.To("source"),
 			Partition:   0,
 			Offset:      0,
 			Metadata:    nil,
@@ -49,7 +50,7 @@ func main() {
 			LeaderEpoch: nil,
 		},
 		Value: payload,
-		Key:   []byte("data"),
+		Key:   []byte("random msg id"),
 	})
 	if err != nil {
 		slog.Error("failed to produce message: %w", err)

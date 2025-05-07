@@ -7,18 +7,21 @@ import (
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"github.com/samber/lo"
 )
+
+const handlerTimeout = 30 * time.Second
 
 type HandlerFunc func(context.Context, *kafka.Message) error
 
 type Consumer struct {
 	cfg      Config
 	consumer *kafka.Consumer
-	topic    string
-	handler  HandlerFunc
+	// handler  HandlerFunc
+	handlers map[string]HandlerFunc // map of topic to handler
 }
 
-func NewConsumer(cfg Config, handler HandlerFunc) (*Consumer, error) {
+func NewConsumer(cfg Config, handlers map[string]HandlerFunc) (*Consumer, error) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": cfg.BootstrapServers,
 		"group.id":          "dataGroup",
@@ -30,14 +33,16 @@ func NewConsumer(cfg Config, handler HandlerFunc) (*Consumer, error) {
 
 	return &Consumer{
 		consumer: c,
-		topic:    cfg.Topic,
-		handler:  handler,
+		handlers: handlers,
 		cfg:      cfg,
 	}, nil
 }
 
 func (c Consumer) Run(ctx context.Context) error {
-	err := c.consumer.SubscribeTopics([]string{c.topic}, nil)
+	if len(c.handlers) == 0 {
+		return fmt.Errorf("no handlers provided")
+	}
+	err := c.consumer.SubscribeTopics(lo.Keys(c.handlers), nil)
 
 	if err != nil {
 		return fmt.Errorf("failed to subscribe to topic: %w", err)
@@ -59,9 +64,16 @@ func (c Consumer) Run(ctx context.Context) error {
 		if msg == nil {
 			continue
 		}
-		err = c.handler(ctx, msg)
+		handler, ok := c.handlers[*msg.TopicPartition.Topic]
+		if !ok {
+			slog.Error("no handler for topic", "topic", *msg.TopicPartition.Topic)
+			continue
+		}
+		ctx, cancel := context.WithTimeout(ctx, handlerTimeout)
+		defer cancel()
+		err = handler(ctx, msg)
 		if err != nil {
-			slog.Error("failed to process kafka msg: %w", err)
+			slog.Error("failed to process kafka msg", "err", err)
 		}
 	}
 }

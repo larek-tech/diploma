@@ -7,7 +7,8 @@ import (
 type Type uint8
 
 const (
-	Web = iota
+	Undefined = iota
+	Web
 	SingleFile
 	ArchivedFiles
 	S3WithCredentials

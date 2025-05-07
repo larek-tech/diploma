@@ -1,6 +1,8 @@
 package qaas
 
 import (
+	"time"
+
 	"github.com/larek-tech/diploma/data/internal/domain/document"
 	"github.com/larek-tech/diploma/data/internal/domain/site"
 )
@@ -19,6 +21,13 @@ type SiteJob = DelayedJob[site.Site]
 type PageJob = DelayedJob[site.Page]
 type PageResultJob = DelayedJob[site.Page]
 type EmbedJob = DelayedJob[document.Document]
+
+type ParseStatusJob struct {
+	SourceID         string
+	SiteID           string
+	ParsePageJobsIDs []string
+	Delay            time.Duration
+}
 
 type ResultMessage struct {
 	SourceID string // uuid ID источника

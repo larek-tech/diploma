@@ -92,6 +92,20 @@ func (p *Publisher) Publish(ctx context.Context, rawMsg []any, opts ...PublishOp
 					"sourceQueue": string(options.SourceQueue),
 				},
 			}
+		case ParseStatusJob:
+			payload, err := json.Marshal(rawMsg[i])
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal message: %w", err)
+			}
+			jobStartTime := time.Now().Add(v.Delay)
+			msgs[i] = &pgq.MessageOutgoing{
+				ScheduledFor: &jobStartTime,
+				Payload:      payload,
+				Metadata: pgq.Metadata{
+					"queue":   string(options.Queue),
+					"objType": reflect.TypeOf(v).Name(),
+				},
+			}
 		default:
 			return nil, fmt.Errorf("unsupported message type: %T", rawMsg[i])
 		}

@@ -14,7 +14,9 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 go build -o ./bin/main ./cmd/parser/main.go
+ENV CGO_ENABLED=1
+
+RUN go build -tags musl -o ./bin/main ./cmd/parser/main.go
 
 # Runner
 FROM alpine:latest AS runner

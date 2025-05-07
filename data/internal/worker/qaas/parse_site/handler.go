@@ -5,11 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/larek-tech/diploma/data/internal/domain/site"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 	"github.com/samber/lo"
 	"go.dataddo.com/pgq"
+)
+
+const (
+	StatusDelay = time.Second * 10
 )
 
 type Handler struct {
@@ -70,9 +75,24 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 		qaas.WithQueue(qaas.ParsePageQueue),
 	}
 
-	_, err = h.pagePublisher.Publish(ctx, parseJobs, publishOptions...)
+	parsePageJobIDs, err := h.pagePublisher.Publish(ctx, parseJobs, publishOptions...)
 	if err != nil {
 		slog.Error("failed to publish page job", "page", currentSite.AvailablePages, "error", err)
+		return true, err
+	}
+
+	// TODO: send status job to check parsing status
+	publishOptions = []qaas.PublishOption{
+		qaas.WithQueue(qaas.ParseSiteStatusQueue),
+	}
+	_, err = h.pagePublisher.Publish(ctx, []any{qaas.ParseStatusJob{
+		SiteID:           currentSite.ID,
+		SourceID:         currentSite.SourceID,
+		ParsePageJobsIDs: parsePageJobIDs,
+		Delay:            StatusDelay,
+	}}, publishOptions...)
+	if err != nil {
+		slog.Error("failed to publish status job", "site", currentSite, "error", err)
 		return true, err
 	}
 

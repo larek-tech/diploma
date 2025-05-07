@@ -56,6 +56,12 @@ func run() int {
 		slog.Error("Failed to get SQL connection")
 		return 1
 	}
+	kafkaProducer, err := kafka.NewProducer(*kafkaCfg)
+	if err != nil {
+		slog.Error("failed to create kafka producer")
+		return 1
+	}
+
 	pub := qaas.NewPublisher(sqlDB)
 	pub.CreateAllTables([]qaas.Queue{
 		qaas.ParseSiteQueue,
@@ -75,7 +81,11 @@ func run() int {
 		return 1
 	}
 
-	kafkaConsumer, err := kafka.NewConsumer(*kafkaCfg, create_source.New().Handle)
+	kafkaHandlers := map[string]kafka.HandlerFunc{
+		"source": create_source.New(srcService, kafkaProducer).Handle,
+	}
+
+	kafkaConsumer, err := kafka.NewConsumer(*kafkaCfg, kafkaHandlers)
 	if err != nil {
 		// for now kafka can be disabled and we can accept messages from http and grpc
 		slog.Error("failed to create kafka consumer: %w", err)

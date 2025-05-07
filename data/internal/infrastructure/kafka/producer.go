@@ -9,7 +9,6 @@ import (
 
 type Producer struct {
 	producer *kafka.Producer
-	topic    string
 }
 
 func NewProducer(cfg Config) (*Producer, error) {
@@ -22,7 +21,6 @@ func NewProducer(cfg Config) (*Producer, error) {
 
 	return &Producer{
 		producer: p,
-		topic:    cfg.Topic,
 	}, nil
 }
 
