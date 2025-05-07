@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"net/url"
 
@@ -76,13 +75,8 @@ func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (
 }
 
 func (s Service) createSite(src *source.Source, message source.DataMessage) (*site.Site, error) {
-	var decodedURL []byte
-	_, err := base64.StdEncoding.Decode(decodedURL, message.Content)
-	if err != nil {
-		return nil, err
-	}
 
-	siteURL, err := url.Parse(string(decodedURL))
+	siteURL, err := url.Parse(string(message.Content))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse url for web source: %w", err)
 	}

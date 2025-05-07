@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	resultTopic string = "status"
+	resultTopic string = "status_topic"
 	statusDelay        = time.Second * 10
 )
 

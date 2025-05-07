@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -25,11 +24,11 @@ func main() {
 		slog.Error("failed to create kafka producer: %w", err)
 		return
 	}
-	str := "https://gitflic.com/sitemap.xml"
-	content := base64.StdEncoding.EncodeToString([]byte(str))
+	str := "https://notes.kiriha.ru/sitemap.xml"
+	// content := base64.StdEncoding.EncodeToString([]byte(str))
 	testPayload := &DataMessage{
 		Title:        "gitflic",
-		Content:      []byte(content),
+		Content:      []byte(str),
 		Type:         Web,
 		Credentials:  nil,
 		UpdateParams: nil,

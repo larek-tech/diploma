@@ -1,6 +1,7 @@
 package create_source
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/ptr"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/queue/messages"
 )
 
@@ -31,7 +33,12 @@ func New(service service, kafkaProducer kafkaProducer) *Handler {
 
 func (h Handler) Handle(ctx context.Context, msg *kafka.Message) error {
 	slog.Info("received new msg", "msg", msg)
+
+	// aHR0cHM6Ly9ub3Rlcy5raXJpaGEucnUvc2l0ZW1hcC54bWw=
 	var payload source.DataMessage
+	if err := json.NewDecoder(bytes.NewReader(msg.Value)).Decode(&payload); err != nil {
+		return fmt.Errorf("failed to decode json")
+	}
 	err := json.Unmarshal(msg.Value, &payload)
 	if err != nil {
 		return fmt.Errorf("failed to process DataMessage: %w", err)
@@ -69,8 +76,10 @@ func (h Handler) assembleMessage(incomingMsg *kafka.Message, src *source.Source)
 	}
 
 	return &kafka.Message{
-		TopicPartition: kafka.TopicPartition{},
-		Value:          payload,
-		Key:            incomingMsg.Key,
+		TopicPartition: kafka.TopicPartition{
+			Topic: ptr.To(resultTopic),
+		},
+		Value: payload,
+		Key:   incomingMsg.Key,
 	}, nil
 }

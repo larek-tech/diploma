@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/jackc/pgx/v5/stdlib"
@@ -56,11 +57,6 @@ func run() int {
 		slog.Error("Failed to get SQL connection")
 		return 1
 	}
-	kafkaProducer, err := kafka.NewProducer(*kafkaCfg)
-	if err != nil {
-		slog.Error("failed to create kafka producer")
-		return 1
-	}
 
 	pub := qaas.NewPublisher(sqlDB)
 	pub.CreateAllTables([]qaas.Queue{
@@ -80,11 +76,14 @@ func run() int {
 		slog.Error("failed to create ollama client", "error", err)
 		return 1
 	}
-
+	kafkaProducer, err := kafka.NewProducer(*kafkaCfg)
+	if err != nil {
+		slog.Error("failed to create kafka producer")
+		return 1
+	}
 	kafkaHandlers := map[string]kafka.HandlerFunc{
 		"source": create_source.New(srcService, kafkaProducer).Handle,
 	}
-
 	kafkaConsumer, err := kafka.NewConsumer(*kafkaCfg, kafkaHandlers)
 	if err != nil {
 		// for now kafka can be disabled and we can accept messages from http and grpc
@@ -169,11 +168,12 @@ func run() int {
 		w.WriteHeader(http.StatusOK)
 		w.Write(resp)
 	}))
-
+	wg := sync.WaitGroup{}
 	srv := server.New()
 	pb.RegisterDataServiceServer(srv.GetSrv(), vector_search.New(chunkStore, embedder))
-
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		slog.Info("gRPC server started")
 		grpcErr := srv.Run()
 		if grpcErr != nil {
@@ -182,7 +182,9 @@ func run() int {
 		}
 
 	}()
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		if kafkaConsumer != nil {
 			slog.Info("Starting kafka consumer")
 			kafkaErr := kafkaConsumer.Run(ctx)
@@ -193,12 +195,15 @@ func run() int {
 			slog.Info("Kafka consumer is disabled")
 		}
 	}()
-
-	slog.Info("Starting server on :8080")
-	if err = http.ListenAndServe(":8080", nil); err != nil {
-		slog.Error("Failed to start server", "error", err)
-		return 1
-	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		slog.Info("Starting server on :8080")
+		if err = http.ListenAndServe(":8080", nil); err != nil {
+			slog.Error("Failed to start server", "error", err)
+		}
+	}()
+	wg.Wait()
 	return 0
 }
 
