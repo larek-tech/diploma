@@ -45,6 +45,13 @@ create table auth.user_role (
     role_id bigint not null,
     created_at timestamp not null default current_timestamp
 );
+
+insert into auth."user"(email, hash_password)
+values ('test@test.com', '$2a$10$Al13C5oYeRdPN4ux98fDCuxk5gEIAhjtFfOLPoUTuPtGAkf3/cmHC');
+
+insert into auth.user_role(user_id, role_id)
+values (1, 2), (1, 1);
+
 -- +goose StatementEnd
 
 -- +goose Down

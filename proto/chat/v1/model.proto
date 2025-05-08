@@ -3,7 +3,6 @@ syntax = "proto3";
 package chat.v1;
 option go_package = "internal/chat/pb";
 
-import "ml/v1/model.proto";
 import "google/protobuf/timestamp.proto";
 
 enum ResponseStatus {
@@ -82,4 +81,19 @@ message ListChatsRequest {
 
 message ListChatsResponse {
   repeated Chat chats = 1;
+}
+
+message ProcessQueryRequest {
+  int64 userId = 1;
+  string chatId = 2;
+  string content = 3;
+  optional int64 domainId = 4;
+  repeated string sourceIds = 5;
+  optional int64 scenarioId = 6;
+  optional bytes metadata = 7;
+};
+
+message CancelProcessingRequest {
+  int64 queryId = 1;
+  int64 userId = 2;
 }

@@ -29,11 +29,12 @@ services:
       - "4318:4318"
     restart: unless-stopped
 
-  postgres:
+  pg:
     image: postgres:17
     restart: always
     ports:
-      - "5432:5432"
+      - "5433:5433"
+    command: -p 5433
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-pguser}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pgpass}
@@ -95,7 +96,7 @@ services:
       - "9000:9000"
     depends_on:
       - jaeger
-      - postgres
+      - pg
       - auth
       - domain
 
@@ -108,7 +109,7 @@ services:
       - "9001:9001"
     depends_on:
       - jaeger
-      - postgres
+      - pg
 
   chat:
     build:
@@ -117,6 +118,9 @@ services:
     restart: always
     ports:
       - "9002:9002"
+    depends_on:
+       - jaeger
+       - pg
 
   domain:
     build:
@@ -127,6 +131,6 @@ services:
       - "9003:9003"
     depends_on:
       - jaeger
-      - postgres
+      - pg
       - zookeeper
       - kafka
