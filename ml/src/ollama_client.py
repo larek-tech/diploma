@@ -1,16 +1,17 @@
+import asyncio
 import json
-from collections.abc import Iterator
+from collections.abc import AsyncIterator
 from typing import Any
 
-import requests
+import httpx
 
 from config import OLLAMA_BASE_URL
 from utils.logger import logger
 
 
-class OllamaClient:
-    def __init__(self, base_url: str = "http://localhost:11434") -> None:
-        """Инициализация клиента Ollama API.
+class AsyncOllamaClient:
+    def __init__(self, base_url: str = OLLAMA_BASE_URL) -> None:
+        """Инициализация асинхронного клиента Ollama API.
 
         Parameters
         ----------
@@ -19,14 +20,14 @@ class OllamaClient:
         """
         self.base_url = base_url
 
-    def generate(
+    async def generate(
         self,
         prompt: str,
         model: str,
         *,
         stream: bool = False,
         **kwargs: dict[str, Any],
-    ) -> str | Iterator[str] | None:
+    ) -> str | AsyncIterator[str] | None:
         """Генерация текста с помощью предустановленной модели.
 
         Parameters
@@ -42,7 +43,7 @@ class OllamaClient:
 
         Returns
         -------
-        str | Iterator[str] | None
+        str | AsyncIterator[str] | None
             Сгенерированный текст или итератор при потоковом режиме.
             Возвращает None в случае ошибки.
 
@@ -59,43 +60,46 @@ class OllamaClient:
             **kwargs,
         }
 
-        try:
-            response = requests.post(
-                url, json=payload, stream=stream, timeout=600
-            )
-            response.raise_for_status()
+        async with httpx.AsyncClient(timeout=600) as client:
+            try:
+                response = await client.post(url, json=payload)
+                response.raise_for_status()
 
-            if stream:
-                return self._handle_stream_response(response)
-            return self._handle_regular_response(response)
+                if stream:
+                    return self._handle_stream_response(response)
+                return self._handle_regular_response(response)
 
-        except requests.exceptions.RequestException as e:
-            msg = f"API request failed: {e}"
-            raise RuntimeError(msg) from e
+            except httpx.RequestError as e:
+                msg = f"API request failed: {e}"
+                raise RuntimeError(msg) from e
 
-    def _handle_regular_response(self, response: requests.Response) -> str:
+    def _handle_regular_response(self, response: httpx.Response) -> str:
         """Обработка обычного (не потокового) ответа."""
         result = response.json()
         return result.get("response", "")
 
-    def _handle_stream_response(
-        self, response: requests.Response
-    ) -> Iterator[str]:
+    async def _handle_stream_response(
+        self, response: httpx.Response
+    ) -> AsyncIterator[str]:
         """Обработка потокового ответа."""
-        for line in response.iter_lines():
+        async for line in response.aiter_lines():
             if line:
-                chunk = json.loads(line.decode("utf-8"))
+                chunk = json.loads(line)
                 yield chunk.get("response", "")
 
 
-if __name__ == "__main__":
-    client = OllamaClient(
+async def main() -> None:
+    client = AsyncOllamaClient()
+
+    stream = await client.generate(
+        prompt="Привет, как дела?",
         model="hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
-        base_url=OLLAMA_BASE_URL,
+        stream=True,
     )
 
-    for text in client.generate(
-        prompt="Привет, как дела?",
-        stream=True,
-    ):
-        logger.info(text, end=" ")
+    async for text in stream:
+        logger.info(text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

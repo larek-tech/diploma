@@ -1,7 +1,7 @@
 import json
 
 from config import MULTI_QUESTION_PROMPT
-from ollama_client import OllamaClient
+from ollama_client import AsyncOllamaClient
 
 
 def generate_schema(
@@ -30,8 +30,8 @@ def generate_schema(
     }
 
 
-def get_multi_questions(
-    client: OllamaClient,
+async def get_multi_questions(
+    client: AsyncOllamaClient,
     user_prompt: str,
     n_questions: int,
     model: str,
@@ -43,7 +43,7 @@ def get_multi_questions(
     )
     return list(
         json.loads(
-            client.generate(
+            await client.generate(
                 prompt=MULTI_QUESTION_PROMPT.format(
                     query=user_prompt,
                     n_questions=n_questions,

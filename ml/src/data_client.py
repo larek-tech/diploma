@@ -1,12 +1,16 @@
+
+import asyncio
+
 import grpc
+from grpc import aio
 
 import data.v1.model_pb2 as pb
 import data.v1.service_pb2_grpc as pb_grpc
-from utils.logger import logger
+from config import logger
 
 
-class DataServiceClient:
-    """Клиент для взаимодействия с сервисом данных через gRPC.
+class AsyncDataServiceClient:
+    """Асинхронный клиент для взаимодействия с сервисом данных через gRPC.
 
     Parameters
     ----------
@@ -17,14 +21,14 @@ class DataServiceClient:
     """
 
     def __init__(self, host: str = "localhost", port: int = 9990) -> None:
-        self.channel = grpc.insecure_channel(f"{host}:{port}")
+        self.channel = aio.insecure_channel(f"{host}:{port}")
         self.stub = pb_grpc.DataServiceStub(self.channel)
 
-    def close(self) -> None:
+    async def close(self) -> None:
         """Закрывает соединение с сервером по gRPC."""
-        self.channel.close()
+        await self.channel.close()
 
-    def vector_search(
+    async def vector_search(
         self,
         query: str,
         source_ids: list[str],
@@ -60,13 +64,13 @@ class DataServiceClient:
             threshold=threshold,
             useQuestions=use_questions,
         )
-        return self.stub.VectorSearch(request)
+        return await self.stub.VectorSearch(request)
 
 
-if __name__ == "__main__":
-    client = DataServiceClient()
+async def main() -> None:
+    client = AsyncDataServiceClient()
     try:
-        response = client.vector_search(
+        response = await client.vector_search(
             query="Java разработчик",
             source_ids=["a6bfe96f-45bd-4e4b-8e6f-2c2ef53ca280"],
             top_k=5,
@@ -81,6 +85,9 @@ if __name__ == "__main__":
             logger.info(f"Index: {chunk.index}")
             logger.info(f"Similarity: {chunk.similarity:.2f}")
             logger.info(f"Content: {chunk.content}")
-
     finally:
-        client.close()
+        await client.close()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
