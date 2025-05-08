@@ -22,3 +22,24 @@ message DocumentChunk {
 message VectorSearchResponse {
   repeated DocumentChunk chunks = 1;
 };
+
+message GetDocumentsIn {
+  string sourceId = 1;
+  uint32 size = 2;
+  uint32 page = 3;
+};
+
+message Document {
+  string id = 1;
+  string sourceId = 2;
+  string name = 3;
+  string content = 4;
+  string metadata = 5;
+}
+
+message GetDocumentsOut {
+  uint32 size = 1;
+  uint32 page = 2;
+  uint32 total = 3;
+  repeated Document documents = 4;
+}

@@ -9,7 +9,6 @@ import (
 )
 
 type Handler struct {
-	pb.UnimplementedDataServiceServer
 	chunkStore chunkStorage
 	embedder   embedder
 }

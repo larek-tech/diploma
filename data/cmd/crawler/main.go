@@ -16,13 +16,15 @@ import (
 	sitemap "github.com/larek-tech/diploma/data/internal/domain/sitemap/service"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
 	sourceService "github.com/larek-tech/diploma/data/internal/domain/source/service"
+	"github.com/larek-tech/diploma/data/internal/grpc/get_documents"
 	"github.com/larek-tech/diploma/data/internal/grpc/vector_search"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/grpc/server"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/kafka"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/ollama"
-	chunkStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/chunk"
-	sourceStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/source"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
+	chunkStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/chunk"
+	documentStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/document"
+	sourceStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/source"
 	"github.com/larek-tech/diploma/data/internal/worker/kafka/create_source"
 	"github.com/larek-tech/storage/postgres"
 )
@@ -68,7 +70,7 @@ func run() int {
 
 	sourceStore := sourceStorage.New(pg)
 	srcService := sourceService.New(sourceStore, sitemap.New(), pub, trManager)
-
+	documentStore := documentStorage.New(pg)
 	chunkStore := chunkStorage.New(pg, trManager)
 	host, _ := getOllamaConfig()
 	embedder, err := ollama.New(host)
@@ -170,7 +172,13 @@ func run() int {
 	}))
 	wg := sync.WaitGroup{}
 	srv := server.New()
-	pb.RegisterDataServiceServer(srv.GetSrv(), vector_search.New(chunkStore, embedder))
+	pb.RegisterDataServiceServer(
+		srv.GetSrv(),
+		server.NewHandlers(
+			vector_search.New(chunkStore, embedder),
+			get_documents.New(documentStore),
+		),
+	)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()

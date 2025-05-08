@@ -11,4 +11,3 @@ type (
 		Handle(context.Context, *pgq.MessageIncoming) (bool, error)
 	}
 )
-	

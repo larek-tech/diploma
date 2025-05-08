@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	DataService_VectorSearch_FullMethodName = "/data.v1.DataService/VectorSearch"
+	DataService_GetDocuments_FullMethodName = "/data.v1.DataService/GetDocuments"
 )
 
 // DataServiceClient is the client API for DataService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DataServiceClient interface {
 	VectorSearch(ctx context.Context, in *VectorSearchRequest, opts ...grpc.CallOption) (*VectorSearchResponse, error)
+	GetDocuments(ctx context.Context, in *GetDocumentsIn, opts ...grpc.CallOption) (*GetDocumentsOut, error)
 }
 
 type dataServiceClient struct {
@@ -47,11 +49,22 @@ func (c *dataServiceClient) VectorSearch(ctx context.Context, in *VectorSearchRe
 	return out, nil
 }
 
+func (c *dataServiceClient) GetDocuments(ctx context.Context, in *GetDocumentsIn, opts ...grpc.CallOption) (*GetDocumentsOut, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDocumentsOut)
+	err := c.cc.Invoke(ctx, DataService_GetDocuments_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DataServiceServer is the server API for DataService service.
 // All implementations must embed UnimplementedDataServiceServer
 // for forward compatibility.
 type DataServiceServer interface {
 	VectorSearch(context.Context, *VectorSearchRequest) (*VectorSearchResponse, error)
+	GetDocuments(context.Context, *GetDocumentsIn) (*GetDocumentsOut, error)
 	mustEmbedUnimplementedDataServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedDataServiceServer struct{}
 
 func (UnimplementedDataServiceServer) VectorSearch(context.Context, *VectorSearchRequest) (*VectorSearchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VectorSearch not implemented")
+}
+func (UnimplementedDataServiceServer) GetDocuments(context.Context, *GetDocumentsIn) (*GetDocumentsOut, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDocuments not implemented")
 }
 func (UnimplementedDataServiceServer) mustEmbedUnimplementedDataServiceServer() {}
 func (UnimplementedDataServiceServer) testEmbeddedByValue()                     {}
@@ -104,6 +120,24 @@ func _DataService_VectorSearch_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataService_GetDocuments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDocumentsIn)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataServiceServer).GetDocuments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataService_GetDocuments_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataServiceServer).GetDocuments(ctx, req.(*GetDocumentsIn))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DataService_ServiceDesc is the grpc.ServiceDesc for DataService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var DataService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VectorSearch",
 			Handler:    _DataService_VectorSearch_Handler,
+		},
+		{
+			MethodName: "GetDocuments",
+			Handler:    _DataService_GetDocuments_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

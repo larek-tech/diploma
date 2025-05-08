@@ -217,6 +217,210 @@ func (x *VectorSearchResponse) GetChunks() []*DocumentChunk {
 	return nil
 }
 
+type GetDocumentsIn struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SourceId      string                 `protobuf:"bytes,1,opt,name=sourceId,proto3" json:"sourceId,omitempty"`
+	Size          uint32                 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	Page          uint32                 `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDocumentsIn) Reset() {
+	*x = GetDocumentsIn{}
+	mi := &file_data_v1_model_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDocumentsIn) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDocumentsIn) ProtoMessage() {}
+
+func (x *GetDocumentsIn) ProtoReflect() protoreflect.Message {
+	mi := &file_data_v1_model_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDocumentsIn.ProtoReflect.Descriptor instead.
+func (*GetDocumentsIn) Descriptor() ([]byte, []int) {
+	return file_data_v1_model_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetDocumentsIn) GetSourceId() string {
+	if x != nil {
+		return x.SourceId
+	}
+	return ""
+}
+
+func (x *GetDocumentsIn) GetSize() uint32 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *GetDocumentsIn) GetPage() uint32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+type Document struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	SourceId      string                 `protobuf:"bytes,2,opt,name=sourceId,proto3" json:"sourceId,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`
+	Metadata      string                 `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Document) Reset() {
+	*x = Document{}
+	mi := &file_data_v1_model_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Document) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Document) ProtoMessage() {}
+
+func (x *Document) ProtoReflect() protoreflect.Message {
+	mi := &file_data_v1_model_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Document.ProtoReflect.Descriptor instead.
+func (*Document) Descriptor() ([]byte, []int) {
+	return file_data_v1_model_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Document) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Document) GetSourceId() string {
+	if x != nil {
+		return x.SourceId
+	}
+	return ""
+}
+
+func (x *Document) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Document) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *Document) GetMetadata() string {
+	if x != nil {
+		return x.Metadata
+	}
+	return ""
+}
+
+type GetDocumentsOut struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Size          uint32                 `protobuf:"varint,1,opt,name=size,proto3" json:"size,omitempty"`
+	Page          uint32                 `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
+	Total         uint32                 `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
+	Documents     []*Document            `protobuf:"bytes,4,rep,name=documents,proto3" json:"documents,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDocumentsOut) Reset() {
+	*x = GetDocumentsOut{}
+	mi := &file_data_v1_model_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDocumentsOut) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDocumentsOut) ProtoMessage() {}
+
+func (x *GetDocumentsOut) ProtoReflect() protoreflect.Message {
+	mi := &file_data_v1_model_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDocumentsOut.ProtoReflect.Descriptor instead.
+func (*GetDocumentsOut) Descriptor() ([]byte, []int) {
+	return file_data_v1_model_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GetDocumentsOut) GetSize() uint32 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *GetDocumentsOut) GetPage() uint32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *GetDocumentsOut) GetTotal() uint32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *GetDocumentsOut) GetDocuments() []*Document {
+	if x != nil {
+		return x.Documents
+	}
+	return nil
+}
+
 var File_data_v1_model_proto protoreflect.FileDescriptor
 
 var file_data_v1_model_proto_rawDesc = string([]byte{
@@ -245,9 +449,30 @@ var file_data_v1_model_proto_rawDesc = string([]byte{
 	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2e, 0x0a, 0x06, 0x63, 0x68, 0x75, 0x6e, 0x6b, 0x73,
 	0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x64, 0x61, 0x74, 0x61, 0x2e, 0x76, 0x31,
 	0x2e, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x43, 0x68, 0x75, 0x6e, 0x6b, 0x52, 0x06,
-	0x63, 0x68, 0x75, 0x6e, 0x6b, 0x73, 0x42, 0x12, 0x5a, 0x10, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e,
-	0x61, 0x6c, 0x2f, 0x64, 0x61, 0x74, 0x61, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x63, 0x68, 0x75, 0x6e, 0x6b, 0x73, 0x22, 0x54, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x44, 0x6f, 0x63,
+	0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x49, 0x6e, 0x12, 0x1a, 0x0a, 0x08, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x49, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x73, 0x69, 0x7a, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0d, 0x52, 0x04, 0x73, 0x69, 0x7a, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x67, 0x65,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x70, 0x61, 0x67, 0x65, 0x22, 0x80, 0x01, 0x0a,
+	0x08, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x73, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x49, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x73, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x49, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e,
+	0x74, 0x65, 0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74,
+	0x65, 0x6e, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x22,
+	0x80, 0x01, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73,
+	0x4f, 0x75, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x73, 0x69, 0x7a, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0d, 0x52, 0x04, 0x73, 0x69, 0x7a, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x67, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x70, 0x61, 0x67, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x74,
+	0x6f, 0x74, 0x61, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x05, 0x74, 0x6f, 0x74, 0x61,
+	0x6c, 0x12, 0x2f, 0x0a, 0x09, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x18, 0x04,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x64, 0x61, 0x74, 0x61, 0x2e, 0x76, 0x31, 0x2e, 0x44,
+	0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x09, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e,
+	0x74, 0x73, 0x42, 0x12, 0x5a, 0x10, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x64,
+	0x61, 0x74, 0x61, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 })
 
 var (
@@ -262,19 +487,23 @@ func file_data_v1_model_proto_rawDescGZIP() []byte {
 	return file_data_v1_model_proto_rawDescData
 }
 
-var file_data_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_data_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_data_v1_model_proto_goTypes = []any{
 	(*VectorSearchRequest)(nil),  // 0: data.v1.VectorSearchRequest
 	(*DocumentChunk)(nil),        // 1: data.v1.DocumentChunk
 	(*VectorSearchResponse)(nil), // 2: data.v1.VectorSearchResponse
+	(*GetDocumentsIn)(nil),       // 3: data.v1.GetDocumentsIn
+	(*Document)(nil),             // 4: data.v1.Document
+	(*GetDocumentsOut)(nil),      // 5: data.v1.GetDocumentsOut
 }
 var file_data_v1_model_proto_depIdxs = []int32{
 	1, // 0: data.v1.VectorSearchResponse.chunks:type_name -> data.v1.DocumentChunk
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	4, // 1: data.v1.GetDocumentsOut.documents:type_name -> data.v1.Document
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_data_v1_model_proto_init() }
@@ -288,7 +517,7 @@ func file_data_v1_model_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_data_v1_model_proto_rawDesc), len(file_data_v1_model_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

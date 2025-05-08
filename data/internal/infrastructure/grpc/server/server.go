@@ -16,7 +16,6 @@ type Server struct {
 }
 
 func New() *Server {
-
 	srvOpts := []grpc.ServerOption{}
 	srv := grpc.NewServer(srvOpts...)
 	return &Server{srv: srv}

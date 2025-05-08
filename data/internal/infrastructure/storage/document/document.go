@@ -26,7 +26,7 @@ func (s Storage) Save(ctx context.Context, doc *document.Document) error {
 	// check if document with given ID already exists
 	var res document.Document
 	sql := `
-SELECT 
+SELECT
 id
 FROM documents
 WHERE id = $1;
@@ -62,4 +62,43 @@ WHERE id = $8`
 		return fmt.Errorf("failed to update document: %w", err)
 	}
 	return nil
+}
+
+func (s Storage) GetMany(ctx context.Context, sourceID string, page, size int) (int, []*document.Document, error) {
+	// enforce maximum page size of 50
+	if size > 50 {
+		size = 50
+	}
+	// ensure page is at least 1
+	if page < 1 {
+		page = 1
+	}
+	offset := (page - 1) * size
+
+	sqlQuery := `
+SELECT
+    id, source_id, object_id, object_type, name, content, metadata, created_at, updated_at
+FROM documents
+WHERE source_id = $1
+ORDER BY created_at DESC
+LIMIT $2 OFFSET $3;
+`
+	var docs []*document.Document
+	err := s.db.QueryStruct(ctx, &docs, sqlQuery, sourceID, size, offset)
+	if err != nil {
+		return 0, nil, fmt.Errorf("failed to query documents: %w", err)
+	}
+	var total int
+	sqlQuery = `
+SELECT
+	COUNT(*)
+FROM documents
+WHERE source_id = $1
+ORDER BY created_at DESC;
+	`
+	err = s.db.QueryStruct(ctx, &total, sqlQuery, sourceID)
+	if err != nil {
+		return 0, nil, fmt.Errorf("failed to get total number of documents")
+	}
+	return total, docs, nil
 }

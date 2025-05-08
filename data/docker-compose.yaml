@@ -28,7 +28,8 @@ services:
       dockerfile: docker/migrator.Dockerfile
     container_name: migrator_local
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     env_file:
         - local.env
     environment:
@@ -100,6 +101,9 @@ services:
       OLLAMA_LLM_MODEL: llama3.2
       OLLAMA_EMBEDDER_ENDPOINT: http://ollama_local:11434
       OLLAMA_EMBEDDER_MODEL: bge-m3:latest
+      S3_ENDPOINT: s3:9000
+      S3_ACCESS_KEY_ID: minio
+      S3_SECRET_ACCESS_KEY: minio123
     ports:
       - "9999:8081"
   zookeeper:
@@ -147,6 +151,19 @@ services:
       - kafka_data_cfg:/mnt/shared/config
       - kafka_data:/var/lib/kafka/data
       - kafka_data_secrets:/etc/kafka/secrets
+  s3:
+    container_name: s3_local
+    image: quay.io/minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
 
 
 
@@ -159,3 +176,4 @@ volumes:
   kafka_data_cfg:
   kafka_data:
   kafka_data_secrets:
+  minio_data:

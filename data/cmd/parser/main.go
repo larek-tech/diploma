@@ -14,12 +14,13 @@ import (
 	"github.com/larek-tech/diploma/data/internal/domain/site/service/crawler"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/kafka"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/ollama"
-	chunkStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/chunk"
-	documentStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/document"
-	pageStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/page"
-	questionStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/question"
-	siteStorage "github.com/larek-tech/diploma/data/internal/infrastructure/postgres/site"
-	"github.com/larek-tech/diploma/data/internal/infrastructure/postgres/sitejob"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/s3"
+	chunkStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/chunk"
+	documentStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/document"
+	pageStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/page"
+	questionStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/question"
+	siteStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/site"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/storage/sitejob"
 
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/embed_document"
@@ -90,11 +91,22 @@ func run() int {
 		qaas.ParseSiteStatusQueue,
 	})
 
+	objectStorage, err := s3.New(getS3Credentials())
+	if err != nil {
+		slog.Error("failed to create s3 client", "error", err)
+		return -1
+	}
+	err = objectStorage.CreateBuckets(ctx, pageStorage.PageBucketName)
+	if err != nil {
+		slog.Error("failed to create s3 bucket", "error", err)
+		return -1
+	}
+
 	siteStore := siteStorage.New(pg)
 	documentStore := documentStorage.New(pg)
 	questionStore := questionStorage.New(pg, trManager)
 	chunkStore := chunkStorage.New(pg, trManager)
-	pageStore := pageStorage.New(pg)
+	pageStore := pageStorage.New(pg, objectStorage)
 	siteJobStore := sitejob.New(pg)
 	pageService := crawler.New(httpClient, siteStore, pageStore, siteJobStore, trManager)
 	embeddingService := documentService.New(documentStore, chunkStore, questionStore, embedderModel, llm, trManager)
@@ -169,4 +181,12 @@ func getEmbedderConfig() (string, string) {
 		model = "bge-m3:latest"
 	}
 	return host, model
+}
+
+func getS3Credentials() s3.Credentials {
+	endpoint := os.Getenv("S3_ENDPOINT")
+	if endpoint == "" {
+		endpoint = "localhost:9000"
+	}
+	return s3.NewCredentials(endpoint, os.Getenv("S3_ACCESS_KEY_ID"), os.Getenv("S3_SECRET_ACCESS_KEY"))
 }

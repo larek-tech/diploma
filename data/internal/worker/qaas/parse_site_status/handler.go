@@ -39,38 +39,39 @@ func (h Handler) Handle(ctx context.Context, queueMsg *pgq.MessageIncoming) (boo
 		return true, fmt.Errorf("failed to unmarshal payload: %w", err)
 	}
 	// Check if the job is already processed
-	processed, err := h.pageJobStore.GetProcessedPageCount(ctx, payload.SiteID)
-	if err != nil {
-		return true, fmt.Errorf("failed to get processed page count: %w", err)
-	}
-	unprocessed, err := h.pageJobStore.GetUnprocessedPageCount(ctx, payload.SiteID)
-	if err != nil {
-		return true, fmt.Errorf("failed to get unprocessed page count: %w", err)
-	}
-
-	responseMsg, err := h.assembleMessage(payload.SiteID, processed, unprocessed)
-	if err != nil {
-		return true, fmt.Errorf("failed to assemble message: %w", err)
-	}
-	err = h.kafkaProducer.Produce(ctx, responseMsg)
-	if err != nil {
-		return false, fmt.Errorf("failed to produce message: %w", err)
-	}
-	if processed > 0 && unprocessed == 0 {
-		return true, nil
-	}
-	// schedule next status check
-	publishOptions := []qaas.PublishOption{
-		qaas.WithQueue(qaas.ParseSiteStatusQueue),
-		qaas.WithScheduledFor(ptr.To(time.Now().Add(statusDelay))),
-	}
-
-	_, err = h.publisher.Publish(ctx, []any{payload}, publishOptions...)
-	if err != nil {
-		return false, fmt.Errorf("failed to schedule next status check: %w", err)
-	}
-
 	return true, nil
+	// processed, err := h.pageJobStore.GetProcessedPageCount(ctx, payload.SiteID)
+	// if err != nil {
+	// 	return true, fmt.Errorf("failed to get processed page count: %w", err)
+	// }
+	// unprocessed, err := h.pageJobStore.GetUnprocessedPageCount(ctx, payload.SiteID)
+	// if err != nil {
+	// 	return true, fmt.Errorf("failed to get unprocessed page count: %w", err)
+	// }
+
+	// responseMsg, err := h.assembleMessage(payload.SiteID, processed, unprocessed)
+	// if err != nil {
+	// 	return true, fmt.Errorf("failed to assemble message: %w", err)
+	// }
+	// err = h.kafkaProducer.Produce(ctx, responseMsg)
+	// if err != nil {
+	// 	return false, fmt.Errorf("failed to produce message: %w", err)
+	// }
+	// if processed > 0 && unprocessed == 0 {
+	// 	return true, nil
+	// }
+	// // schedule next status check
+	// publishOptions := []qaas.PublishOption{
+	// 	qaas.WithQueue(qaas.ParseSiteStatusQueue),
+	// 	qaas.WithScheduledFor(ptr.To(time.Now().Add(statusDelay))),
+	// }
+
+	// _, err = h.publisher.Publish(ctx, []any{payload}, publishOptions...)
+	// if err != nil {
+	// 	return false, fmt.Errorf("failed to schedule next status check: %w", err)
+	// }
+
+	// return true, nil
 }
 
 func (h Handler) assembleMessage(siteID string, processed, unprocessed int) (*kafka.Message, error) {
