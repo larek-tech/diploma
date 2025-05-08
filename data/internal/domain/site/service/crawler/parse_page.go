@@ -23,26 +23,6 @@ func (s Service) ParsePage(ctx context.Context, page *site.Page, parseSiteJobID 
 		return nil, false, errors.New("page already parsed")
 	}
 
-	//oldPage, err := s.pageStore.GetByURL(ctx, page.URL)
-	//if err != nil {
-	//	slog.Debug("page not found", "err", err)
-	//}
-	// TODO: create mechanism to check if page was parsed in the last ParsingDelta
-	//if oldPage != nil {
-	//	if time.Since(oldPage.UpdatedAt) < ParsingDelta {
-	//		slog.Debug("page already parsed", "page", page.URL)
-	//		return nil, true, nil
-	//	}
-	//	slog.Debug("page already parsed, but outdated", "page", page.URL)
-	//	page.ID = oldPage.ID
-	//	page.OutgoingPages = lo.Uniq(append(page.OutgoingPages, oldPage.OutgoingPages...))
-	//	err = s.pageStore.Save(ctx, page)
-	//	if err != nil {
-	//		return nil, false, fmt.Errorf("failed to save page: %w", err)
-	//	}
-	//	return nil, true, nil
-	//}
-
 	siteInfo, err := s.siteStore.GetByID(ctx, page.SiteID)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to get site: %w", err)

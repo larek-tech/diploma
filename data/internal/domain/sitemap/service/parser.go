@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 
 	"github.com/larek-tech/diploma/data/internal/domain/sitemap"
 )
@@ -17,8 +18,10 @@ func New() *SitemapParser {
 }
 
 // GetAndParseSitemap fetches a sitemap from a URL and parses it
-func (sp *SitemapParser) GetAndParseSitemap(url string) ([]sitemap.URLResult, error) {
-	resp, err := http.Get(url)
+func (sp *SitemapParser) GetAndParseSitemap(siteURL url.URL) ([]sitemap.URLResult, error) {
+	siteURL.Path = "/sitemap.xml"
+
+	resp, err := http.Get(siteURL.String())
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch sitemap: %w", err)
 	}

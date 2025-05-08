@@ -197,7 +197,7 @@ func run() int {
 			slog.Info("Starting kafka consumer")
 			kafkaErr := kafkaConsumer.Run(ctx)
 			if kafkaErr != nil {
-				slog.Error("failed to run kafka: %w", kafkaErr)
+				slog.Error("failed to run kafka: %w", "err", kafkaErr)
 			}
 		} else {
 			slog.Info("Kafka consumer is disabled")

@@ -75,6 +75,10 @@ func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (
 }
 
 func (s Service) createSite(src *source.Source, message source.DataMessage) (*site.Site, error) {
+	rawUrl := string(message.Content)
+	if rawUrl == "" {
+		return nil, fmt.Errorf("url is empty")
+	}
 
 	siteURL, err := url.Parse(string(message.Content))
 	if err != nil {
@@ -84,8 +88,7 @@ func (s Service) createSite(src *source.Source, message source.DataMessage) (*si
 	if err != nil {
 		return nil, fmt.Errorf("failed to create site: %w", err)
 	}
-
-	availableURLs, err := s.sitemapParser.GetAndParseSitemap(siteURL.String())
+	availableURLs, err := s.sitemapParser.GetAndParseSitemap(*siteURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse sitemap: %w", err)
 	}
