@@ -1,16 +1,22 @@
 import os
+from pathlib import Path
 
-from dotenv import load_dotenv
+import dotenv
 
-load_dotenv()
+from utils.logger import logger
+
+dotenv_path = Path(__file__).parents[1] / ".env"
+logger.info(dotenv_path)
+dotenv.load_dotenv(dotenv_path)
 
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL")
 GIGA_CHAT_API_KEY = os.getenv("GIGA_CHAT_API_KEY")
 DEVICE = os.getenv("DEVICE")
 DATA_SERVICE_PORT = os.getenv("DATA_SERVICE_PORT")
 DATA_SERVICE_HOST = os.getenv("DATA_SERVICE_HOST")
-DEFAULT_RERANKER_NAME = os.getenv("DEFAULT_RERANKER_NAME")
-
+DEFAULT_RERANKER_NAME = os.environ["DEFAULT_RERANKER_NAME"]
+ML_SERVICE_PORT = os.getenv("ML_SERVICE_PORT")
+HF_TOKEN = os.getenv("HF_TOKEN")
 
 MULTI_QUESTION_PROMPT = """
 Переформулируй вопрос: {query}. Предложите {n_questions} различных вариантов, которые помогут рассмотреть тему с разных сторон.

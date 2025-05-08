@@ -1,6 +1,9 @@
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
+from config import HF_TOKEN
+from utils.logger import logger
+
 
 class Reranker:
     """Класс для повторной оценки документов на основе заданного запроса
@@ -21,12 +24,15 @@ class Reranker:
     """
 
     def __init__(self, reranker_model_name: str, device: str) -> None:
+        logger.info(reranker_model_name)
         self.reranker_tokenizer = AutoTokenizer.from_pretrained(
-            reranker_model_name
+            reranker_model_name,
+            token=HF_TOKEN,
         )
         self.reranker_model = (
             AutoModelForSequenceClassification.from_pretrained(
-                reranker_model_name
+                reranker_model_name,
+                token=HF_TOKEN,
             )
         )
         self.device = device

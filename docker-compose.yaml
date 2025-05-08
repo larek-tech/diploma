@@ -5,122 +5,141 @@ volumes:
   kafka_data:
 
 services:
-  jaeger:
-    image: jaegertracing/all-in-one
-    container_name: jaeger
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
-    volumes:
-      - jaeger_data:/tmp
-    ports:
-      - "5775:5775"
-      - "6831:6831/udp"
-      - "6832:6832/udp"
-      - "5778:5778"
-      - "16686:16686"
-      - "14268:14268"
-      - "14250:14250"
-      - "9411:9411"
-      - "4317:4317"
-      - "4318:4318"
-    restart: unless-stopped
+  # jaeger:
+  #   image: jaegertracing/all-in-one
+  #   container_name: jaeger
+  #   environment:
+  #     - COLLECTOR_OTLP_ENABLED=true
+  #   volumes:
+  #     - jaeger_data:/tmp
+  #   ports:
+  #     - "5775:5775"
+  #     - "6831:6831/udp"
+  #     - "6832:6832/udp"
+  #     - "5778:5778"
+  #     - "16686:16686"
+  #     - "14268:14268"
+  #     - "14250:14250"
+  #     - "9411:9411"
+  #     - "4317:4317"
+  #     - "4318:4318"
+  #   restart: unless-stopped
 
-  postgres:
-    image: postgres:17
-    restart: always
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER:-pguser}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pgpass}
-      - POSTGRES_DB=${POSTGRES_DB:-dev}
-    volumes:
-      - pg_data:/var/lib/postgresql/data
+  # postgres:
+  #   image: postgres:17
+  #   restart: always
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     - POSTGRES_USER=${POSTGRES_USER:-pguser}
+  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pgpass}
+  #     - POSTGRES_DB=${POSTGRES_DB:-dev}
+  #   volumes:
+  #     - pg_data:/var/lib/postgresql/data
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_SERVER_ID: 1
-      ZOOKEEPER_TICK_TIME: 2000
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_INIT_LIMIT: 5
-      ZOOKEEPER_SYNC_LIMIT: 2
-      ZOOKEEPER_SERVERS: zookeeper:2888:3888
-    healthcheck:
-      test: echo stat | nc localhost 2181
-      interval: 10s
-      timeout: 10s
-      retries: 3
-    volumes:
-      - zoo_data:/var/lib/zookeeper/log
-      - zoo_data:/etc/zookeeper/secrets
-      - zoo_data:/var/lib/zookeeper/data
-    ports:
-      - "2181:2181"
-      - "2888:2888"
-      - "3888:3888"
+  # zookeeper:
+  #   image: confluentinc/cp-zookeeper:latest
+  #   environment:
+  #     ZOOKEEPER_SERVER_ID: 1
+  #     ZOOKEEPER_TICK_TIME: 2000
+  #     ZOOKEEPER_CLIENT_PORT: 2181
+  #     ZOOKEEPER_INIT_LIMIT: 5
+  #     ZOOKEEPER_SYNC_LIMIT: 2
+  #     ZOOKEEPER_SERVERS: zookeeper:2888:3888
+  #   healthcheck:
+  #     test: echo stat | nc localhost 2181
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 3
+  #   volumes:
+  #     - zoo_data:/var/lib/zookeeper/log
+  #     - zoo_data:/etc/zookeeper/secrets
+  #     - zoo_data:/var/lib/zookeeper/data
+  #   ports:
+  #     - "2181:2181"
+  #     - "2888:2888"
+  #     - "3888:3888"
 
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    healthcheck:
-      test: ps augwwx | egrep [S]upportedKafka
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_LISTENERS: LISTENER_INT://kafka:29092,LISTENER_EXT://0.0.0.0:9092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: LISTENER_INT://kafka:29092,LISTENER_EXT://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INT:PLAINTEXT,LISTENER_EXT:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INT
-    volumes:
-      - kafka_data:/mnt/shared/config
-      - kafka_data:/var/lib/kafka/data
-      - kafka_data:/etc/kafka/secrets
+  # kafka:
+  #   image: confluentinc/cp-kafka:latest
+  #   healthcheck:
+  #     test: ps augwwx | egrep [S]upportedKafka
+  #   depends_on:
+  #     - zookeeper
+  #   ports:
+  #     - "9092:9092"
+  #   environment:
+  #     KAFKA_BROKER_ID: 1
+  #     KAFKA_LISTENERS: LISTENER_INT://kafka:29092,LISTENER_EXT://0.0.0.0:9092
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #     KAFKA_ADVERTISED_LISTENERS: LISTENER_INT://kafka:29092,LISTENER_EXT://localhost:9092
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INT:PLAINTEXT,LISTENER_EXT:PLAINTEXT
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INT
+  #   volumes:
+  #     - kafka_data:/mnt/shared/config
+  #     - kafka_data:/var/lib/kafka/data
+  #     - kafka_data:/etc/kafka/secrets
 
-  api:
+  # api:
+  #   build:
+  #     context: api
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   ports:
+  #     - "9000:9000"
+  #   depends_on:
+  #     - jaeger
+  #     - postgres
+  #     - auth
+  #     - domain
+
+  # auth:
+  #   build:
+  #     context: auth
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   ports:
+  #     - "9001:9001"
+  #   depends_on:
+  #     - jaeger
+  #     - postgres
+
+  # chat:
+  #   build:
+  #     context: chat
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   ports:
+  #     - "9002:9002"
+
+  # domain:
+  #   build:
+  #     context: domain
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   ports:
+  #     - "9003:9003"
+  #   depends_on:
+  #     - jaeger
+  #     - postgres
+  #     - zookeeper
+  #     - kafka
+
+  ml:
     build:
-      context: api
+      context: ml
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "9000:9000"
-    depends_on:
-      - jaeger
-      - postgres
-      - auth
-      - domain
-
-  auth:
-    build:
-      context: auth
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - "9001:9001"
-    depends_on:
-      - jaeger
-      - postgres
-
-  chat:
-    build:
-      context: chat
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - "9002:9002"
-
-  domain:
-    build:
-      context: domain
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - "9003:9003"
-    depends_on:
-      - jaeger
-      - postgres
-      - zookeeper
-      - kafka
+      - "8888:8888"
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

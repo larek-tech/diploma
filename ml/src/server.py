@@ -12,6 +12,7 @@ from config import (
     DATA_SERVICE_PORT,
     DEFAULT_RERANKER_NAME,
     DEVICE,
+    ML_SERVICE_PORT,
     OLLAMA_BASE_URL,
     RAG_PROMPT,
 )
@@ -38,7 +39,9 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
         )
 
     def ProcessQuery(  # noqa: N802
-        self, request: ml_pb2_model.ProcessQueryRequest, context
+        self,
+        request: ml_pb2_model.ProcessQueryRequest,
+        context: grpc.ServicerContext,
     ) -> Iterator[ml_pb2_model.ProcessQueryResponse]:
         client_ip = context.peer().split(":")[-1]
         request_id = f"{request.query.userId}-{hash(request.query.content)}"
@@ -125,7 +128,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
                 yield response
         except Exception as e:
             logger.error(
-                f"Error processing request {request_id}: {str(e)}\n"
+                f"Error processing request {request_id}: {e!s}\n"
                 f"Traceback: {logging.traceback.format_exc()}"
             )
             context.abort(grpc.StatusCode.INTERNAL, "Internal server error")
@@ -134,10 +137,10 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
 def serve() -> None:
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     ml_pb2_grpc.add_MLServiceServicer_to_server(MLServiceServicer(), server)
-    server.add_insecure_port("0.0.0.0:50051")
+    server.add_insecure_port(f"0.0.0.0:{ML_SERVICE_PORT}")
     server.start()
 
-    logger.info("Server started on port 50051")
+    logger.info(f"Server started on port {ML_SERVICE_PORT}")
     logger.info("Waiting for requests...")
 
     try:
