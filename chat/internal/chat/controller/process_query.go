@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+// ProcessQuery start query processing with streaming response.
 func (ctrl *Controller) ProcessQuery(
 	ctx context.Context,
 	req *pb.ProcessQueryRequest,
