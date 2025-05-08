@@ -89,7 +89,7 @@ func run() int {
 	kafkaConsumer, err := kafka.NewConsumer(*kafkaCfg, kafkaHandlers)
 	if err != nil {
 		// for now kafka can be disabled and we can accept messages from http and grpc
-		slog.Error("failed to create kafka consumer: %w", err)
+		slog.Error("failed to create kafka consumer: %w", "err", err)
 	}
 
 	http.Handle("/test", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -197,7 +197,7 @@ func run() int {
 			slog.Info("Starting kafka consumer")
 			kafkaErr := kafkaConsumer.Run(ctx)
 			if kafkaErr != nil {
-				slog.Error("failed to run kafka: %w", kafkaErr)
+				slog.Error("failed to run kafka: %w", "err", kafkaErr)
 			}
 		} else {
 			slog.Info("Kafka consumer is disabled")

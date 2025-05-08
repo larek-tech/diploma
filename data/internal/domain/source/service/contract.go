@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"net/url"
 
 	"github.com/larek-tech/diploma/data/internal/domain/sitemap"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
@@ -21,6 +22,6 @@ type (
 		Do(context.Context, func(context.Context) error) error
 	}
 	sitemapParser interface {
-		GetAndParseSitemap(url string) ([]sitemap.URLResult, error)
+		GetAndParseSitemap(url.URL) ([]sitemap.URLResult, error)
 	}
 )
