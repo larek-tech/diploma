@@ -46,6 +46,7 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    restart: unless-stopped
     environment:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_TICK_TIME: 2000
@@ -69,6 +70,7 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:latest
+    restart: unless-stopped
     healthcheck:
       test: ps augwwx | egrep [S]upportedKafka
     depends_on:
@@ -223,6 +225,9 @@ services:
     restart: always
     ports:
       - "9002:9002"
+    depends_on:
+       - jaeger
+       - pg
 
   domain:
     build:

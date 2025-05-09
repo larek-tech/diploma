@@ -101,10 +101,20 @@ func Run() error {
 	}
 	defer domainConn.Close()
 
+	chatConn, err := grpcclient.NewGrpcClient(
+		&cfg.ChatService,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
+	)
+	if err != nil {
+		return errs.WrapErr(err, "connect to chat service")
+	}
+	defer chatConn.Close()
+
 	// Api routes with JWT middleware
 	apiRouter := srv.GetSrv().Group("/api/v1")
 	apiRouter.Use(middleware.Jwt(authService))
-	api.SetupRoutes(apiRouter, tracer, domainConn.Conn())
+	api.SetupRoutes(apiRouter, domainConn.Conn(), chatConn.Conn(), authConn.Conn(), tracer, cfg.Server.WsConfig())
 
 	srv.Start()
 

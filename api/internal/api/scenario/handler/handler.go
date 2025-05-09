@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/larek-tech/diploma/api/internal/domain/pb"
-	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -14,13 +13,11 @@ const (
 // Handler implements scenario methods on transport level.
 type Handler struct {
 	scenarioService pb.ScenarioServiceClient
-	tracer          trace.Tracer
 }
 
 // New creates new Handler.
-func New(scenarioService pb.ScenarioServiceClient, tracer trace.Tracer) *Handler {
+func New(scenarioService pb.ScenarioServiceClient) *Handler {
 	return &Handler{
 		scenarioService: scenarioService,
-		tracer:          tracer,
 	}
 }

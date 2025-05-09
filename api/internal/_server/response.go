@@ -9,6 +9,10 @@ import (
 var (
 	errMap = map[error]response.ErrorResponse{
 		// 400
+		shared.ErrWsProtocolRequired: {
+			Msg:    "upgrade to ws protocol required",
+			Status: fiber.StatusBadRequest,
+		},
 		shared.ErrCreateSource: {
 			Msg:    "failed creating source",
 			Status: fiber.StatusBadRequest,
@@ -69,6 +73,30 @@ var (
 			Msg:    "failed listing available scenarios",
 			Status: fiber.StatusBadRequest,
 		},
+		shared.ErrCreateChat: {
+			Msg:    "failed creating chat",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrGetChat: {
+			Msg:    "failed getting chat",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrUpdateChat: {
+			Msg:    "failed updating chat",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrDeleteChat: {
+			Msg:    "failed deleting chat",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrListChats: {
+			Msg:    "failed listing available chats",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrCancelQuery: {
+			Msg:    "failed to cancel query processing",
+			Status: fiber.StatusBadRequest,
+		},
 		// 401
 		shared.ErrUnauthorized: {
 			Msg:    "unauthorized",
@@ -90,6 +118,10 @@ var (
 		},
 		shared.ErrScenarioNotFound: {
 			Msg:    "scenario not found",
+			Status: fiber.StatusNotFound,
+		},
+		shared.ErrChatNotFound: {
+			Msg:    "chat not found",
 			Status: fiber.StatusNotFound,
 		},
 		// 422

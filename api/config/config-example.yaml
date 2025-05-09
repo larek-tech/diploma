@@ -19,3 +19,6 @@ auth_service:
 domain_service:
   host: domain
   port: 9003
+chat_service:
+  host: chat
+  port: 9002

@@ -81,7 +81,7 @@ migrate-new:
 .PHONY: proto-auth
 proto-auth: AUTH_PROTO_SRC=$(PROTO_SRC)/auth/v1
 proto-auth:
-	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
+	@for dir in $(shell find . -type f -name go.mod -not -path "./data/*" -exec dirname {} \;); do \
 		echo "Generating stubs in $$dir";\
 		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
 			$(AUTH_PROTO_SRC)/service.proto $(AUTH_PROTO_SRC)/model.proto; \
@@ -91,7 +91,7 @@ proto-auth:
 .PHONY: proto-ml
 proto-ml: ML_PROTO_SRC=$(PROTO_SRC)/ml/v1
 proto-ml:
-	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
+	@for dir in ./chat ./domain ./api; do \
   		echo "Generating stubs in $$dir";\
 		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
 			$(ML_PROTO_SRC)/service.proto $(ML_PROTO_SRC)/model.proto; \
@@ -105,11 +105,9 @@ proto-ml:
 .PHONY: proto-data
 proto-data: DATA_PROTO_SRC=$(PROTO_SRC)/data/v1
 proto-data:
-	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
-  		echo "Generating stubs in $$dir";\
-		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
-			$(DATA_PROTO_SRC)/service.proto $(DATA_PROTO_SRC)/model.proto; \
-	done
+	@echo "Generating stubs in ./data"
+	@$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=./data --go-grpc_out=./data \
+		$(DATA_PROTO_SRC)/service.proto $(DATA_PROTO_SRC)/model.proto;
 	@mkdir -p ml/data/pb
 	@echo "Generating stubs in ./ml"
 	@python3 -m grpc_tools.protoc -I$(PROTO_SRC) --python_out=ml/data/pb --pyi_out=ml/data/pb --grpc_python_out=ml/data/pb \
@@ -119,7 +117,7 @@ proto-data:
 .PHONY: proto-domain
 proto-domain: DOMAIN_PROTO_SRC=$(PROTO_SRC)/domain/v1
 proto-domain:
-	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
+	@for dir in ./domain ./api; do \
 		echo "Generating stubs in $$dir";\
 		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
 			$(DOMAIN_PROTO_SRC)/source_service.proto $(DOMAIN_PROTO_SRC)/source_model.proto \
@@ -127,12 +125,23 @@ proto-domain:
 			$(DOMAIN_PROTO_SRC)/scenario_service.proto $(DOMAIN_PROTO_SRC)/scenario_model.proto \
 			$(DOMAIN_PROTO_SRC)/admin_service.proto $(DOMAIN_PROTO_SRC)/admin_model.proto \
 			$(DOMAIN_PROTO_SRC)/common_model.proto \
-			$(PROTO_SRC)/google/protobuf/timestamp.proto; \
+			$(PROTO_SRC)/google/protobuf/timestamp.proto $(PROTO_SRC)/google/protobuf/empty.proto; \
 	done
 	@echo "Protobuf stubs for domain service generated\n"
 
+.PHONY: proto-chat
+proto-chat: CHAT_PROTO_SRC=$(PROTO_SRC)/chat/v1
+proto-chat:
+	@for dir in ./chat ./api; do \
+		echo "Generating stubs in $$dir";\
+		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
+			$(CHAT_PROTO_SRC)/service.proto $(CHAT_PROTO_SRC)/model.proto \
+			$(PROTO_SRC)/google/protobuf/timestamp.proto $(PROTO_SRC)/google/protobuf/empty.proto; \
+	done
+	@echo "Protobuf stubs for chat service generated\n"
+
 .PHONY: proto
-proto: proto-auth proto-ml proto-data proto-domain
+proto: proto-auth proto-ml proto-data proto-domain proto-chat
 	@echo "All protobuf stubs generated"
 
 .PHONY: swag
