@@ -217,6 +217,210 @@ func (x *VectorSearchResponse) GetChunks() []*DocumentChunk {
 	return nil
 }
 
+type GetDocumentsIn struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SourceId      string                 `protobuf:"bytes,1,opt,name=sourceId,proto3" json:"sourceId,omitempty"`
+	Size          uint32                 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	Page          uint32                 `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDocumentsIn) Reset() {
+	*x = GetDocumentsIn{}
+	mi := &file_data_v1_model_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDocumentsIn) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDocumentsIn) ProtoMessage() {}
+
+func (x *GetDocumentsIn) ProtoReflect() protoreflect.Message {
+	mi := &file_data_v1_model_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDocumentsIn.ProtoReflect.Descriptor instead.
+func (*GetDocumentsIn) Descriptor() ([]byte, []int) {
+	return file_data_v1_model_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetDocumentsIn) GetSourceId() string {
+	if x != nil {
+		return x.SourceId
+	}
+	return ""
+}
+
+func (x *GetDocumentsIn) GetSize() uint32 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *GetDocumentsIn) GetPage() uint32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+type Document struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	SourceId      string                 `protobuf:"bytes,2,opt,name=sourceId,proto3" json:"sourceId,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`
+	Metadata      string                 `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Document) Reset() {
+	*x = Document{}
+	mi := &file_data_v1_model_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Document) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Document) ProtoMessage() {}
+
+func (x *Document) ProtoReflect() protoreflect.Message {
+	mi := &file_data_v1_model_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Document.ProtoReflect.Descriptor instead.
+func (*Document) Descriptor() ([]byte, []int) {
+	return file_data_v1_model_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Document) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Document) GetSourceId() string {
+	if x != nil {
+		return x.SourceId
+	}
+	return ""
+}
+
+func (x *Document) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Document) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *Document) GetMetadata() string {
+	if x != nil {
+		return x.Metadata
+	}
+	return ""
+}
+
+type GetDocumentsOut struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Size          uint32                 `protobuf:"varint,1,opt,name=size,proto3" json:"size,omitempty"`
+	Page          uint32                 `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
+	Total         uint32                 `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
+	Documents     []*Document            `protobuf:"bytes,4,rep,name=documents,proto3" json:"documents,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDocumentsOut) Reset() {
+	*x = GetDocumentsOut{}
+	mi := &file_data_v1_model_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDocumentsOut) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDocumentsOut) ProtoMessage() {}
+
+func (x *GetDocumentsOut) ProtoReflect() protoreflect.Message {
+	mi := &file_data_v1_model_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDocumentsOut.ProtoReflect.Descriptor instead.
+func (*GetDocumentsOut) Descriptor() ([]byte, []int) {
+	return file_data_v1_model_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GetDocumentsOut) GetSize() uint32 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *GetDocumentsOut) GetPage() uint32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *GetDocumentsOut) GetTotal() uint32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *GetDocumentsOut) GetDocuments() []*Document {
+	if x != nil {
+		return x.Documents
+	}
+	return nil
+}
+
 var File_data_v1_model_proto protoreflect.FileDescriptor
 
 const file_data_v1_model_proto_rawDesc = "" +
@@ -237,7 +441,22 @@ const file_data_v1_model_proto_rawDesc = "" +
 	"similarity\x18\x05 \x01(\x02R\n" +
 	"similarity\"F\n" +
 	"\x14VectorSearchResponse\x12.\n" +
-	"\x06chunks\x18\x01 \x03(\v2\x16.data.v1.DocumentChunkR\x06chunksB\x12Z\x10internal/data/pbb\x06proto3"
+	"\x06chunks\x18\x01 \x03(\v2\x16.data.v1.DocumentChunkR\x06chunks\"T\n" +
+	"\x0eGetDocumentsIn\x12\x1a\n" +
+	"\bsourceId\x18\x01 \x01(\tR\bsourceId\x12\x12\n" +
+	"\x04size\x18\x02 \x01(\rR\x04size\x12\x12\n" +
+	"\x04page\x18\x03 \x01(\rR\x04page\"\x80\x01\n" +
+	"\bDocument\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bsourceId\x18\x02 \x01(\tR\bsourceId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x18\n" +
+	"\acontent\x18\x04 \x01(\tR\acontent\x12\x1a\n" +
+	"\bmetadata\x18\x05 \x01(\tR\bmetadata\"\x80\x01\n" +
+	"\x0fGetDocumentsOut\x12\x12\n" +
+	"\x04size\x18\x01 \x01(\rR\x04size\x12\x12\n" +
+	"\x04page\x18\x02 \x01(\rR\x04page\x12\x14\n" +
+	"\x05total\x18\x03 \x01(\rR\x05total\x12/\n" +
+	"\tdocuments\x18\x04 \x03(\v2\x11.data.v1.DocumentR\tdocumentsB\x12Z\x10internal/data/pbb\x06proto3"
 
 var (
 	file_data_v1_model_proto_rawDescOnce sync.Once
@@ -251,19 +470,23 @@ func file_data_v1_model_proto_rawDescGZIP() []byte {
 	return file_data_v1_model_proto_rawDescData
 }
 
-var file_data_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_data_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_data_v1_model_proto_goTypes = []any{
 	(*VectorSearchRequest)(nil),  // 0: data.v1.VectorSearchRequest
 	(*DocumentChunk)(nil),        // 1: data.v1.DocumentChunk
 	(*VectorSearchResponse)(nil), // 2: data.v1.VectorSearchResponse
+	(*GetDocumentsIn)(nil),       // 3: data.v1.GetDocumentsIn
+	(*Document)(nil),             // 4: data.v1.Document
+	(*GetDocumentsOut)(nil),      // 5: data.v1.GetDocumentsOut
 }
 var file_data_v1_model_proto_depIdxs = []int32{
 	1, // 0: data.v1.VectorSearchResponse.chunks:type_name -> data.v1.DocumentChunk
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	4, // 1: data.v1.GetDocumentsOut.documents:type_name -> data.v1.Document
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_data_v1_model_proto_init() }
@@ -277,7 +500,7 @@ func file_data_v1_model_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_data_v1_model_proto_rawDesc), len(file_data_v1_model_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

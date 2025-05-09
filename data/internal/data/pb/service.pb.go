@@ -24,19 +24,24 @@ var File_data_v1_service_proto protoreflect.FileDescriptor
 
 const file_data_v1_service_proto_rawDesc = "" +
 	"\n" +
-	"\x15data/v1/service.proto\x12\adata.v1\x1a\x13data/v1/model.proto2\\\n" +
+	"\x15data/v1/service.proto\x12\adata.v1\x1a\x13data/v1/model.proto2\xa1\x01\n" +
 	"\vDataService\x12M\n" +
-	"\fVectorSearch\x12\x1c.data.v1.VectorSearchRequest\x1a\x1d.data.v1.VectorSearchResponse\"\x00B\x12Z\x10internal/data/pbb\x06proto3"
+	"\fVectorSearch\x12\x1c.data.v1.VectorSearchRequest\x1a\x1d.data.v1.VectorSearchResponse\"\x00\x12C\n" +
+	"\fGetDocuments\x12\x17.data.v1.GetDocumentsIn\x1a\x18.data.v1.GetDocumentsOut\"\x00B\x12Z\x10internal/data/pbb\x06proto3"
 
 var file_data_v1_service_proto_goTypes = []any{
 	(*VectorSearchRequest)(nil),  // 0: data.v1.VectorSearchRequest
-	(*VectorSearchResponse)(nil), // 1: data.v1.VectorSearchResponse
+	(*GetDocumentsIn)(nil),       // 1: data.v1.GetDocumentsIn
+	(*VectorSearchResponse)(nil), // 2: data.v1.VectorSearchResponse
+	(*GetDocumentsOut)(nil),      // 3: data.v1.GetDocumentsOut
 }
 var file_data_v1_service_proto_depIdxs = []int32{
 	0, // 0: data.v1.DataService.VectorSearch:input_type -> data.v1.VectorSearchRequest
-	1, // 1: data.v1.DataService.VectorSearch:output_type -> data.v1.VectorSearchResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	1, // 1: data.v1.DataService.GetDocuments:input_type -> data.v1.GetDocumentsIn
+	2, // 2: data.v1.DataService.VectorSearch:output_type -> data.v1.VectorSearchResponse
+	3, // 3: data.v1.DataService.GetDocuments:output_type -> data.v1.GetDocumentsOut
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
