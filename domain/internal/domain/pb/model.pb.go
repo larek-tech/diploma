@@ -441,7 +441,7 @@ func (x *Query) GetContent() string {
 type ProcessQueryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Query         *Query                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
-	Scenario      *Scenario              `protobuf:"bytes,2,opt,name=scenario,proto3" json:"scenario,omitempty"`
+	Scenario      *Scenario              `protobuf:"bytes,2,opt,name=scenario,proto3,oneof" json:"scenario,omitempty"`
 	SourceIds     []string               `protobuf:"bytes,3,rep,name=sourceIds,proto3" json:"sourceIds,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -636,11 +636,12 @@ const file_ml_v1_model_proto_rawDesc = "" +
 	"\x05Query\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
 	"\x06userId\x18\x02 \x01(\x03R\x06userId\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\tR\acontent\"\x84\x01\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\"\x96\x01\n" +
 	"\x13ProcessQueryRequest\x12\"\n" +
-	"\x05query\x18\x01 \x01(\v2\f.pb.ml.QueryR\x05query\x12+\n" +
-	"\bscenario\x18\x02 \x01(\v2\x0f.pb.ml.ScenarioR\bscenario\x12\x1c\n" +
-	"\tsourceIds\x18\x03 \x03(\tR\tsourceIds\"!\n" +
+	"\x05query\x18\x01 \x01(\v2\f.pb.ml.QueryR\x05query\x120\n" +
+	"\bscenario\x18\x02 \x01(\v2\x0f.pb.ml.ScenarioH\x00R\bscenario\x88\x01\x01\x12\x1c\n" +
+	"\tsourceIds\x18\x03 \x03(\tR\tsourceIdsB\v\n" +
+	"\t_scenario\"!\n" +
 	"\x05Chunk\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\tR\acontent\"X\n" +
 	"\x14ProcessQueryResponse\x12\"\n" +
@@ -696,6 +697,7 @@ func file_ml_v1_model_proto_init() {
 	}
 	file_ml_v1_model_proto_msgTypes[0].OneofWrappers = []any{}
 	file_ml_v1_model_proto_msgTypes[4].OneofWrappers = []any{}
+	file_ml_v1_model_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

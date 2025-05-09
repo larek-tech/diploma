@@ -1,5 +1,54 @@
 basePath: /
 definitions:
+  internal_chat_pb.Query:
+    properties:
+      chatId:
+        type: string
+      content:
+        type: string
+      createdAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      domainId:
+        type: integer
+      id:
+        type: integer
+      metadata:
+        items:
+          type: integer
+        type: array
+      scenarioId:
+        type: integer
+      sourceIds:
+        items:
+          type: string
+        type: array
+      userId:
+        type: integer
+    type: object
+  pb.Chat:
+    properties:
+      content:
+        items:
+          $ref: '#/definitions/pb.Content'
+        type: array
+      createdAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      id:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      userId:
+        type: integer
+    type: object
+  pb.Content:
+    properties:
+      query:
+        $ref: '#/definitions/internal_chat_pb.Query'
+      response:
+        $ref: '#/definitions/pb.Response'
+    type: object
   pb.CreateDomainRequest:
     properties:
       sourceIds:
@@ -80,6 +129,13 @@ definitions:
       source:
         $ref: '#/definitions/pb.Source'
     type: object
+  pb.ListChatsResponse:
+    properties:
+      chats:
+        items:
+          $ref: '#/definitions/pb.Chat'
+        type: array
+    type: object
   pb.ListDomainsResponse:
     properties:
       domains:
@@ -136,7 +192,6 @@ definitions:
         description: Количество перефразированных вопросов
         type: integer
       queryModelName:
-        description: Пока не знаю нучно ли будет
         type: string
       useMultiquery:
         type: boolean
@@ -159,6 +214,13 @@ definitions:
           type: integer
         type: array
     type: object
+  pb.RenameChatRequest:
+    properties:
+      chatId:
+        type: string
+      title:
+        type: string
+    type: object
   pb.Reranker:
     properties:
       rerankerMaxLength:
@@ -171,6 +233,43 @@ definitions:
       useRerank:
         type: boolean
     type: object
+  pb.Response:
+    properties:
+      chatId:
+        type: string
+      content:
+        type: string
+      createdAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      id:
+        type: integer
+      metadata:
+        items:
+          type: integer
+        type: array
+      queryId:
+        type: integer
+      status:
+        $ref: '#/definitions/pb.ResponseStatus'
+      updatedAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
+    type: object
+  pb.ResponseStatus:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    type: integer
+    x-enum-varnames:
+    - ResponseStatus_RESPONSE_UNDEFINED
+    - ResponseStatus_RESPONSE_CREATED
+    - ResponseStatus_RESPONSE_PROCESSING
+    - ResponseStatus_RESPONSE_SUCCESS
+    - ResponseStatus_RESPONSE_ERROR
+    - ResponseStatus_RESPONSE_CANCELED
   pb.Scenario:
     properties:
       createdAt:
@@ -360,6 +459,185 @@ info:
   title: Diploma API
   version: "1.0"
 paths:
+  /api/v1/chat/:
+    post:
+      consumes:
+      - application/json
+      description: Creates new chat for RAG system.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Chat successfully created
+          schema:
+            $ref: '#/definitions/pb.Chat'
+        "400":
+          description: Failed to create chat
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create new chat.
+      tags:
+      - chat
+  /api/v1/chat/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete chat by ID.
+      parameters:
+      - description: Chat ID
+        in: path
+        name: chatID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Chat successfully deleted
+          schema:
+            $ref: '#/definitions/pb.Chat'
+        "400":
+          description: Failed to delete chat
+          schema:
+            type: string
+        "404":
+          description: Chat not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete chat.
+      tags:
+      - chat
+    put:
+      consumes:
+      - application/json
+      description: Update chat information.
+      parameters:
+      - description: Chat ID
+        in: path
+        name: chatID
+        required: true
+        type: integer
+      - description: Update params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.RenameChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Chat updated
+          schema:
+            $ref: '#/definitions/pb.Chat'
+        "400":
+          description: Failed to update chat
+          schema:
+            type: string
+        "404":
+          description: Chat not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update chat.
+      tags:
+      - chat
+  /api/v1/chat/cancel/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Cancel processing of query (all dependant jobs) by id.
+      parameters:
+      - description: Query ID
+        in: path
+        name: queryID
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Processing query successfully canceled
+          schema:
+            $ref: '#/definitions/pb.Chat'
+        "400":
+          description: Failed to cancel query
+          schema:
+            type: string
+        "403":
+          description: No access to cancel query
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Cancel query.
+      tags:
+      - chat
+  /api/v1/chat/history/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Returns chat with messages within it.
+      parameters:
+      - description: Chat ID
+        in: path
+        name: chatID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returned chat
+          schema:
+            $ref: '#/definitions/pb.Chat'
+        "400":
+          description: Failed to get chat
+          schema:
+            type: string
+        "404":
+          description: Chat not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get chat.
+      tags:
+      - chat
+  /api/v1/chat/list:
+    get:
+      consumes:
+      - application/json
+      description: List chats created by user.
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: Pagination limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of chats
+          schema:
+            $ref: '#/definitions/pb.ListChatsResponse'
+        "400":
+          description: Failed to list chats
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List chats.
+      tags:
+      - chat
   /api/v1/domain/:
     post:
       consumes:
@@ -639,7 +917,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates new scenario (group of sources used for RAG vector search).
+      description: Creates new scenario (options used for RAG vector search).
       parameters:
       - description: Input data for creating scenario
         in: body
@@ -764,7 +1042,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: List scenarios to which user has access.
+      description: List scenarios create by user.
       parameters:
       - description: Pagination offset
         in: query

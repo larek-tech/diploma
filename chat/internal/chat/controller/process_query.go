@@ -70,10 +70,13 @@ func (ctrl *Controller) ProcessQuery(
 	ctrl.processing[queryID] = cancel
 	ctrl.mu.Unlock()
 
-	scenario := mlpb.Scenario{}
-	if err = json.Unmarshal(q.Metadata, &scenario); err != nil {
-		errCh <- errs.WrapErr(err, "get query scenario from metadata")
-		return
+	var scenario *mlpb.Scenario = nil
+	if q.Metadata != nil {
+		scenario = &mlpb.Scenario{}
+		if err = json.Unmarshal(q.Metadata, &scenario); err != nil {
+			errCh <- errs.WrapErr(err, "get query scenario from metadata")
+			return
+		}
 	}
 
 	respCreate := model.ResponseDao{
@@ -114,7 +117,7 @@ func (ctrl *Controller) ProcessQuery(
 			UserId:  q.UserID,
 			Content: q.Content,
 		},
-		Scenario:  &scenario,
+		Scenario:  scenario,
 		SourceIds: q.SourceIDs,
 	}
 	stream, err := ctrl.mlService.ProcessQuery(ctx, mlReq)

@@ -12,7 +12,7 @@ import (
 // ListScenarios godoc
 //
 //	@Summary		List scenarios.
-//	@Description	List scenarios to which user has access.
+//	@Description	List scenarios create by user.
 //	@Tags			scenario
 //	@Accept			json
 //	@Produce		json

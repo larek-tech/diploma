@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 
+	authpb "github.com/larek-tech/diploma/chat/internal/auth/pb"
 	"github.com/larek-tech/diploma/chat/internal/chat/model"
 	"github.com/larek-tech/diploma/chat/internal/chat/pb"
 	"github.com/yogenyslav/pkg/errs"
@@ -11,14 +12,14 @@ import (
 )
 
 // CancelProcessing cancels processing context and dependant jobs.
-func (ctrl *Controller) CancelProcessing(ctx context.Context, req *pb.CancelProcessingRequest) error {
+func (ctrl *Controller) CancelProcessing(ctx context.Context, req *pb.CancelProcessingRequest, meta *authpb.UserAuthMetadata) error {
 	queryID := req.GetQueryId()
 
 	ctx, span := ctrl.tracer.Start(
 		ctx,
 		"Controller.CancelProcessing",
 		trace.WithAttributes(
-			attribute.Int64("userID", req.GetUserId()),
+			attribute.Int64("userID", meta.GetUserId()),
 			attribute.Int64("queryID", queryID),
 		),
 	)
@@ -34,7 +35,7 @@ func (ctrl *Controller) CancelProcessing(ctx context.Context, req *pb.CancelProc
 		return errs.WrapErr(err)
 	}
 
-	if req.GetUserId() != creatorID {
+	if meta.GetUserId() != creatorID {
 		return errs.WrapErr(ErrNoAccessToChat, "cancel processing query")
 	}
 

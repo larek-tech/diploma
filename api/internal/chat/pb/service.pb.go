@@ -25,7 +25,7 @@ var File_chat_v1_service_proto protoreflect.FileDescriptor
 
 const file_chat_v1_service_proto_rawDesc = "" +
 	"\n" +
-	"\x15chat/v1/service.proto\x12\achat.v1\x1a\x13chat/v1/model.proto\x1a\x1bgoogle/protobuf/empty.proto2\xda\x03\n" +
+	"\x15chat/v1/service.proto\x12\achat.v1\x1a\x13chat/v1/model.proto\x1a\x1bgoogle/protobuf/empty.proto2\xa0\x04\n" +
 	"\vChatService\x125\n" +
 	"\n" +
 	"CreateChat\x12\x16.google.protobuf.Empty\x1a\r.chat.v1.Chat\"\x00\x123\n" +
@@ -34,6 +34,7 @@ const file_chat_v1_service_proto_rawDesc = "" +
 	"RenameChat\x12\x1a.chat.v1.RenameChatRequest\x1a\r.chat.v1.Chat\"\x00\x12B\n" +
 	"\n" +
 	"DeleteChat\x12\x1a.chat.v1.DeleteChatRequest\x1a\x16.google.protobuf.Empty\"\x00\x12D\n" +
+	"\vCleanupChat\x12\x1b.chat.v1.CleanupChatRequest\x1a\x16.google.protobuf.Empty\"\x00\x12D\n" +
 	"\tListChats\x12\x19.chat.v1.ListChatsRequest\x1a\x1a.chat.v1.ListChatsResponse\"\x00\x12J\n" +
 	"\fProcessQuery\x12\x1c.chat.v1.ProcessQueryRequest\x1a\x18.chat.v1.ChunkedResponse\"\x000\x01\x12N\n" +
 	"\x10CancelProcessing\x12 .chat.v1.CancelProcessingRequest\x1a\x16.google.protobuf.Empty\"\x00B\x12Z\x10internal/chat/pbb\x06proto3"
@@ -43,33 +44,36 @@ var file_chat_v1_service_proto_goTypes = []any{
 	(*GetChatRequest)(nil),          // 1: chat.v1.GetChatRequest
 	(*RenameChatRequest)(nil),       // 2: chat.v1.RenameChatRequest
 	(*DeleteChatRequest)(nil),       // 3: chat.v1.DeleteChatRequest
-	(*ListChatsRequest)(nil),        // 4: chat.v1.ListChatsRequest
-	(*ProcessQueryRequest)(nil),     // 5: chat.v1.ProcessQueryRequest
-	(*CancelProcessingRequest)(nil), // 6: chat.v1.CancelProcessingRequest
-	(*Chat)(nil),                    // 7: chat.v1.Chat
-	(*ListChatsResponse)(nil),       // 8: chat.v1.ListChatsResponse
-	(*ChunkedResponse)(nil),         // 9: chat.v1.ChunkedResponse
+	(*CleanupChatRequest)(nil),      // 4: chat.v1.CleanupChatRequest
+	(*ListChatsRequest)(nil),        // 5: chat.v1.ListChatsRequest
+	(*ProcessQueryRequest)(nil),     // 6: chat.v1.ProcessQueryRequest
+	(*CancelProcessingRequest)(nil), // 7: chat.v1.CancelProcessingRequest
+	(*Chat)(nil),                    // 8: chat.v1.Chat
+	(*ListChatsResponse)(nil),       // 9: chat.v1.ListChatsResponse
+	(*ChunkedResponse)(nil),         // 10: chat.v1.ChunkedResponse
 }
 var file_chat_v1_service_proto_depIdxs = []int32{
-	0, // 0: chat.v1.ChatService.CreateChat:input_type -> google.protobuf.Empty
-	1, // 1: chat.v1.ChatService.GetChat:input_type -> chat.v1.GetChatRequest
-	2, // 2: chat.v1.ChatService.RenameChat:input_type -> chat.v1.RenameChatRequest
-	3, // 3: chat.v1.ChatService.DeleteChat:input_type -> chat.v1.DeleteChatRequest
-	4, // 4: chat.v1.ChatService.ListChats:input_type -> chat.v1.ListChatsRequest
-	5, // 5: chat.v1.ChatService.ProcessQuery:input_type -> chat.v1.ProcessQueryRequest
-	6, // 6: chat.v1.ChatService.CancelProcessing:input_type -> chat.v1.CancelProcessingRequest
-	7, // 7: chat.v1.ChatService.CreateChat:output_type -> chat.v1.Chat
-	7, // 8: chat.v1.ChatService.GetChat:output_type -> chat.v1.Chat
-	7, // 9: chat.v1.ChatService.RenameChat:output_type -> chat.v1.Chat
-	0, // 10: chat.v1.ChatService.DeleteChat:output_type -> google.protobuf.Empty
-	8, // 11: chat.v1.ChatService.ListChats:output_type -> chat.v1.ListChatsResponse
-	9, // 12: chat.v1.ChatService.ProcessQuery:output_type -> chat.v1.ChunkedResponse
-	0, // 13: chat.v1.ChatService.CancelProcessing:output_type -> google.protobuf.Empty
-	7, // [7:14] is the sub-list for method output_type
-	0, // [0:7] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: chat.v1.ChatService.CreateChat:input_type -> google.protobuf.Empty
+	1,  // 1: chat.v1.ChatService.GetChat:input_type -> chat.v1.GetChatRequest
+	2,  // 2: chat.v1.ChatService.RenameChat:input_type -> chat.v1.RenameChatRequest
+	3,  // 3: chat.v1.ChatService.DeleteChat:input_type -> chat.v1.DeleteChatRequest
+	4,  // 4: chat.v1.ChatService.CleanupChat:input_type -> chat.v1.CleanupChatRequest
+	5,  // 5: chat.v1.ChatService.ListChats:input_type -> chat.v1.ListChatsRequest
+	6,  // 6: chat.v1.ChatService.ProcessQuery:input_type -> chat.v1.ProcessQueryRequest
+	7,  // 7: chat.v1.ChatService.CancelProcessing:input_type -> chat.v1.CancelProcessingRequest
+	8,  // 8: chat.v1.ChatService.CreateChat:output_type -> chat.v1.Chat
+	8,  // 9: chat.v1.ChatService.GetChat:output_type -> chat.v1.Chat
+	8,  // 10: chat.v1.ChatService.RenameChat:output_type -> chat.v1.Chat
+	0,  // 11: chat.v1.ChatService.DeleteChat:output_type -> google.protobuf.Empty
+	0,  // 12: chat.v1.ChatService.CleanupChat:output_type -> google.protobuf.Empty
+	9,  // 13: chat.v1.ChatService.ListChats:output_type -> chat.v1.ListChatsResponse
+	10, // 14: chat.v1.ChatService.ProcessQuery:output_type -> chat.v1.ChunkedResponse
+	0,  // 15: chat.v1.ChatService.CancelProcessing:output_type -> google.protobuf.Empty
+	8,  // [8:16] is the sub-list for method output_type
+	0,  // [0:8] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_chat_v1_service_proto_init() }

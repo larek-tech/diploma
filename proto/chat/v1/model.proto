@@ -70,6 +70,10 @@ message DeleteChatRequest {
   string chatId = 1;
 }
 
+message CleanupChatRequest {
+  string chatId = 1;
+}
+
 message ListChatsRequest {
   uint64 offset = 1;
   uint64 limit = 2;
@@ -91,5 +95,4 @@ message ProcessQueryRequest {
 
 message CancelProcessingRequest {
   int64 queryId = 1;
-  int64 userId = 2;
 }

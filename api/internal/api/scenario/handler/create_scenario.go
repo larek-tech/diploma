@@ -10,7 +10,7 @@ import (
 // CreateScenario godoc
 //
 //	@Summary		Create new scenario.
-//	@Description	Creates new scenario (group of sources used for RAG vector search).
+//	@Description	Creates new scenario (options used for RAG vector search).
 //	@Tags			scenario
 //	@Accept			json
 //	@Produce		json

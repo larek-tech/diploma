@@ -11,6 +11,7 @@ service ChatService {
   rpc GetChat(chat.v1.GetChatRequest) returns (chat.v1.Chat) {};
   rpc RenameChat(chat.v1.RenameChatRequest) returns (chat.v1.Chat) {};
   rpc DeleteChat(chat.v1.DeleteChatRequest) returns (google.protobuf.Empty) {};
+  rpc CleanupChat(chat.v1.CleanupChatRequest) returns (google.protobuf.Empty) {};
   rpc ListChats(chat.v1.ListChatsRequest) returns (chat.v1.ListChatsResponse) {};
   rpc ProcessQuery(chat.v1.ProcessQueryRequest) returns (stream chat.v1.ChunkedResponse) {};
   rpc CancelProcessing(chat.v1.CancelProcessingRequest) returns (google.protobuf.Empty) {};

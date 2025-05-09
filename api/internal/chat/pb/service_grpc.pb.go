@@ -24,6 +24,7 @@ const (
 	ChatService_GetChat_FullMethodName          = "/chat.v1.ChatService/GetChat"
 	ChatService_RenameChat_FullMethodName       = "/chat.v1.ChatService/RenameChat"
 	ChatService_DeleteChat_FullMethodName       = "/chat.v1.ChatService/DeleteChat"
+	ChatService_CleanupChat_FullMethodName      = "/chat.v1.ChatService/CleanupChat"
 	ChatService_ListChats_FullMethodName        = "/chat.v1.ChatService/ListChats"
 	ChatService_ProcessQuery_FullMethodName     = "/chat.v1.ChatService/ProcessQuery"
 	ChatService_CancelProcessing_FullMethodName = "/chat.v1.ChatService/CancelProcessing"
@@ -37,6 +38,7 @@ type ChatServiceClient interface {
 	GetChat(ctx context.Context, in *GetChatRequest, opts ...grpc.CallOption) (*Chat, error)
 	RenameChat(ctx context.Context, in *RenameChatRequest, opts ...grpc.CallOption) (*Chat, error)
 	DeleteChat(ctx context.Context, in *DeleteChatRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CleanupChat(ctx context.Context, in *CleanupChatRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListChats(ctx context.Context, in *ListChatsRequest, opts ...grpc.CallOption) (*ListChatsResponse, error)
 	ProcessQuery(ctx context.Context, in *ProcessQueryRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ChunkedResponse], error)
 	CancelProcessing(ctx context.Context, in *CancelProcessingRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -90,6 +92,16 @@ func (c *chatServiceClient) DeleteChat(ctx context.Context, in *DeleteChatReques
 	return out, nil
 }
 
+func (c *chatServiceClient) CleanupChat(ctx context.Context, in *CleanupChatRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ChatService_CleanupChat_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *chatServiceClient) ListChats(ctx context.Context, in *ListChatsRequest, opts ...grpc.CallOption) (*ListChatsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListChatsResponse)
@@ -137,6 +149,7 @@ type ChatServiceServer interface {
 	GetChat(context.Context, *GetChatRequest) (*Chat, error)
 	RenameChat(context.Context, *RenameChatRequest) (*Chat, error)
 	DeleteChat(context.Context, *DeleteChatRequest) (*emptypb.Empty, error)
+	CleanupChat(context.Context, *CleanupChatRequest) (*emptypb.Empty, error)
 	ListChats(context.Context, *ListChatsRequest) (*ListChatsResponse, error)
 	ProcessQuery(*ProcessQueryRequest, grpc.ServerStreamingServer[ChunkedResponse]) error
 	CancelProcessing(context.Context, *CancelProcessingRequest) (*emptypb.Empty, error)
@@ -161,6 +174,9 @@ func (UnimplementedChatServiceServer) RenameChat(context.Context, *RenameChatReq
 }
 func (UnimplementedChatServiceServer) DeleteChat(context.Context, *DeleteChatRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteChat not implemented")
+}
+func (UnimplementedChatServiceServer) CleanupChat(context.Context, *CleanupChatRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CleanupChat not implemented")
 }
 func (UnimplementedChatServiceServer) ListChats(context.Context, *ListChatsRequest) (*ListChatsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListChats not implemented")
@@ -264,6 +280,24 @@ func _ChatService_DeleteChat_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ChatService_CleanupChat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CleanupChatRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChatServiceServer).CleanupChat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ChatService_CleanupChat_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChatServiceServer).CleanupChat(ctx, req.(*CleanupChatRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ChatService_ListChats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListChatsRequest)
 	if err := dec(in); err != nil {
@@ -333,6 +367,10 @@ var ChatService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteChat",
 			Handler:    _ChatService_DeleteChat_Handler,
+		},
+		{
+			MethodName: "CleanupChat",
+			Handler:    _ChatService_CleanupChat_Handler,
 		},
 		{
 			MethodName: "ListChats",

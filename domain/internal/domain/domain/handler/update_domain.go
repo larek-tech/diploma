@@ -26,9 +26,8 @@ func (h *Handler) UpdateDomain(ctx context.Context, req *pb.UpdateDomainRequest)
 		log.Err(errs.WrapErr(err)).Msg("update domain")
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, status.Error(codes.NotFound, "domain not found")
-		} else {
-			return nil, status.Error(codes.Internal, "failed to update domain")
 		}
+		return nil, status.Error(codes.Internal, "failed to update domain")
 	}
 
 	return resp, status.Error(codes.OK, "updated domain successfully")

@@ -6,6 +6,9 @@ import (
 
 // 400
 var (
+	// ErrWsProtocolRequired is an error when required to upgrade to ws protocol.
+	ErrWsProtocolRequired = errors.New("upgrade to ws protocol required")
+
 	// ErrCreateSource is an error when failed to create source.
 	ErrCreateSource = errors.New("failed to create source")
 	// ErrGetSource is an error when failed to get source.
@@ -38,6 +41,19 @@ var (
 	ErrDeleteScenario = errors.New("failed to delete scenario")
 	// ErrListScenarios is an error when failed to list scenarios.
 	ErrListScenarios = errors.New("failed to list scenarios")
+
+	// ErrCreateChat is an error when failed to create chat.
+	ErrCreateChat = errors.New("failed to create chat")
+	// ErrGetChat is an error when failed to get chat.
+	ErrGetChat = errors.New("failed to get chat")
+	// ErrUpdateChat is an error when failed to update chat.
+	ErrUpdateChat = errors.New("failed to update chat")
+	// ErrDeleteChat is an error when failed to delete chat.
+	ErrDeleteChat = errors.New("failed to delete chat")
+	// ErrListChats is an error when failed to list chats.
+	ErrListChats = errors.New("failed to list chats")
+	// ErrCancelQuery is an error when failed to cancel processing query.
+	ErrCancelQuery = errors.New("failed to cancel query")
 )
 
 // 401
@@ -60,6 +76,8 @@ var (
 	ErrDomainNotFound = errors.New("domain not found")
 	// ErrScenarioNotFound is an error when no scenario was found.
 	ErrScenarioNotFound = errors.New("scenario not found")
+	// ErrChatNotFound is an error when no chat was found.
+	ErrChatNotFound = errors.New("chat not found")
 )
 
 // 422

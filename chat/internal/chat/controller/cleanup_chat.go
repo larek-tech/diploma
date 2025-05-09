@@ -25,7 +25,7 @@ func (ctrl *Controller) CleanupChat(ctx context.Context, chatIDRaw string) error
 		return errs.WrapErr(err, "parse chat id")
 	}
 
-	if err := ctrl.cr.DeleteChat(ctx, chatID); err != nil {
+	if err = ctrl.cr.DeleteChat(ctx, chatID); err != nil {
 		return errs.WrapErr(err, "cleanup chat")
 	}
 

@@ -23,9 +23,15 @@ func (h *Handler) ProcessQuery(req *pb.ProcessQueryRequest, stream grpc.ServerSt
 		trace.WithAttributes(
 			attribute.Int64("userID", req.GetUserId()),
 			attribute.String("chatID", req.GetChatId()),
+			attribute.StringSlice("sourceIDs", req.GetSourceIds()),
 		),
 	)
 	defer span.End()
+
+	if len(req.GetSourceIds()) == 0 {
+		log.Err(errs.WrapErr(ErrEmptySourceIDs)).Msg("process query")
+		return status.Error(codes.InvalidArgument, "at least 1 source id is required")
+	}
 
 	_, err := auth.GetUserMeta(ctx)
 	if err != nil {

@@ -17,6 +17,7 @@ type Config struct {
 	Jaeger        tracing.Config    `yaml:"jaeger"`
 	AuthService   grpcclient.Config `yaml:"auth_service"`
 	DomainService grpcclient.Config `yaml:"domain_service"`
+	ChatService   grpcclient.Config `yaml:"chat_service"`
 }
 
 // New creates new Config.

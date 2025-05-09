@@ -19,6 +19,290 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/chat/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates new chat for RAG system.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Create new chat.",
+                "responses": {
+                    "201": {
+                        "description": "Chat successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Chat"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to create chat",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chat/cancel/{id}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Cancel processing of query (all dependant jobs) by id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Cancel query.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Query ID",
+                        "name": "queryID",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Processing query successfully canceled",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Chat"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to cancel query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "No access to cancel query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chat/history/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns chat with messages within it.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Get chat.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "chatID",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returned chat",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Chat"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to get chat",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Chat not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chat/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List chats created by user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "List chats.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of chats",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListChatsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list chats",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chat/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update chat information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Update chat.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Chat ID",
+                        "name": "chatID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.RenameChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Chat updated",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Chat"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to update chat",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Chat not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Soft delete chat by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Delete chat.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "chatID",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Chat successfully deleted",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Chat"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to delete chat",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Chat not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/domain/": {
             "post": {
                 "security": [
@@ -459,7 +743,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Creates new scenario (group of sources used for RAG vector search).",
+                "description": "Creates new scenario (options used for RAG vector search).",
                 "consumes": [
                     "application/json"
                 ],
@@ -504,7 +788,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "List scenarios to which user has access.",
+                "description": "List scenarios create by user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1174,6 +1458,81 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "internal_chat_pb.Query": {
+            "type": "object",
+            "properties": {
+                "chatId": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "domainId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "scenarioId": {
+                    "type": "integer"
+                },
+                "sourceIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pb.Chat": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.Content"
+                    }
+                },
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pb.Content": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "$ref": "#/definitions/internal_chat_pb.Query"
+                },
+                "response": {
+                    "$ref": "#/definitions/pb.Response"
+                }
+            }
+        },
         "pb.CreateDomainRequest": {
             "type": "object",
             "properties": {
@@ -1298,6 +1657,17 @@ const docTemplate = `{
                 }
             }
         },
+        "pb.ListChatsResponse": {
+            "type": "object",
+            "properties": {
+                "chats": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.Chat"
+                    }
+                }
+            }
+        },
         "pb.ListDomainsResponse": {
             "type": "object",
             "properties": {
@@ -1384,7 +1754,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "queryModelName": {
-                    "description": "Пока не знаю нучно ли будет",
                     "type": "string"
                 },
                 "useMultiquery": {
@@ -1420,6 +1789,17 @@ const docTemplate = `{
                 }
             }
         },
+        "pb.RenameChatRequest": {
+            "type": "object",
+            "properties": {
+                "chatId": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "pb.Reranker": {
             "type": "object",
             "properties": {
@@ -1437,6 +1817,57 @@ const docTemplate = `{
                     "type": "boolean"
                 }
             }
+        },
+        "pb.Response": {
+            "type": "object",
+            "properties": {
+                "chatId": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "queryId": {
+                    "type": "integer"
+                },
+                "status": {
+                    "$ref": "#/definitions/pb.ResponseStatus"
+                },
+                "updatedAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                }
+            }
+        },
+        "pb.ResponseStatus": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "x-enum-varnames": [
+                "ResponseStatus_RESPONSE_UNDEFINED",
+                "ResponseStatus_RESPONSE_CREATED",
+                "ResponseStatus_RESPONSE_PROCESSING",
+                "ResponseStatus_RESPONSE_SUCCESS",
+                "ResponseStatus_RESPONSE_ERROR",
+                "ResponseStatus_RESPONSE_CANCELED"
+            ]
         },
         "pb.Scenario": {
             "type": "object",

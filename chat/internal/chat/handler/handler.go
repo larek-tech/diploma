@@ -12,6 +12,8 @@ import (
 var (
 	// ErrProcessQueryTimeout is an error when processing query breaks timeout.
 	ErrProcessQueryTimeout = errors.New("process query timeout")
+	// ErrEmptySourceIDs is an error when list of source ids is empty.
+	ErrEmptySourceIDs = errors.New("empty source ids list")
 )
 
 type chatController interface {
@@ -22,7 +24,7 @@ type chatController interface {
 	CleanupChat(ctx context.Context, chatID string) error
 	ListChats(ctx context.Context, req *pb.ListChatsRequest, meta *authpb.UserAuthMetadata) (*pb.ListChatsResponse, error)
 	ProcessQuery(ctx context.Context, req *pb.ProcessQueryRequest, out chan *pb.ChunkedResponse, errCh chan error)
-	CancelProcessing(ctx context.Context, req *pb.CancelProcessingRequest) error
+	CancelProcessing(ctx context.Context, req *pb.CancelProcessingRequest, meta *authpb.UserAuthMetadata) error
 }
 
 // Handler implements chat methods on transport level.
