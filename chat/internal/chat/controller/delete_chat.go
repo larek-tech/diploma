@@ -11,16 +11,21 @@ import (
 )
 
 // DeleteChat soft delete chat.
-func (ctrl *Controller) DeleteChat(ctx context.Context, chatID uuid.UUID, meta *authpb.UserAuthMetadata) error {
+func (ctrl *Controller) DeleteChat(ctx context.Context, chatIDRaw string, meta *authpb.UserAuthMetadata) error {
 	ctx, span := ctrl.tracer.Start(
 		ctx,
 		"Controller.DeleteChat",
 		trace.WithAttributes(
 			attribute.Int64("userID", meta.GetUserId()),
-			attribute.String("chatID", chatID.String()),
+			attribute.String("chatID", chatIDRaw),
 		),
 	)
 	defer span.End()
+
+	chatID, err := uuid.Parse(chatIDRaw)
+	if err != nil {
+		return errs.WrapErr(err, "parse chat id")
+	}
 
 	chatCreatorID, err := ctrl.cr.GetChatUserID(ctx, chatID)
 	if err != nil {

@@ -10,15 +10,20 @@ import (
 )
 
 // CleanupChat delete empty chat.
-func (ctrl *Controller) CleanupChat(ctx context.Context, chatID uuid.UUID) error {
+func (ctrl *Controller) CleanupChat(ctx context.Context, chatIDRaw string) error {
 	ctx, span := ctrl.tracer.Start(
 		ctx,
 		"Controller.CleanupChat",
 		trace.WithAttributes(
-			attribute.String("chatID", chatID.String()),
+			attribute.String("chatID", chatIDRaw),
 		),
 	)
 	defer span.End()
+
+	chatID, err := uuid.Parse(chatIDRaw)
+	if err != nil {
+		return errs.WrapErr(err, "parse chat id")
+	}
 
 	if err := ctrl.cr.DeleteChat(ctx, chatID); err != nil {
 		return errs.WrapErr(err, "cleanup chat")

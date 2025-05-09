@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"errors"
+	"sync"
 
 	"github.com/google/uuid"
 	"github.com/larek-tech/diploma/chat/internal/chat/model"
@@ -22,6 +23,7 @@ type chatRepo interface {
 	GetChat(ctx context.Context, chatID uuid.UUID) (model.ChatDao, error)
 	GetChatUserID(ctx context.Context, chatID uuid.UUID) (int64, error)
 	GetResponseByID(ctx context.Context, respID int64) (model.ResponseDao, error)
+	GetResponseByQueryID(ctx context.Context, queryID int64) (model.ResponseDao, error)
 	UpdateChatTitle(ctx context.Context, title string, chatID uuid.UUID) error
 	UpdateResponse(ctx context.Context, resp model.ResponseDao) error
 	DeleteChat(ctx context.Context, chatID uuid.UUID) error
@@ -31,16 +33,19 @@ type chatRepo interface {
 
 // Controller implements chat methods on logic layer.
 type Controller struct {
-	cr        chatRepo
-	tracer    trace.Tracer
-	mlService pb.MLServiceClient
+	cr         chatRepo
+	tracer     trace.Tracer
+	mlService  pb.MLServiceClient
+	processing map[int64]context.CancelFunc
+	mu         sync.Mutex
 }
 
 // New creates new Controller.
 func New(cr chatRepo, tracer trace.Tracer, mlService pb.MLServiceClient) *Controller {
 	return &Controller{
-		cr:        cr,
-		tracer:    tracer,
-		mlService: mlService,
+		cr:         cr,
+		tracer:     tracer,
+		mlService:  mlService,
+		processing: make(map[int64]context.CancelFunc),
 	}
 }

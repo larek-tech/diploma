@@ -57,10 +57,6 @@ message ChunkedResponse {
   repeated string sourceIds = 3;
 };
 
-message CreateChatRequest{
-  int64 userId = 1;
-};
-
 message GetChatRequest {
   string chatId = 1;
 };

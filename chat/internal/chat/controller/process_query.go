@@ -23,7 +23,6 @@ func (ctrl *Controller) ProcessQuery(
 	req *pb.ProcessQueryRequest,
 	out chan *pb.ChunkedResponse,
 	errCh chan error,
-	cancel chan struct{},
 ) {
 	ctx, span := ctrl.tracer.Start(
 		ctx,
@@ -37,6 +36,20 @@ func (ctrl *Controller) ProcessQuery(
 		errCh <- errs.WrapErr(err, "invalid chat id")
 		return
 	}
+
+	creatorID, err := ctrl.cr.GetChatUserID(ctx, chatID)
+	if err != nil {
+		errCh <- errs.WrapErr(err)
+		return
+	}
+
+	if creatorID != req.GetUserId() {
+		errCh <- errs.WrapErr(ErrNoAccessToChat, "process query")
+		return
+	}
+
+	processCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	q := model.QueryDao{
 		UserID:     req.GetUserId(),
@@ -52,6 +65,10 @@ func (ctrl *Controller) ProcessQuery(
 		errCh <- errs.WrapErr(err, "insert query")
 		return
 	}
+
+	ctrl.mu.Lock()
+	ctrl.processing[queryID] = cancel
+	ctrl.mu.Unlock()
 
 	scenario := mlpb.Scenario{}
 	if err = json.Unmarshal(q.Metadata, &scenario); err != nil {
@@ -114,12 +131,7 @@ func (ctrl *Controller) ProcessQuery(
 
 	for {
 		select {
-		case <-cancel:
-			if err = ctrl.cancel(ctx, &resp); err != nil {
-				errCh <- errs.WrapErr(err)
-			} else {
-				log.Info().Int64("queryID", queryID).Msg("processing canceled")
-			}
+		case <-processCtx.Done():
 			return
 		case <-streamCtx.Done():
 			log.Info().Int64("queryID", queryID).Msg("processing successfully finished")
@@ -135,14 +147,6 @@ func (ctrl *Controller) ProcessQuery(
 			}
 		}
 	}
-}
-
-func (ctrl *Controller) cancel(ctx context.Context, resp *model.ResponseDao) error {
-	resp.Status = model.StatusCanceled
-	if err := ctrl.cr.UpdateResponse(ctx, *resp); err != nil {
-		return errs.WrapErr(err, "set response status cancel")
-	}
-	return nil
 }
 
 func (ctrl *Controller) receiveChunk(
@@ -175,9 +179,8 @@ func (ctrl *Controller) receiveChunk(
 
 	curContent := buff.String()
 	out <- &pb.ChunkedResponse{
-		QueryId:   resp.QueryID,
-		Content:   curContent,
-		SourceIds: nil,
+		QueryId: resp.QueryID,
+		Content: curContent,
 	}
 
 	resp.Content = curContent

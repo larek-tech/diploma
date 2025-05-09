@@ -11,13 +11,18 @@ import (
 )
 
 // GetChat returns chat and its content.
-func (ctrl *Controller) GetChat(ctx context.Context, chatID uuid.UUID) (*pb.Chat, error) {
+func (ctrl *Controller) GetChat(ctx context.Context, chatIDRaw string) (*pb.Chat, error) {
 	ctx, span := ctrl.tracer.Start(
 		ctx,
 		"Controller.GetChat",
-		trace.WithAttributes(attribute.String("chatID", chatID.String())),
+		trace.WithAttributes(attribute.String("chatID", chatIDRaw)),
 	)
 	defer span.End()
+
+	chatID, err := uuid.Parse(chatIDRaw)
+	if err != nil {
+		return nil, errs.WrapErr(err, "parse chat id")
+	}
 
 	chat, err := ctrl.cr.GetChat(ctx, chatID)
 	if err != nil {
