@@ -1074,7 +1074,10 @@ const (
 	IP_ADD_MEMBERSHIP  = 0xc
 	IP_DROP_MEMBERSHIP = 0xd
 	IP_PKTINFO         = 0x13
+<<<<<<< HEAD
 	IP_MTU_DISCOVER    = 0x47
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 
 	IPV6_V6ONLY         = 0x1b
 	IPV6_UNICAST_HOPS   = 0x4
@@ -1084,7 +1087,10 @@ const (
 	IPV6_JOIN_GROUP     = 0xc
 	IPV6_LEAVE_GROUP    = 0xd
 	IPV6_PKTINFO        = 0x13
+<<<<<<< HEAD
 	IPV6_MTU_DISCOVER   = 0x47
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 
 	MSG_OOB       = 0x1
 	MSG_PEEK      = 0x2
@@ -1134,6 +1140,7 @@ const (
 	WSASYS_STATUS_LEN  = 128
 )
 
+<<<<<<< HEAD
 // enum PMTUD_STATE from ws2ipdef.h
 const (
 	IP_PMTUDISC_NOT_SET = 0
@@ -1143,6 +1150,8 @@ const (
 	IP_PMTUDISC_MAX     = 4
 )
 
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 type WSABuf struct {
 	Len uint32
 	Buf *byte
@@ -1157,6 +1166,7 @@ type WSAMsg struct {
 	Flags       uint32
 }
 
+<<<<<<< HEAD
 type WSACMSGHDR struct {
 	Len   uintptr
 	Level int32
@@ -1173,6 +1183,8 @@ type IN6_PKTINFO struct {
 	Ifindex uint32
 }
 
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 // Flags for WSASocket
 const (
 	WSA_FLAG_OVERLAPPED             = 0x01

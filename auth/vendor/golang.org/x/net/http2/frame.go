@@ -225,11 +225,14 @@ var fhBytes = sync.Pool{
 	},
 }
 
+<<<<<<< HEAD
 func invalidHTTP1LookingFrameHeader() FrameHeader {
 	fh, _ := readFrameHeader(make([]byte, frameHeaderLen), strings.NewReader("HTTP/1.1 "))
 	return fh
 }
 
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 // ReadFrameHeader reads 9 bytes from r and returns a FrameHeader.
 // Most users should use Framer.ReadFrame instead.
 func ReadFrameHeader(r io.Reader) (FrameHeader, error) {
@@ -508,16 +511,22 @@ func (fr *Framer) ReadFrame() (Frame, error) {
 		return nil, err
 	}
 	if fh.Length > fr.maxReadSize {
+<<<<<<< HEAD
 		if fh == invalidHTTP1LookingFrameHeader() {
 			return nil, fmt.Errorf("http2: failed reading the frame payload: %w, note that the frame header looked like an HTTP/1.1 header", err)
 		}
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		return nil, ErrFrameTooLarge
 	}
 	payload := fr.getReadBuf(fh.Length)
 	if _, err := io.ReadFull(fr.r, payload); err != nil {
+<<<<<<< HEAD
 		if fh == invalidHTTP1LookingFrameHeader() {
 			return nil, fmt.Errorf("http2: failed reading the frame payload: %w, note that the frame header looked like an HTTP/1.1 header", err)
 		}
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		return nil, err
 	}
 	f, err := typeFrameParser(fh.Type)(fr.frameCache, fh, fr.countError, payload)

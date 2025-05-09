@@ -5,7 +5,11 @@
 package httpcommon
 
 import (
+<<<<<<< HEAD
 	"net/textproto"
+=======
+	"net/http"
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 	"sync"
 )
 
@@ -82,7 +86,11 @@ func buildCommonHeaderMaps() {
 	commonLowerHeader = make(map[string]string, len(common))
 	commonCanonHeader = make(map[string]string, len(common))
 	for _, v := range common {
+<<<<<<< HEAD
 		chk := textproto.CanonicalMIMEHeaderKey(v)
+=======
+		chk := http.CanonicalHeaderKey(v)
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		commonLowerHeader[chk] = v
 		commonCanonHeader[v] = chk
 	}
@@ -104,7 +112,11 @@ func CanonicalHeader(v string) string {
 	if s, ok := commonCanonHeader[v]; ok {
 		return s
 	}
+<<<<<<< HEAD
 	return textproto.CanonicalMIMEHeaderKey(v)
+=======
+	return http.CanonicalHeaderKey(v)
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 }
 
 // CachedCanonicalHeader returns the canonical form of a well-known header name.

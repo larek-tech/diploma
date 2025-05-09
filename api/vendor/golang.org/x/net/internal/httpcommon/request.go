@@ -5,12 +5,19 @@
 package httpcommon
 
 import (
+<<<<<<< HEAD
 	"context"
 	"errors"
 	"fmt"
 	"net/http/httptrace"
 	"net/textproto"
 	"net/url"
+=======
+	"errors"
+	"fmt"
+	"net/http"
+	"net/http/httptrace"
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 	"sort"
 	"strconv"
 	"strings"
@@ -23,6 +30,7 @@ var (
 	ErrRequestHeaderListSize = errors.New("request header list larger than peer's advertised limit")
 )
 
+<<<<<<< HEAD
 // Request is a subset of http.Request.
 // It'd be simpler to pass an *http.Request, of course, but we can't depend on net/http
 // without creating a dependency cycle.
@@ -38,6 +46,11 @@ type Request struct {
 // EncodeHeadersParam is parameters to EncodeHeaders.
 type EncodeHeadersParam struct {
 	Request Request
+=======
+// EncodeHeadersParam is parameters to EncodeHeaders.
+type EncodeHeadersParam struct {
+	Request *http.Request
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 
 	// AddGzipHeader indicates that an "accept-encoding: gzip" header should be
 	// added to the request.
@@ -61,11 +74,19 @@ type EncodeHeadersResult struct {
 // It validates a request and calls headerf with each pseudo-header and header
 // for the request.
 // The headerf function is called with the validated, canonicalized header name.
+<<<<<<< HEAD
 func EncodeHeaders(ctx context.Context, param EncodeHeadersParam, headerf func(name, value string)) (res EncodeHeadersResult, _ error) {
 	req := param.Request
 
 	// Check for invalid connection-level headers.
 	if err := checkConnHeaders(req.Header); err != nil {
+=======
+func EncodeHeaders(param EncodeHeadersParam, headerf func(name, value string)) (res EncodeHeadersResult, _ error) {
+	req := param.Request
+
+	// Check for invalid connection-level headers.
+	if err := checkConnHeaders(req); err != nil {
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		return res, err
 	}
 
@@ -87,10 +108,14 @@ func EncodeHeaders(ctx context.Context, param EncodeHeadersParam, headerf func(n
 
 	// isNormalConnect is true if this is a non-extended CONNECT request.
 	isNormalConnect := false
+<<<<<<< HEAD
 	var protocol string
 	if vv := req.Header[":protocol"]; len(vv) > 0 {
 		protocol = vv[0]
 	}
+=======
+	protocol := req.Header.Get(":protocol")
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 	if req.Method == "CONNECT" && protocol == "" {
 		isNormalConnect = true
 	} else if protocol != "" && req.Method != "CONNECT" {
@@ -124,7 +149,13 @@ func EncodeHeaders(ctx context.Context, param EncodeHeadersParam, headerf func(n
 		return res, fmt.Errorf("invalid HTTP trailer %s", err)
 	}
 
+<<<<<<< HEAD
 	trailers, err := commaSeparatedTrailers(req.Trailer)
+=======
+	contentLength := ActualContentLength(req)
+
+	trailers, err := commaSeparatedTrailers(req)
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 	if err != nil {
 		return res, err
 	}
@@ -138,7 +169,11 @@ func EncodeHeaders(ctx context.Context, param EncodeHeadersParam, headerf func(n
 		f(":authority", host)
 		m := req.Method
 		if m == "" {
+<<<<<<< HEAD
 			m = "GET"
+=======
+			m = http.MethodGet
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		}
 		f(":method", m)
 		if !isNormalConnect {
@@ -213,8 +248,13 @@ func EncodeHeaders(ctx context.Context, param EncodeHeadersParam, headerf func(n
 				f(k, v)
 			}
 		}
+<<<<<<< HEAD
 		if shouldSendReqContentLength(req.Method, req.ActualContentLength) {
 			f("content-length", strconv.FormatInt(req.ActualContentLength, 10))
+=======
+		if shouldSendReqContentLength(req.Method, contentLength) {
+			f("content-length", strconv.FormatInt(contentLength, 10))
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		}
 		if param.AddGzipHeader {
 			f("accept-encoding", "gzip")
@@ -240,7 +280,11 @@ func EncodeHeaders(ctx context.Context, param EncodeHeadersParam, headerf func(n
 		}
 	}
 
+<<<<<<< HEAD
 	trace := httptrace.ContextClientTrace(ctx)
+=======
+	trace := httptrace.ContextClientTrace(req.Context())
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 
 	// Header list size is ok. Write the headers.
 	enumerateHeaders(func(name, value string) {
@@ -258,19 +302,32 @@ func EncodeHeaders(ctx context.Context, param EncodeHeadersParam, headerf func(n
 		}
 	})
 
+<<<<<<< HEAD
 	res.HasBody = req.ActualContentLength != 0
+=======
+	res.HasBody = contentLength != 0
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 	res.HasTrailers = trailers != ""
 	return res, nil
 }
 
 // IsRequestGzip reports whether we should add an Accept-Encoding: gzip header
 // for a request.
+<<<<<<< HEAD
 func IsRequestGzip(method string, header map[string][]string, disableCompression bool) bool {
 	// TODO(bradfitz): this is a copy of the logic in net/http. Unify somewhere?
 	if !disableCompression &&
 		len(header["Accept-Encoding"]) == 0 &&
 		len(header["Range"]) == 0 &&
 		method != "HEAD" {
+=======
+func IsRequestGzip(req *http.Request, disableCompression bool) bool {
+	// TODO(bradfitz): this is a copy of the logic in net/http. Unify somewhere?
+	if !disableCompression &&
+		req.Header.Get("Accept-Encoding") == "" &&
+		req.Header.Get("Range") == "" &&
+		req.Method != "HEAD" {
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		// Request gzip only, not deflate. Deflate is ambiguous and
 		// not as universally supported anyway.
 		// See: https://zlib.net/zlib_faq.html#faq39
@@ -295,6 +352,7 @@ func IsRequestGzip(method string, header map[string][]string, disableCompression
 //
 // Certain headers are special-cased as okay but not transmitted later.
 // For example, we allow "Transfer-Encoding: chunked", but drop the header when encoding.
+<<<<<<< HEAD
 func checkConnHeaders(h map[string][]string) error {
 	if vv := h["Upgrade"]; len(vv) > 0 && (vv[0] != "" && vv[0] != "chunked") {
 		return fmt.Errorf("invalid Upgrade request header: %q", vv)
@@ -303,14 +361,30 @@ func checkConnHeaders(h map[string][]string) error {
 		return fmt.Errorf("invalid Transfer-Encoding request header: %q", vv)
 	}
 	if vv := h["Connection"]; len(vv) > 0 && (len(vv) > 1 || vv[0] != "" && !asciiEqualFold(vv[0], "close") && !asciiEqualFold(vv[0], "keep-alive")) {
+=======
+func checkConnHeaders(req *http.Request) error {
+	if v := req.Header.Get("Upgrade"); v != "" {
+		return fmt.Errorf("invalid Upgrade request header: %q", req.Header["Upgrade"])
+	}
+	if vv := req.Header["Transfer-Encoding"]; len(vv) > 0 && (len(vv) > 1 || vv[0] != "" && vv[0] != "chunked") {
+		return fmt.Errorf("invalid Transfer-Encoding request header: %q", vv)
+	}
+	if vv := req.Header["Connection"]; len(vv) > 0 && (len(vv) > 1 || vv[0] != "" && !asciiEqualFold(vv[0], "close") && !asciiEqualFold(vv[0], "keep-alive")) {
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		return fmt.Errorf("invalid Connection request header: %q", vv)
 	}
 	return nil
 }
 
+<<<<<<< HEAD
 func commaSeparatedTrailers(trailer map[string][]string) (string, error) {
 	keys := make([]string, 0, len(trailer))
 	for k := range trailer {
+=======
+func commaSeparatedTrailers(req *http.Request) (string, error) {
+	keys := make([]string, 0, len(req.Trailer))
+	for k := range req.Trailer {
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		k = CanonicalHeader(k)
 		switch k {
 		case "Transfer-Encoding", "Trailer", "Content-Length":
@@ -325,6 +399,22 @@ func commaSeparatedTrailers(trailer map[string][]string) (string, error) {
 	return "", nil
 }
 
+<<<<<<< HEAD
+=======
+// ActualContentLength returns a sanitized version of
+// req.ContentLength, where 0 actually means zero (not unknown) and -1
+// means unknown.
+func ActualContentLength(req *http.Request) int64 {
+	if req.Body == nil || req.Body == http.NoBody {
+		return 0
+	}
+	if req.ContentLength != 0 {
+		return req.ContentLength
+	}
+	return -1
+}
+
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 // validPseudoPath reports whether v is a valid :path pseudo-header
 // value. It must be either:
 //
@@ -342,7 +432,11 @@ func validPseudoPath(v string) bool {
 	return (len(v) > 0 && v[0] == '/') || v == "*"
 }
 
+<<<<<<< HEAD
 func validateHeaders(hdrs map[string][]string) string {
+=======
+func validateHeaders(hdrs http.Header) string {
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 	for k, vv := range hdrs {
 		if !httpguts.ValidHeaderFieldName(k) && k != ":protocol" {
 			return fmt.Sprintf("name %q", k)
@@ -379,6 +473,7 @@ func shouldSendReqContentLength(method string, contentLength int64) bool {
 		return false
 	}
 }
+<<<<<<< HEAD
 
 // ServerRequestParam is parameters to NewServerRequest.
 type ServerRequestParam struct {
@@ -465,3 +560,5 @@ func NewServerRequest(rp ServerRequestParam) ServerRequestResult {
 		Trailer:       trailer,
 	}
 }
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
