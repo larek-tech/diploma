@@ -48,11 +48,12 @@ func NewSite(sourceID, siteURL string) (*Site, error) {
 }
 
 type Page struct {
-	ID            string            `db:"id"`         // ID uuid идентификатор страницы
-	SiteID        string            `db:"site_id"`    // SiteID идентификатор сайта к которому относится страница
-	URL           string            `db:"url"`        // URL адрес страницы
-	Metadata      map[string]string `db:"metadata"`   // Metadata метаданные страницы (needs JSONB in Postgres)
-	Raw           string            `db:"raw"`        // Raw необработанное содержание страницы
+	ID            string            `db:"id"`            // ID uuid идентификатор страницы
+	SiteID        string            `db:"site_id"`       // SiteID идентификатор сайта к которому относится страница
+	URL           string            `db:"url"`           // URL адрес страницы
+	Metadata      map[string]string `db:"metadata"`      // Metadata метаданные страницы (needs JSONB in Postgres)
+	RawObjectID   string            `db:"raw_object_id"` // RawObjectID идентификатор объекта в S3 с необработанным содержанием страницы
+	Raw           string            // Raw необработанное содержание страницы
 	Content       string            `db:"content"`    // Content текстовое содержание страницы
 	OutgoingPages []string          `db:"outgoing"`   // OutgoingPages список UUID страниц на которые ссылается текущая страница
 	CreatedAt     time.Time         `db:"created_at"` // CreatedAt время создания страницы

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/larek-tech/diploma/data/internal/domain/site"
-	"github.com/larek-tech/diploma/data/internal/infrastructure/postgres"
+	storage "github.com/larek-tech/diploma/data/internal/infrastructure/storage"
 )
 
 type Storage struct {
@@ -21,7 +21,7 @@ func (s Storage) Save(ctx context.Context, site *site.Site) error {
 	currentSite, err := s.GetByURL(ctx, site.URL)
 	if err != nil {
 		// if record not found, create a new one
-		if postgres.IsNoRowsError(err) {
+		if storage.IsNoRowsError(err) {
 			err = s.db.Exec(ctx, `
 INSERT INTO sites (id, source_id, url, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5);

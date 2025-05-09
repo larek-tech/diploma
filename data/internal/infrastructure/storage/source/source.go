@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/larek-tech/diploma/data/internal/domain/source"
-	"github.com/larek-tech/diploma/data/internal/infrastructure/postgres"
+	storage "github.com/larek-tech/diploma/data/internal/infrastructure/storage"
 )
 
 type Storage struct {
@@ -59,7 +59,7 @@ FROM sources
 WHERE title = $1;
 `, name)
 	if err != nil {
-		if postgres.IsNoRowsError(err) {
+		if storage.IsNoRowsError(err) {
 			return nil, nil
 		}
 		return nil, err
@@ -79,7 +79,7 @@ FROM sources
 WHERE id = $1;
 `, id)
 	if err != nil {
-		if postgres.IsNoRowsError(err) {
+		if storage.IsNoRowsError(err) {
 			return nil, nil
 		}
 		return nil, err

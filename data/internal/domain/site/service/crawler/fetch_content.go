@@ -51,7 +51,7 @@ func (s Service) fetchContent(ctx context.Context, page *site.Page) ([]string, e
 		return nil, fmt.Errorf("extract metadata error: %w", err)
 	}
 
-	page.Raw = cleanUTF8(rawContent)
+	page.Raw = rawContent
 	page.Metadata = metadata
 	page.UpdatedAt = time.Now()
 

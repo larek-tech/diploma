@@ -7,4 +7,7 @@ import "data/v1/model.proto";
 
 service DataService {
   rpc VectorSearch(VectorSearchRequest) returns (VectorSearchResponse) {};
+  rpc GetDocuments(GetDocumentsIn) returns (GetDocumentsOut) {};
 };
+
+
