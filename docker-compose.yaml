@@ -146,6 +146,13 @@ services:
     healthcheck:
       test: "bash -c 'cat < /dev/null > /dev/tcp/localhost/11434'"
       interval: 5s
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
 
   crawler:
     build:
@@ -241,3 +248,22 @@ services:
       - pg
       - zookeeper
       - kafka
+
+  ml:
+    build:
+      context: ml
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8888:8888"
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]

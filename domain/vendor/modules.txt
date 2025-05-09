@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # github.com/BurntSushi/toml v1.2.1
 ## explicit; go 1.16
 github.com/BurntSushi/toml
@@ -351,16 +350,11 @@ golang.org/x/crypto/sha3
 ## explicit; go 1.23.0
 golang.org/x/net/html
 golang.org/x/net/html/atom
-=======
-# golang.org/x/net v0.35.0
-## explicit; go 1.18
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 golang.org/x/net/http/httpguts
 golang.org/x/net/http2
 golang.org/x/net/http2/hpack
 golang.org/x/net/idna
 golang.org/x/net/internal/httpcommon
-<<<<<<< HEAD
 golang.org/x/net/internal/socks
 golang.org/x/net/internal/timeseries
 golang.org/x/net/proxy
@@ -396,22 +390,6 @@ golang.org/x/text/width
 google.golang.org/genproto/googleapis/api/httpbody
 # google.golang.org/genproto/googleapis/rpc v0.0.0-20250428153025-10db94c68c34
 ## explicit; go 1.23.0
-=======
-golang.org/x/net/internal/timeseries
-golang.org/x/net/trace
-# golang.org/x/sys v0.30.0
-## explicit; go 1.18
-golang.org/x/sys/unix
-golang.org/x/sys/windows
-# golang.org/x/text v0.22.0
-## explicit; go 1.18
-golang.org/x/text/secure/bidirule
-golang.org/x/text/transform
-golang.org/x/text/unicode/bidi
-golang.org/x/text/unicode/norm
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20250218202821-56aae31c358a
-## explicit; go 1.22
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.72.0
 ## explicit; go 1.23
@@ -433,18 +411,12 @@ google.golang.org/grpc/connectivity
 google.golang.org/grpc/credentials
 google.golang.org/grpc/credentials/insecure
 google.golang.org/grpc/encoding
-<<<<<<< HEAD
 google.golang.org/grpc/encoding/gzip
-=======
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 google.golang.org/grpc/encoding/proto
 google.golang.org/grpc/experimental/stats
 google.golang.org/grpc/grpclog
 google.golang.org/grpc/grpclog/internal
-<<<<<<< HEAD
 google.golang.org/grpc/health/grpc_health_v1
-=======
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 google.golang.org/grpc/internal
 google.golang.org/grpc/internal/backoff
 google.golang.org/grpc/internal/balancer/gracefulswitch
@@ -483,13 +455,8 @@ google.golang.org/grpc/serviceconfig
 google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
-<<<<<<< HEAD
 # google.golang.org/protobuf v1.36.6
 ## explicit; go 1.22
-=======
-# google.golang.org/protobuf v1.36.5
-## explicit; go 1.21
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 google.golang.org/protobuf/encoding/protojson
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire
@@ -522,7 +489,6 @@ google.golang.org/protobuf/runtime/protoiface
 google.golang.org/protobuf/runtime/protoimpl
 google.golang.org/protobuf/types/known/anypb
 google.golang.org/protobuf/types/known/durationpb
-<<<<<<< HEAD
 google.golang.org/protobuf/types/known/emptypb
 google.golang.org/protobuf/types/known/fieldmaskpb
 google.golang.org/protobuf/types/known/structpb
@@ -534,6 +500,3 @@ gopkg.in/yaml.v3
 # olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3
 ## explicit; go 1.13
 olympos.io/encoding/edn
-=======
-google.golang.org/protobuf/types/known/timestamppb
->>>>>>> e302735 ([backend] generate vendor folders for backend services)

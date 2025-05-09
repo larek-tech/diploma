@@ -19,8 +19,4 @@
 package grpc
 
 // Version is the current grpc version.
-<<<<<<< HEAD
 const Version = "1.72.0"
-=======
-const Version = "1.71.1"
->>>>>>> e302735 ([backend] generate vendor folders for backend services)

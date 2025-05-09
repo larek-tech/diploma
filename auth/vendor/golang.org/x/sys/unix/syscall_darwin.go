@@ -602,7 +602,6 @@ func Connectx(fd int, srcIf uint32, srcAddr, dstAddr Sockaddr, associd SaeAssocI
 	return
 }
 
-<<<<<<< HEAD
 // sys	connectx(fd int, endpoints *SaEndpoints, associd SaeAssocID, flags uint32, iov []Iovec, n *uintptr, connid *SaeConnID) (err error)
 const minIovec = 8
 
@@ -747,9 +746,6 @@ func darwinKernelVersionMin(maj, min, patch int) bool {
 	return actualMaj > maj || actualMaj == maj && (actualMin > min || actualMin == min && actualPatch >= patch)
 }
 
-=======
-//sys	connectx(fd int, endpoints *SaEndpoints, associd SaeAssocID, flags uint32, iov []Iovec, n *uintptr, connid *SaeConnID) (err error)
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 //sys	sendfile(infd int, outfd int, offset int64, len *int64, hdtr unsafe.Pointer, flags int) (err error)
 
 //sys	shmat(id int, addr uintptr, flag int) (ret uintptr, err error)
@@ -852,10 +848,7 @@ func darwinKernelVersionMin(maj, min, patch int) bool {
 //sys	write(fd int, p []byte) (n int, err error)
 //sys	mmap(addr uintptr, length uintptr, prot int, flag int, fd int, pos int64) (ret uintptr, err error)
 //sys	munmap(addr uintptr, length uintptr) (err error)
-<<<<<<< HEAD
 //sys	readv(fd int, iovecs []Iovec) (n int, err error)
 //sys	preadv(fd int, iovecs []Iovec, offset int64) (n int, err error)
 //sys	writev(fd int, iovecs []Iovec) (n int, err error)
 //sys	pwritev(fd int, iovecs []Iovec, offset int64) (n int, err error)
-=======
->>>>>>> e302735 ([backend] generate vendor folders for backend services)

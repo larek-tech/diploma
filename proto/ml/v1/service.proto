@@ -6,5 +6,5 @@ option go_package="internal/domain/pb";
 import "ml/v1/model.proto";
 
 service MLService {
-  rpc ProcessQuery (ProcessQueryRequest) returns (stream ProcessQueryRequest) {};
+  rpc ProcessQuery (ProcessQueryRequest) returns (stream ProcessQueryResponse) {};
 };

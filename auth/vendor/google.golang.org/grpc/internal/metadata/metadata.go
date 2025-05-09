@@ -97,21 +97,11 @@ func hasNotPrintable(msg string) bool {
 	return false
 }
 
-<<<<<<< HEAD
 // ValidateKey validates a key with the following rules (pseudo-headers are
 // skipped):
 // - the key must contain one or more characters.
 // - the characters in the key must be in [0-9 a-z _ - .].
 func ValidateKey(key string) error {
-=======
-// ValidatePair validate a key-value pair with the following rules (the pseudo-header will be skipped) :
-//
-// - key must contain one or more characters.
-// - the characters in the key must be contained in [0-9 a-z _ - .].
-// - if the key ends with a "-bin" suffix, no validation of the corresponding value is performed.
-// - the characters in the every value must be printable (in [%x20-%x7E]).
-func ValidatePair(key string, vals ...string) error {
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 	// key should not be empty
 	if key == "" {
 		return fmt.Errorf("there is an empty key in the header")
@@ -127,7 +117,6 @@ func ValidatePair(key string, vals ...string) error {
 			return fmt.Errorf("header key %q contains illegal characters not in [0-9a-z-_.]", key)
 		}
 	}
-<<<<<<< HEAD
 	return nil
 }
 
@@ -142,8 +131,6 @@ func ValidatePair(key string, vals ...string) error {
 	if err := ValidateKey(key); err != nil {
 		return err
 	}
-=======
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 	if strings.HasSuffix(key, "-bin") {
 		return nil
 	}

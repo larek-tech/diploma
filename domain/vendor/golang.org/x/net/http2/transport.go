@@ -1286,7 +1286,6 @@ func (cc *ClientConn) responseHeaderTimeout() time.Duration {
 	return 0
 }
 
-<<<<<<< HEAD
 // actualContentLength returns a sanitized version of
 // req.ContentLength, where 0 actually means zero (not unknown) and -1
 // means unknown.
@@ -1300,8 +1299,6 @@ func actualContentLength(req *http.Request) int64 {
 	return -1
 }
 
-=======
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 func (cc *ClientConn) decrStreamReservations() {
 	cc.mu.Lock()
 	defer cc.mu.Unlock()
@@ -1326,11 +1323,7 @@ func (cc *ClientConn) roundTrip(req *http.Request, streamf func(*clientStream)) 
 		reqCancel:            req.Cancel,
 		isHead:               req.Method == "HEAD",
 		reqBody:              req.Body,
-<<<<<<< HEAD
 		reqBodyContentLength: actualContentLength(req),
-=======
-		reqBodyContentLength: httpcommon.ActualContentLength(req),
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		trace:                httptrace.ContextClientTrace(ctx),
 		peerClosed:           make(chan struct{}),
 		abort:                make(chan struct{}),
@@ -1338,11 +1331,7 @@ func (cc *ClientConn) roundTrip(req *http.Request, streamf func(*clientStream)) 
 		donec:                make(chan struct{}),
 	}
 
-<<<<<<< HEAD
 	cs.requestedGzip = httpcommon.IsRequestGzip(req.Method, req.Header, cc.t.disableCompression())
-=======
-	cs.requestedGzip = httpcommon.IsRequestGzip(req, cc.t.disableCompression())
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 
 	go cs.doRequest(req, streamf)
 
@@ -1373,11 +1362,7 @@ func (cc *ClientConn) roundTrip(req *http.Request, streamf func(*clientStream)) 
 		}
 		res.Request = req
 		res.TLS = cc.tlsState
-<<<<<<< HEAD
 		if res.Body == noBody && actualContentLength(req) == 0 {
-=======
-		if res.Body == noBody && httpcommon.ActualContentLength(req) == 0 {
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 			// If there isn't a request or response body still being
 			// written, then wait for the stream to be closed before
 			// RoundTrip returns.
@@ -1624,16 +1609,7 @@ func (cs *clientStream) encodeAndWriteHeaders(req *http.Request) error {
 	// sent by writeRequestBody below, along with any Trailers,
 	// again in form HEADERS{1}, CONTINUATION{0,})
 	cc.hbuf.Reset()
-<<<<<<< HEAD
 	res, err := encodeRequestHeaders(req, cs.requestedGzip, cc.peerMaxHeaderListSize, func(name, value string) {
-=======
-	res, err := httpcommon.EncodeHeaders(httpcommon.EncodeHeadersParam{
-		Request:               req,
-		AddGzipHeader:         cs.requestedGzip,
-		PeerMaxHeaderListSize: cc.peerMaxHeaderListSize,
-		DefaultUserAgent:      defaultUserAgent,
-	}, func(name, value string) {
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		cc.writeHeader(name, value)
 	})
 	if err != nil {
@@ -1649,7 +1625,6 @@ func (cs *clientStream) encodeAndWriteHeaders(req *http.Request) error {
 	return err
 }
 
-<<<<<<< HEAD
 func encodeRequestHeaders(req *http.Request, addGzipHeader bool, peerMaxHeaderListSize uint64, headerf func(name, value string)) (httpcommon.EncodeHeadersResult, error) {
 	return httpcommon.EncodeHeaders(req.Context(), httpcommon.EncodeHeadersParam{
 		Request: httpcommon.Request{
@@ -1666,8 +1641,6 @@ func encodeRequestHeaders(req *http.Request, addGzipHeader bool, peerMaxHeaderLi
 	}, headerf)
 }
 
-=======
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 // cleanupWriteRequest performs post-request tasks.
 //
 // If err (the result of writeRequest) is non-nil and the stream is not closed,
@@ -2237,7 +2210,6 @@ func (rl *clientConnReadLoop) cleanup() {
 	}
 	cc.cond.Broadcast()
 	cc.mu.Unlock()
-<<<<<<< HEAD
 
 	if !cc.seenSettings {
 		// If we have a pending request that wants extended CONNECT,
@@ -2245,8 +2217,6 @@ func (rl *clientConnReadLoop) cleanup() {
 		cc.extendedConnectAllowed = true
 		close(cc.seenSettingsChan)
 	}
-=======
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 }
 
 // countReadFrameError calls Transport.CountError with a string
@@ -2339,12 +2309,6 @@ func (rl *clientConnReadLoop) run() error {
 			if VerboseLogs {
 				cc.vlogf("http2: Transport conn %p received error from processing frame %v: %v", cc, summarizeFrame(f), err)
 			}
-<<<<<<< HEAD
-=======
-			if !cc.seenSettings {
-				close(cc.seenSettingsChan)
-			}
->>>>>>> e302735 ([backend] generate vendor folders for backend services)
 			return err
 		}
 	}
