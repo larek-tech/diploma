@@ -1,0 +1,22 @@
+meta {
+  name: q
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/q
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "query": "Java разработчик",
+    "sourceIds": ["a6bfe96f-45bd-4e4b-8e6f-2c2ef53ca280"],
+    "topK": 3,
+    "threshold": 0.1,
+    "useQuestions": false
+  }
+  
+}

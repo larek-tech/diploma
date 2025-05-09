@@ -1,0 +1,18 @@
+log_level: "debug"
+server:
+  grpc_port: 9001
+jaeger:
+  host: "jaeger"
+  port: 4318
+jwt:
+  secret: "secret"
+  expire: 24
+  encryption: "1F7006E3A96D34CAB69A15F365FED784"
+postgres:
+  user: "pguser"
+  password: "pgpass"
+  host: "postgres"
+  db: "dev"
+  ssl: false
+  port: 5432
+  retry_timeout: 5

@@ -1,10 +1,12 @@
 syntax = "proto3";
 
-package ml;
+import "ml/v1/model.proto";
+
+package pb.ml;
 option go_package = "internal/ml/pb";
 
-import "ml/v1/model.proto";
 
 service MLService {
   rpc ProcessQuery (ProcessQueryRequest) returns (stream ProcessQueryResponse) {};
 };
+

@@ -59,6 +59,15 @@ func Clone(m Message) Message {
 	return dst.Interface()
 }
 
+<<<<<<< HEAD
+// CloneOf returns a deep copy of m. If the top-level message is invalid,
+// it returns an invalid message as well.
+func CloneOf[M Message](m M) M {
+	return Clone(m).(M)
+}
+
+=======
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 // mergeOptions provides a namespace for merge functions, and can be
 // exported in the future if we add user-visible merge options.
 type mergeOptions struct{}

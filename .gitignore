@@ -30,3 +30,6 @@ venv
 .venv
 .DS_Store
 .idea
+config.yaml
+requests
+google.golang.org

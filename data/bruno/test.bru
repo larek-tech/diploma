@@ -1,0 +1,24 @@
+meta {
+  name: test
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/test
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Sample Website Source",
+    "content": "aHR0cHM6Ly9naXRmbGljLnJ1Lw==",
+    "type": 0,
+    "credentials": "",
+    "update_params": {
+      "every_period": 86400,
+      "on_time": "2026-12-31T23:59:59Z"
+    }
+  }
+}

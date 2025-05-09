@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package domain.v1;
+option go_package = "internal/domain/pb";
+
+<<<<<<< HEAD
+enum SourceType {
+  TYPE_UNDEFINED = 0;
+  TYPE_WEB = 1;
+  TYPE_SINGLE_FILE = 2;
+  TYPE_ARCHIVED_FILES = 3;
+  TYPE_WITH_CREDENTIALS = 4;
+};
+
+enum SourceStatus {
+  STATUS_UNDEFINED = 0;
+  STATUS_READY = 1;
+  STATUS_PARSING = 2;
+  STATUS_FAILED = 3;
+}
+
+message CronFormat {
+  int32 minute = 1;
+  int32 hour = 2;
+  int32 dayOfMonth = 3;
+  int32 month = 4;
+  int32 dayOfWeek = 5;
+}
+
+message UpdateParams {
+  optional int64 everyPeriod = 1;
+  optional CronFormat cron = 2;
+=======
+import "google/protobuf/timestamp.proto";
+
+enum SourceType {
+  UNDEFINED_SOURCE_TYPE = 0;
+  WEB_SOURCE = 1;
+  SINGLE_FILE = 2;
+  ARCHIVED_FILES = 3;
+  WITH_CREDENTIALS = 4;
+>>>>>>> d946f4c (stable)
+};
+
+message Source {
+  string title = 1;
+  bytes content = 2;
+  SourceType typ = 3;
+<<<<<<< HEAD
+  optional UpdateParams updateParams = 4;
+  optional bytes credentials = 5;
+};
+
+message GetSourceRequest {
+  int64 sourceId = 1;
+};
+
+message GetSourceResponse {
+  Source source = 1;
+};
+
+message UpdateSourceRequest {
+  int64 sourceId = 1;
+  optional string title = 2;
+  optional bytes content = 3;
+  optional UpdateParams updateParams = 4;
+  optional bytes credentials = 5;
+};
+
+message DeleteSourceRequest {
+  int64 sourceId = 1;
+};
+
+message ListSourcesRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+};
+
+message ListSourcesResponse {
+  repeated Source sources = 1;
+=======
+};
+
+message UpdateParams {
+  int64 everyPeriod = 1;
+  google.protobuf.Timestamp onTime = 2;
+};
+
+message CreateSourceRequest {
+  int64 userId = 1;
+  Source source = 2;
+};
+
+message GetSourceRequest {
+
+};
+
+message GetSourceResponse {
+
+};
+
+message UpdateSourceRequest {
+
+};
+
+message DeleteSourceRequest {
+
+};
+
+message ListSourcesRequest {
+
+};
+
+message ListSourcesResponse {
+
+};
+
+message ModifySourceResponse {
+
+>>>>>>> d946f4c (stable)
+};

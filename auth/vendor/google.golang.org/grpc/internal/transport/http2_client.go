@@ -1390,8 +1390,12 @@ func (t *http2Client) handleGoAway(f *http2.GoAwayFrame) error {
 // the caller.
 func (t *http2Client) setGoAwayReason(f *http2.GoAwayFrame) {
 	t.goAwayReason = GoAwayNoReason
+<<<<<<< HEAD
+	if f.ErrCode == http2.ErrCodeEnhanceYourCalm {
+=======
 	switch f.ErrCode {
 	case http2.ErrCodeEnhanceYourCalm:
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		if string(f.DebugData()) == "too_many_pings" {
 			t.goAwayReason = GoAwayTooManyPings
 		}

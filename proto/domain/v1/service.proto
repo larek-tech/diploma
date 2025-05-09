@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package domain.v1;
+option go_package = "internal/domain/pb";
+
+<<<<<<< HEAD
+import "google/protobuf/empty.proto";
+import "domain/v1/model.proto";
+
+service DomainService {
+  rpc CreateSource(Source) returns (Source) {};
+  rpc GetSource(GetSourceRequest) returns (GetSourceResponse) {};
+  rpc UpdateSource(UpdateSourceRequest) returns (Source) {};
+  rpc DeleteSource(DeleteSourceRequest) returns (google.protobuf.Empty) {};
+  rpc ListSources(ListSourcesRequest) returns(ListSourcesResponse) {};
+=======
+service DomainService {
+  rpc CreateSource() returns () {};
+  rpc GetSource() returns () {};
+  rpc UpdateSource() returns () {};
+  rpc DeleteSource() returns () {};
+  rpc ListSources() returns() {};
+>>>>>>> d946f4c (stable)
+};

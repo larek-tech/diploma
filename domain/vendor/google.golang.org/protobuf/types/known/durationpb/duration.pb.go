@@ -289,6 +289,15 @@ func (x *Duration) GetNanos() int32 {
 
 var File_google_protobuf_duration_proto protoreflect.FileDescriptor
 
+<<<<<<< HEAD
+const file_google_protobuf_duration_proto_rawDesc = "" +
+	"\n" +
+	"\x1egoogle/protobuf/duration.proto\x12\x0fgoogle.protobuf\":\n" +
+	"\bDuration\x12\x18\n" +
+	"\aseconds\x18\x01 \x01(\x03R\aseconds\x12\x14\n" +
+	"\x05nanos\x18\x02 \x01(\x05R\x05nanosB\x83\x01\n" +
+	"\x13com.google.protobufB\rDurationProtoP\x01Z1google.golang.org/protobuf/types/known/durationpb\xf8\x01\x01\xa2\x02\x03GPB\xaa\x02\x1eGoogle.Protobuf.WellKnownTypesb\x06proto3"
+=======
 var file_google_protobuf_duration_proto_rawDesc = string([]byte{
 	0x0a, 0x1e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
 	0x66, 0x2f, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
@@ -307,6 +316,7 @@ var file_google_protobuf_duration_proto_rawDesc = string([]byte{
 	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x57, 0x65, 0x6c, 0x6c, 0x4b, 0x6e, 0x6f, 0x77, 0x6e, 0x54, 0x79,
 	0x70, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 })
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 
 var (
 	file_google_protobuf_duration_proto_rawDescOnce sync.Once

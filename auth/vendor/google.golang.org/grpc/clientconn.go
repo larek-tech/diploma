@@ -1231,8 +1231,12 @@ func (ac *addrConn) updateConnectivityState(s connectivity.State, lastErr error)
 // adjustParams updates parameters used to create transports upon
 // receiving a GoAway.
 func (ac *addrConn) adjustParams(r transport.GoAwayReason) {
+<<<<<<< HEAD
+	if r == transport.GoAwayTooManyPings {
+=======
 	switch r {
 	case transport.GoAwayTooManyPings:
+>>>>>>> e302735 ([backend] generate vendor folders for backend services)
 		v := 2 * ac.dopts.copts.KeepaliveParams.Time
 		ac.cc.mu.Lock()
 		if v > ac.cc.keepaliveParams.Time {

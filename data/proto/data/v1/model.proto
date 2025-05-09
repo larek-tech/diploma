@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package data.v1;
+option go_package = "internal/data/pb";
+
+message VectorSearchRequest {
+  string query = 1;
+  repeated string sourceIds = 2;
+  uint64 topK = 3;
+  float threshold = 4;
+  bool useQuestions = 5; // hypothetical questions
+};
+
+message DocumentChunk {
+  string id = 1;
+  int64 index = 2;
+  string content = 3;
+  bytes metadata = 4; // encoded json<any,any>
+  float similarity = 5;
+};
+
+message VectorSearchResponse {
+  repeated DocumentChunk chunks = 1;
+};

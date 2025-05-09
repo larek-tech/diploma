@@ -4,7 +4,7 @@ package auth.v1;
 option go_package = "internal/auth/pb";
 
 message UserAuthMetadata {
-  int64 user_id = 1;
+  int64 userId = 1;
   repeated int64 roles = 2;
 };
 

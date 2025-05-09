@@ -1,0 +1,21 @@
+log_level: "debug"
+server:
+  http_port: 9000
+  body_limit: 1073741824
+jaeger:
+  host: "jaeger"
+  port: 4318
+postgres:
+  user: "pguser"
+  password: "pgpass"
+  host: "postgres"
+  db: "dev"
+  ssl: false
+  port: 5432
+  retry_timeout: 5
+auth_service:
+  host: auth
+  port: 9001
+domain_service:
+  host: domain
+  port: 9003
