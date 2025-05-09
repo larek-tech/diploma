@@ -7,10 +7,10 @@ jaeger:
 postgres:
   user: "pguser"
   password: "pgpass"
-  host: "postgres"
+  host: "pg"
   db: "dev"
   ssl: false
-  port: 5432
+  port: 5433
   retry_timeout: 5
 kafka:
   offset_newest: true

@@ -32,6 +32,9 @@ func (ctrl *Controller) UpdateSource(ctx context.Context, req *pb.UpdateSourceRe
 	source.Title = req.GetTitle()
 	source.Content = req.GetContent()
 	source.Credentials = req.GetCredentials()
+	if source.Credentials == nil {
+		source.Credentials = make([]byte, 0)
+	}
 	source.FillUpdateParams(req.UpdateParams)
 	source.UpdatedAt = time.Now()
 

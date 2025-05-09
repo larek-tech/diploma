@@ -25,13 +25,11 @@ func SetupRoutes(api fiber.Router, h chatHandler, wsConfig websocket.Config) {
 	api.Put("/:id", h.RenameChat)
 	api.Delete("/:id", h.DeleteChat)
 
-	api.Route("/:id", func(ws fiber.Router) {
-		ws.Use("/:id", func(c *fiber.Ctx) error {
-			if websocket.IsWebSocketUpgrade(c) {
-				return c.Next()
-			}
-			return errs.WrapErr(shared.ErrWsProtocolRequired)
-		})
-		ws.Get("/:id", websocket.New(h.Chat, wsConfig))
-	}, "ws")
+	api.Use("/ws/:id", func(c *fiber.Ctx) error {
+		if websocket.IsWebSocketUpgrade(c) {
+			return c.Next()
+		}
+		return errs.WrapErr(shared.ErrWsProtocolRequired)
+	})
+	api.Get("/ws/:id", websocket.New(h.Chat, wsConfig))
 }

@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 
 	"github.com/gofiber/contrib/websocket"
@@ -33,16 +32,21 @@ func getMsg(c *websocket.Conn) (model.SocketMessage, error) {
 }
 
 func sendErr(c *websocket.Conn, err error, msg string) {
+	if websocket.IsCloseError(err, websocket.CloseGoingAway) {
+		return
+	}
+
 	log.Err(errs.WrapErr(err)).Msg("chat error")
 	sendMsg(c, &model.SocketMessage{
 		Type:   model.TypeError,
 		IsLast: true,
-		Err:    errors.New(msg),
+		Err:    msg,
 	})
 }
 
 func sendMsg(c *websocket.Conn, msg *model.SocketMessage) {
-	if err := c.WriteJSON(msg); err != nil {
+	log.Debug().Any("resp", *msg).Msg("send message")
+	if err := c.WriteJSON(*msg); err != nil {
 		log.Warn().Err(errs.WrapErr(err)).Msg("send message")
 	}
 }
@@ -69,13 +73,14 @@ func (h *Handler) authorize(c *websocket.Conn, ctx context.Context) (*authpb.Use
 		return nil, errs.WrapErr(err, "validate token")
 	}
 
+	span.SetAttributes(attribute.Int64("userID", userMeta.GetMeta().GetUserId()))
+
 	return userMeta.GetMeta(), nil
 }
 
 // Chat handles websocket connection for sending messages.
 func (h *Handler) Chat(c *websocket.Conn) {
-	ctx, span := h.tracer.Start(context.Background(), "Handler.Chat")
-	defer span.End()
+	ctx := context.Background()
 
 	c.SetCloseHandler(closeHandler)
 	defer func() {
@@ -85,20 +90,13 @@ func (h *Handler) Chat(c *websocket.Conn) {
 	}()
 
 	chatID := c.Params(chatIDParam)
-	addr := c.LocalAddr().String()
-	span.SetAttributes(
-		attribute.String("chatID", chatID),
-		attribute.String("addr", addr),
-	)
-	log.Info().Str("addr", addr).Msg("new conn")
+	log.Info().Str("addr", c.LocalAddr().String()).Msg("new conn")
 
 	userMeta, err := h.authorize(c, ctx)
 	if err != nil {
 		sendErr(c, errs.WrapErr(err), "unauthorized")
 		return
 	}
-
-	span.SetAttributes(attribute.Int64("userID", userMeta.GetUserId()))
 
 	ctx = auth.PushUserMeta(ctx, userMeta)
 	defer func() {

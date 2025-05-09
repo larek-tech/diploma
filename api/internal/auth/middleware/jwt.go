@@ -13,7 +13,7 @@ import (
 // Jwt is an authorization middleware.
 func Jwt(authService pb.AuthServiceClient) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		if c.Route().Name == "ws" {
+		if strings.Contains(c.Path(), "/ws/") {
 			return c.Next()
 		}
 

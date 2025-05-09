@@ -40,6 +40,9 @@ func (ctrl *Controller) CreateSource(ctx context.Context, req *pb.CreateSourceRe
 		UpdatedAt:   time.Now(),
 	}
 	source.FillUpdateParams(req.GetUpdateParams())
+	if source.Credentials == nil {
+		source.Credentials = make([]byte, 0)
+	}
 
 	sourceID, err := ctrl.sr.InsertSource(ctx, source)
 	if err != nil {

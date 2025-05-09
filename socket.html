@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Chat Tester with Auth</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        textarea, input, select {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        #messages {
+            border: 1px solid #ccc;
+            height: 200px;
+            overflow-y: scroll;
+            padding: 5px;
+        }
+
+        button {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+<h1>WebSocket Chat Tester with JWT Auth</h1>
+
+<h3>Login</h3>
+<input id="email" placeholder="Email" type="email" value="test@test.com">
+<input id="password" placeholder="Password" type="password" value="test123456">
+<button onclick="login()">🔐 Login</button>
+<div id="tokenDisplay"></div>
+
+<h3>Chat Controls</h3>
+<button onclick="getChatList()">🔄 Get Chat List</button>
+<select id="chatList" onchange="selectChat()"></select>
+<button onclick="createChat()">➕ Create Chat</button>
+<button onclick="deleteChat()">🗑️ Delete Selected Chat</button>
+<button onclick="getHistory()">📜 Get History</button>
+<button onclick="connectWebSocket()">🔌 Connect WebSocket</button>
+
+<h3>Send Message</h3>
+<select id="msgType">
+    <option value="auth">auth</option>
+    <option value="query">query</option>
+    <option value="chunk">chunk</option>
+    <option value="error">error</option>
+</select>
+<textarea id="msgContent" placeholder="Message content..."></textarea>
+<label><input id="isChunked" type="checkbox"> isChunked</label>
+<label><input id="isLast" type="checkbox"> isLast</label>
+<h4>Source IDs</h4>
+<input id="sourceIdInput" placeholder="Enter source ID" type="text">
+<button onclick="addSourceId()">➕ Add Source ID</button>
+<ul id="sourceIdList"></ul>
+<button onclick="sendMessage()">📤 Send</button>
+
+<h3>Messages</h3>
+<div id="messages"></div>
+
+<script>
+    let token = '';
+    let socket = null;
+    let currentChatId = null;
+
+    let sourceIDs = [];
+
+    function addSourceId() {
+        const input = document.getElementById('sourceIdInput');
+        const id = input.value.trim();
+        if (!id) return;
+        sourceIDs.push(id);
+        input.value = '';
+        renderSourceIds();
+    }
+
+    function removeSourceId(index) {
+        sourceIDs.splice(index, 1);
+        renderSourceIds();
+    }
+
+    function renderSourceIds() {
+        const ul = document.getElementById('sourceIdList');
+        ul.innerHTML = '';
+        sourceIDs.forEach((id, idx) => {
+            const li = document.createElement('li');
+            li.textContent = id + ' ';
+            const btn = document.createElement('button');
+            btn.textContent = '❌';
+            btn.onclick = () => removeSourceId(idx);
+            li.appendChild(btn);
+            ul.appendChild(li);
+        });
+    }
+
+
+    function log(msg) {
+        const div = document.getElementById('messages');
+        div.innerHTML += `<div>${new Date().toLocaleTimeString()} ➤ ${msg}</div>`;
+        div.scrollTop = div.scrollHeight;
+    }
+
+    async function login() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const res = await fetch('http://localhost:9000/auth/v1/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email, password})
+        });
+
+        if (!res.ok) {
+            log('Login failed');
+            return;
+        }
+
+        const data = await res.json();
+        token = data.token;
+        document.getElementById('tokenDisplay').innerText = `Token: ${token}`;
+        log('Login successful');
+    }
+
+    async function getChatList() {
+        const res = await fetch('http://localhost:9000/api/v1/chat/list', {
+            headers: {'Authorization': `Bearer ${token}`}
+        });
+
+        const data = await res.json();
+        const chats = data.chats || [];
+        const select = document.getElementById('chatList');
+        select.innerHTML = '';
+
+        chats.forEach(chat => {
+            const option = document.createElement('option');
+            option.value = chat.id;
+            option.text = `Chat ${chat.id} — ${chat.title || 'No Title'}`;
+            select.appendChild(option);
+        });
+
+        if (chats.length > 0) {
+            currentChatId = chats[0].id;
+            log(`Loaded ${chats.length} chat(s), selected ${currentChatId}`);
+        } else {
+            log('No chats found');
+        }
+    }
+
+
+    async function createChat() {
+        const res = await fetch('http://localhost:9000/api/v1/chat/', {
+            method: 'POST',
+            headers: {'Authorization': `Bearer ${token}`}
+        });
+        const chat = await res.json();
+        log(`Created chat: ${chat.id}`);
+        getChatList();
+    }
+
+    async function deleteChat() {
+        if (!currentChatId) return alert('Select a chat');
+        await fetch(`http://localhost:9000/api/v1/chat/${currentChatId}`, {
+            method: 'DELETE',
+            headers: {'Authorization': `Bearer ${token}`}
+        });
+        log(`Deleted chat ${currentChatId}`);
+        getChatList();
+    }
+
+    function selectChat() {
+        const select = document.getElementById('chatList');
+        currentChatId = select.value;
+        log(`Selected chat ${currentChatId}`);
+    }
+
+    async function getHistory() {
+        if (!currentChatId) return alert('Select a chat');
+        const res = await fetch(`http://localhost:9000/api/v1/chat/history/${currentChatId}`, {
+            headers: {'Authorization': `Bearer ${token}`}
+        });
+        const history = await res.json();
+        log(`History for ${currentChatId}: ${JSON.stringify(history)}`);
+    }
+
+    function connectWebSocket() {
+        if (!currentChatId) return alert('Select a chat');
+        if (!token) return alert('Login first');
+        if (socket) socket.close();
+
+        socket = new WebSocket(`ws://localhost:9000/api/v1/chat/ws/${currentChatId}`);
+
+        socket.onopen = () => {
+            log('WebSocket connected');
+            // Отправляем авторизационное сообщение
+            const authMsg = {
+                type: "auth",
+                content: token,
+                isChunked: false,
+                isLast: true,
+                sourceIDs: [],
+                queryMetadata: {}
+            };
+            socket.send(JSON.stringify(authMsg));
+            log(`Sent auth message`);
+        };
+
+        socket.onmessage = e => log(`Received: ${e.data}`);
+        socket.onerror = e => log('WebSocket error');
+        socket.onclose = () => log('WebSocket closed');
+    }
+
+
+    function sendMessage() {
+        if (!socket || socket.readyState !== WebSocket.OPEN) return alert('WebSocket not connected');
+        if (sourceIDs.length === 0) return alert('Please add at least one source ID');
+
+        const msg = {
+            type: document.getElementById('msgType').value,
+            content: document.getElementById('msgContent').value,
+            isChunked: document.getElementById('isChunked').checked,
+            isLast: document.getElementById('isLast').checked,
+            sourceIDs: sourceIDs,
+            queryMetadata: {
+                domainID: null,
+                scenario: null
+            }
+        };
+        socket.send(JSON.stringify(msg));
+        log(`Sent: ${JSON.stringify(msg)}`);
+    }
+
+
+</script>
+</body>
+</html>
