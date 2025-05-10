@@ -3,7 +3,7 @@ volumes:
   jaeger_data:
   zoo_data:
   kafka_data:
-
+  redis_data:
 services:
   # jaeger:
   #   image: jaegertracing/all-in-one
@@ -143,3 +143,11 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
