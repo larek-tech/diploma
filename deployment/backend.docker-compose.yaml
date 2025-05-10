@@ -1,0 +1,66 @@
+volumes:
+  pg_data:
+    driver: local
+  redis_data:
+    driver: local
+
+services:
+  pg:
+    image: postgres:17
+    restart: always
+    ports:
+      - "5433:5433"
+    command: -p 5433
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-pguser}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pgpass}
+      - POSTGRES_DB=${POSTGRES_DB:-dev}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+  api:
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "9000:9000"
+    depends_on:
+      - pg
+      - auth
+      - domain
+  auth:
+    build:
+      context: ../auth
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "9001:9001"
+    depends_on:
+      - pg
+
+  chat:
+    build:
+      context: ../chat
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "9002:9002"
+    depends_on:
+        - pg
+
+  domain:
+    build:
+      context: ../domain
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "9003:9003"
+    depends_on:
+      - pg
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data

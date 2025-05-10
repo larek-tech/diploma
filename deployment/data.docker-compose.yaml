@@ -1,7 +1,7 @@
 services:
   postgres:
     build:
-      context: .
+      context: ../data
       dockerfile: docker/postgres.Dockerfile
     container_name: postgres_local
     restart: unless-stopped
@@ -24,7 +24,7 @@ services:
 
   migrator:
     build:
-      context: .
+      context: ../data
       dockerfile: docker/migrator.Dockerfile
     container_name: migrator_local
     depends_on:
@@ -41,7 +41,7 @@ services:
 
   crawler:
     build:
-      context: .
+      context: ../data
       dockerfile: docker/crawler.Dockerfile
     container_name: crawler_local
     restart: unless-stopped
@@ -62,13 +62,12 @@ services:
       - "9998:8080"
   parser:
     build:
-      context: .
+      context: ../data
       dockerfile: docker/parser.Dockerfile
     container_name: parser_local
     restart: unless-stopped
     depends_on:
       - postgres
-      - ollama
     env_file:
         - local.env
     environment:

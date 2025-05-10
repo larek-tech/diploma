@@ -1,0 +1,28 @@
+services:
+  ml:
+    build:
+      context: ../ml
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8888:8888"
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    environment:
+      OLLAMA_BASE_URL: "${ML_OLLAMA_BASE_URL:-http://host.docker.internal:11434}"
+      GIGA_CHAT_API_KEY: "${ML_GIGA_CHAT_API_KEY:-}"
+      DEVICE: "${ML_DEVICE:-cuda}"
+      RERANKER_MAX_LENGTH: "${ML_RERANKER_MAX_LENGTH:-2048}"
+      ML_SERVICE_PORT: "${ML_ML_SERVICE_PORT:-8888}"
+      DATA_SERVICE_HOST: "${ML_DATA_SERVICE_HOST:-host.docker.internal}"
+      DATA_SERVICE_PORT: "${ML_DATA_SERVICE_PORT:-9990}"
+      DEFAULT_RERANKER_NAME: "${ML_DEFAULT_RERANKER_NAME:-BAAI/bge-reranker-v2-m3}"
+      HF_TOKEN: "${ML_HF_TOKEN:-}"
+    deploy:
+     resources:
+       reservations:
+         devices:
+           - driver: nvidia
+             count: 1
+             capabilities: [ gpu ]
+

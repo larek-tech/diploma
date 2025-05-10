@@ -17,6 +17,6 @@ FROM python:$PYTHON_BASE
 COPY --from=builder /project/.venv/ /project/.venv
 ENV PATH="/project/.venv/bin:$PATH"
 
-COPY .env /project/
+
 COPY src /project/src
 CMD ["python", "/project/src/server.py"]
