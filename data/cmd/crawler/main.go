@@ -65,6 +65,8 @@ func run() int {
 		qaas.ParseSiteQueue,
 		qaas.ParsePageResultQueue,
 		qaas.ParsePageQueue,
+		qaas.ParseS3Queue,
+		qaas.ParseS3ResultQueue,
 		qaas.EmbedResultQueue,
 	})
 
