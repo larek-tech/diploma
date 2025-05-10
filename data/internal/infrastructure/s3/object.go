@@ -5,14 +5,15 @@ import "fmt"
 type ContentType string
 
 const (
-	ContentTypeJSON ContentType = "application/json"
-	ContentTypeXML  ContentType = "application/xml"
-	ContentTypeText ContentType = "text/plain"
-	ContentTypeHTML ContentType = "text/html"
-	ContentTypeCSV  ContentType = "text/csv"
-	ContentTypePDF  ContentType = "application/pdf"
-	ContentTypeDocx ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-	ContentTypeXlsx ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+	ContentTypeUndefined ContentType = "application/octet-stream"
+	ContentTypeJSON      ContentType = "application/json"
+	ContentTypeXML       ContentType = "application/xml"
+	ContentTypeText      ContentType = "text/plain"
+	ContentTypeHTML      ContentType = "text/html"
+	ContentTypeCSV       ContentType = "text/csv"
+	ContentTypePDF       ContentType = "application/pdf"
+	ContentTypeDocx      ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+	ContentTypeXlsx      ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
 
 var ErrObjectNotFound = fmt.Errorf("object not found")

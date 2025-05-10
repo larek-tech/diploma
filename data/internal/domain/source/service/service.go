@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/url"
 
 	"github.com/google/uuid"
@@ -61,6 +62,8 @@ func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (
 			if err != nil {
 				return fmt.Errorf("failed to publish site job: %w", err)
 			}
+		case source.S3WithCredentials:
+			slog.Info("creating s3 source", "source", src)
 		default:
 			return fmt.Errorf("unsupported source type: %v", src.Type)
 		}

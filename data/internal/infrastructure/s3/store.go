@@ -90,3 +90,6 @@ func (s Store) Download(ctx context.Context, bucketName, key string) (*Object, e
 		metadata:    objInfo.UserMetadata,
 	}, nil
 }
+
+// TODO: add listObjects method
+// TODO: add upload multiple method
