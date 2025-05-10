@@ -21,7 +21,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
     async def ProcessQuery(  # noqa: N802
         self,
         request: ml_pb2_model.ProcessQueryRequest,
-        context: grpc.ServicerContext,
+        context: aio.ServicerContext,
     ) -> AsyncGenerator[ml_pb2_model.ProcessQueryResponse]:
         client_ip = context.peer().split(":")[-1]
         request_id = f"{request.query.userId}-{hash(request.query.content)}"
@@ -46,10 +46,10 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
                 f"gRPC error processing request {request_id}:"
                 f" {e.code()}: {e.details()}"
             )
-            context.abort(e.code(), e.details())
+            await context.abort(e.code(), e.details())
         except TimeoutError:
             logger.error(f"Timeout error processing request {request_id}")
-            context.abort(grpc.StatusCode.DEADLINE_EXCEEDED, "Timeout")
+            await context.abort(grpc.StatusCode.DEADLINE_EXCEEDED, "Timeout")
 
 
 async def serve() -> None:

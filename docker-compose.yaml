@@ -191,6 +191,7 @@ services:
       KAFKA_SERVERS: kafka:29092
     ports:
       - "9998:8080"
+      - "13131:50051"
 
   parser:
     build:
