@@ -1,0 +1,50 @@
+volumes:
+  zoo_data_log: null
+  zoo_data_secrets: null
+  zoo_data: null
+  kafka_data_cfg: null
+  kafka_data: null
+  kafka_data_secrets: null
+
+services:
+  zookeeper:
+    image: 'confluentinc/cp-zookeeper:latest'
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: 'zookeeper:2888:3888'
+    healthcheck:
+      test: 'echo stat | nc localhost 2181'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - 'zoo_data_log:/var/lib/zookeeper/log'
+      - 'zoo_data_secrets:/etc/zookeeper/secrets'
+      - 'zoo_data:/var/lib/zookeeper/data'
+    ports:
+      - '2181:2181'
+      - '2888:2888'
+      - '3888:3888'
+  kafka:
+    image: 'confluentinc/cp-kafka:latest'
+    healthcheck:
+      test: 'ps augwwx | egrep [S]upportedKafka'
+    depends_on:
+      - zookeeper
+    ports:
+      - '39092:39092'
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENERS: 'LISTENER_INT://kafka:29092,LISTENER_EXT://0.0.0.0:39092'
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INT://kafka:29092,LISTENER_EXT://localhost:39092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'LISTENER_INT:PLAINTEXT,LISTENER_EXT:PLAINTEXT'
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INT
+    volumes:
+      - 'kafka_data_cfg:/mnt/shared/config'
+      - 'kafka_data:/var/lib/kafka/data'
+      - 'kafka_data_secrets:/etc/kafka/secrets'
