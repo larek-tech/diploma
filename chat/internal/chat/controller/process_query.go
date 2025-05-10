@@ -51,6 +51,12 @@ func (ctrl *Controller) ProcessQuery(
 	processCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	var queryMeta []byte
+	if m := req.GetMetadata(); m == nil {
+		queryMeta = []byte("{}")
+	} else {
+		queryMeta = m
+	}
 	q := model.QueryDao{
 		UserID:     req.GetUserId(),
 		ChatID:     chatID,
@@ -58,7 +64,7 @@ func (ctrl *Controller) ProcessQuery(
 		DomainID:   req.GetDomainId(),
 		SourceIDs:  req.GetSourceIds(),
 		ScenarioID: req.GetScenarioId(),
-		Metadata:   req.GetMetadata(),
+		Metadata:   queryMeta,
 	}
 	queryID, err := ctrl.cr.InsertQuery(ctx, q)
 	if err != nil {
@@ -100,14 +106,23 @@ func (ctrl *Controller) ProcessQuery(
 		if err == nil {
 			return
 		}
+		ctx, span := ctrl.tracer.Start(
+			context.Background(),
+			"Controller.SetResponseStatusError",
+			trace.WithAttributes(
+				attribute.Int64("queryID", resp.QueryID),
+				attribute.String("chatID", resp.ChatID.String()),
+			),
+		)
+		defer span.End()
 
-		errCh <- errs.WrapErr(err, "processing query")
+		log.Err(errs.WrapErr(err)).Msg("processing query")
 		resp.Status = model.StatusError
 
+		span.SetAttributes(attribute.Int("status", int(resp.Status)))
+
 		if e := ctrl.cr.UpdateResponse(ctx, resp); e != nil {
-			e = errs.WrapErr(e)
-			log.Warn().Err(e).Msg("set response status error")
-			errCh <- e
+			log.Warn().Err(errs.WrapErr(e)).Msg("set response status error")
 		}
 	}()
 

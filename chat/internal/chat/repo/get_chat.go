@@ -11,7 +11,7 @@ import (
 const getChat = `
 	select 
 		(q.id, q.user_id, q.chat_id, q.content, q.domain_id, q.source_ids, q.scenario_id, q.metadata, q.created_at) as query,
-		(r.id, r.query_id, r.chat_id, r.content, r.status, r.metadata, r.created_at, r.updated_at) as response,
+		(r.id, r.query_id, r.chat_id, r.content, r.status, r.created_at, r.updated_at) as response,
 		c.id, c.user_id, c.title, c.created_at, c.updated_at
 	from chat.query q
 	join

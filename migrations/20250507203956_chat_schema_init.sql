@@ -34,7 +34,7 @@ create table chat.query(
     domain_id bigint not null default 0,
     source_ids text[] not null default array[]::text[],
     scenario_id bigint not null default 0,
-    metadata jsonb not null default '{}'::jsonb,
+    metadata jsonb default '{}'::jsonb,
     created_at timestamp not null default current_timestamp
 );
 
@@ -44,7 +44,6 @@ create table chat.response(
     chat_id uuid not null,
     content text not null,
     status int8 not null,
-    metadata jsonb not null default '{}'::jsonb,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp
 );
@@ -64,21 +63,43 @@ create trigger trg_update_response
     for each row
 execute function chat.update_response();
 
+create or replace function chat.touch_chat_on_query()
+    returns trigger as $$
+begin
+    update chat.chat
+    set updated_at = current_timestamp
+    where id = new.chat_id;
+    return new;
+end;
+$$ language plpgsql;
+
 create trigger trg_update_chat_by_query
     after insert on chat.query
     for each row
-execute function chat.update_chat();
+execute function chat.touch_chat_on_query();
+
+create or replace function chat.touch_chat_on_response()
+    returns trigger as $$
+begin
+    update chat.chat
+    set updated_at = current_timestamp
+    where id = new.chat_id;
+    return new;
+end;
+$$ language plpgsql;
 
 create trigger trg_update_chat_by_response
     after insert on chat.response
     for each row
-execute function chat.update_chat();
+execute function chat.touch_chat_on_response();
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
 drop trigger trg_update_chat_by_query on chat.query;
+drop function chat.touch_chat_on_response();
 drop trigger trg_update_chat_by_response on chat.response;
+drop function chat.touch_chat_on_query();
 drop trigger trg_update_response on chat.response;
 drop function chat.update_response();
 drop table chat.response;

@@ -151,6 +151,7 @@ services:
       - kafka_data_cfg:/mnt/shared/config
       - kafka_data:/var/lib/kafka/data
       - kafka_data_secrets:/etc/kafka/secrets
+
   s3:
     container_name: s3_local
     image: quay.io/minio/minio:latest

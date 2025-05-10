@@ -8,7 +8,7 @@ import (
 )
 
 const getResponseByID = `
-	select id, query_id, chat_id, content, status, metadata, created_at, updated_at
+	select id, query_id, chat_id, content, status, created_at, updated_at
 	from chat.response
 	where id = $1;
 `

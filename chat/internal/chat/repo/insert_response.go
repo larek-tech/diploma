@@ -8,8 +8,8 @@ import (
 )
 
 const insertResponse = `
-	insert into chat.response(query_id, chat_id, content, status, metadata)
-	values ($1, $2, $3, $4, $5)
+	insert into chat.response(query_id, chat_id, content, status)
+	values ($1, $2, $3, $4)
 	returning id;
 `
 
@@ -24,7 +24,6 @@ func (r *Repo) InsertResponse(ctx context.Context, resp model.ResponseDao) (int6
 		resp.ChatID,
 		resp.Content,
 		resp.Status,
-		resp.Metadata,
 	); err != nil {
 		return 0, errs.WrapErr(err, "insert response")
 	}

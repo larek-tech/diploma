@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"time"
 
 	"github.com/larek-tech/diploma/chat/internal/auth"
@@ -18,7 +17,7 @@ import (
 // ProcessQuery starts query processing pipeline.
 func (h *Handler) ProcessQuery(req *pb.ProcessQueryRequest, stream grpc.ServerStreamingServer[pb.ChunkedResponse]) error {
 	ctx, span := h.tracer.Start(
-		context.Background(),
+		stream.Context(),
 		"Handler.ProcessQuery",
 		trace.WithAttributes(
 			attribute.Int64("userID", req.GetUserId()),

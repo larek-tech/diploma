@@ -116,7 +116,7 @@ func (h *Handler) Chat(c *websocket.Conn) {
 		msg, err = getMsg(c)
 		if err != nil {
 			sendErr(c, errs.WrapErr(err), "read next query")
-			return
+			continue
 		}
 
 		if msg.Type != model.TypeQuery {
@@ -125,7 +125,7 @@ func (h *Handler) Chat(c *websocket.Conn) {
 				errs.WrapErr(shared.ErrInvalidBody),
 				fmt.Sprintf("unexpected message type: got %s, want %s", msg.Type, model.TypeQuery),
 			)
-			return
+			continue
 		}
 
 		var (
@@ -137,7 +137,7 @@ func (h *Handler) Chat(c *websocket.Conn) {
 			scenarioMeta, err = json.Marshal(msg.QueryMetadata.Scenario)
 			if err != nil {
 				sendErr(c, errs.WrapErr(shared.ErrInvalidBody), "invalid scenario")
-				return
+				continue
 			}
 		}
 
@@ -153,13 +153,13 @@ func (h *Handler) Chat(c *websocket.Conn) {
 		stream, e := h.chatService.ProcessQuery(ctx, processReq)
 		if e != nil {
 			sendErr(c, errs.WrapErr(e), "start processing query")
-			return
+			continue
 		}
 
 		chunk, err = stream.Recv()
 		if err != nil {
 			sendErr(c, errs.WrapErr(err), "read next chunk")
-			return
+			continue
 		}
 
 		// not last chunk
