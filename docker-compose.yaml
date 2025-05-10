@@ -8,8 +8,9 @@ volumes:
   zoo_data_secrets:
   zoo_data:
   kafka_data_cfg:
-  kafka_data:
   kafka_data_secrets:
+  kafka_data:
+  redis_data:
 
 services:
   jaeger:
@@ -285,3 +286,11 @@ services:
 #            - driver: nvidia
 #              count: 1
 #              capabilities: [ gpu ]
+
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
