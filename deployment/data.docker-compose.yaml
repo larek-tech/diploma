@@ -6,7 +6,7 @@ services:
     container_name: postgres_local
     restart: unless-stopped
     env_file:
-      - local.env
+      - configs/data.env
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
@@ -31,7 +31,7 @@ services:
       postgres:
         condition: service_healthy
     env_file:
-        - local.env
+        - configs/data.env
     environment:
       POSTGRES_DB: ${MIGRATOR_POSTGRES_DB:-master}
       POSTGRES_HOST: ${MIGRATOR_POSTGRES_HOST:-postgres_local}
@@ -48,7 +48,7 @@ services:
     depends_on:
       - postgres
     env_file:
-        - local.env
+        - configs/data.env
     environment:
       POSTGRES_DB: ${CRAWLER_POSTGRES_DB:-master}
       POSTGRES_HOST: ${CRAWLER_POSTGRES_HOST:-postgres_local}
@@ -69,7 +69,7 @@ services:
     depends_on:
       - postgres
     env_file:
-        - local.env
+        - configs/data.env
     environment:
       KAFKA_SERVERS: ${PARSER_KAFKA_SERVERS:-kafka:29092}
       POSTGRES_DB: ${PARSER_POSTGRES_DB:-master}
