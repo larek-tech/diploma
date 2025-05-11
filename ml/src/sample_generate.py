@@ -135,7 +135,9 @@ async def main() -> None:
     output_path = "synthetic_dataset.jsonl"
     await generator.save_to_jsonl(dataset, output_path)
 
-    await generator.save_to_redis(dataset, key_prefix="a6bfe96f-45bd-4e4b-8e6f-2c2ef53ca280")
+    await generator.save_to_redis(
+        dataset, key_prefix="a6bfe96f-45bd-4e4b-8e6f-2c2ef53ca280"
+    )
 
     print(f"Сохранено {len(dataset)} QA-пар в {output_path}")
 

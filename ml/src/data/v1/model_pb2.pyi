@@ -61,3 +61,57 @@ class VectorSearchResponse(_message.Message):
         self,
         chunks: _Optional[_Iterable[_Union[DocumentChunk, _Mapping]]] = ...,
     ) -> None: ...
+
+class GetDocumentsIn(_message.Message):
+    __slots__ = ("sourceId", "size", "page")
+    SOURCEID_FIELD_NUMBER: _ClassVar[int]
+    SIZE_FIELD_NUMBER: _ClassVar[int]
+    PAGE_FIELD_NUMBER: _ClassVar[int]
+    sourceId: str
+    size: int
+    page: int
+    def __init__(
+        self,
+        sourceId: _Optional[str] = ...,
+        size: _Optional[int] = ...,
+        page: _Optional[int] = ...,
+    ) -> None: ...
+
+class Document(_message.Message):
+    __slots__ = ("id", "sourceId", "name", "content", "metadata")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    SOURCEID_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    CONTENT_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    sourceId: str
+    name: str
+    content: str
+    metadata: str
+    def __init__(
+        self,
+        id: _Optional[str] = ...,
+        sourceId: _Optional[str] = ...,
+        name: _Optional[str] = ...,
+        content: _Optional[str] = ...,
+        metadata: _Optional[str] = ...,
+    ) -> None: ...
+
+class GetDocumentsOut(_message.Message):
+    __slots__ = ("size", "page", "total", "documents")
+    SIZE_FIELD_NUMBER: _ClassVar[int]
+    PAGE_FIELD_NUMBER: _ClassVar[int]
+    TOTAL_FIELD_NUMBER: _ClassVar[int]
+    DOCUMENTS_FIELD_NUMBER: _ClassVar[int]
+    size: int
+    page: int
+    total: int
+    documents: _containers.RepeatedCompositeFieldContainer[Document]
+    def __init__(
+        self,
+        size: _Optional[int] = ...,
+        page: _Optional[int] = ...,
+        total: _Optional[int] = ...,
+        documents: _Optional[_Iterable[_Union[Document, _Mapping]]] = ...,
+    ) -> None: ...

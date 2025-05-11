@@ -1,12 +1,13 @@
 syntax = "proto3";
 
 import "ml/v1/model.proto";
-
+import "google/protobuf/empty.proto";
 package pb.ml;
 option go_package = "internal/ml/pb";
 
 
 service MLService {
   rpc ProcessQuery (ProcessQueryRequest) returns (stream ProcessQueryResponse) {};
+  rpc GetDefaultParams (google.protobaf.Empty) returns (ModelParams) {};
+  rpc GetOptimalParams (GetOptimalParamsRequest) returns (ModelParams) {};
 };
-

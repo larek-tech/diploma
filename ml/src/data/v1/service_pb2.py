@@ -23,7 +23,7 @@ from data.v1 import model_pb2 as data_dot_v1_dot_model__pb2
 
 
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
-    b'\n\x15\x64\x61ta/v1/service.proto\x12\x07\x64\x61ta.v1\x1a\x13\x64\x61ta/v1/model.proto2\\\n\x0b\x44\x61taService\x12M\n\x0cVectorSearch\x12\x1c.data.v1.VectorSearchRequest\x1a\x1d.data.v1.VectorSearchResponse"\x00\x42\x12Z\x10internal/data/pbb\x06proto3'
+    b'\n\x15\x64\x61ta/v1/service.proto\x12\x07\x64\x61ta.v1\x1a\x13\x64\x61ta/v1/model.proto2\xa1\x01\n\x0b\x44\x61taService\x12M\n\x0cVectorSearch\x12\x1c.data.v1.VectorSearchRequest\x1a\x1d.data.v1.VectorSearchResponse"\x00\x12\x43\n\x0cGetDocuments\x12\x17.data.v1.GetDocumentsIn\x1a\x18.data.v1.GetDocumentsOut"\x00\x42\x12Z\x10internal/data/pbb\x06proto3'
 )
 
 _globals = globals()
@@ -34,6 +34,6 @@ _builder.BuildTopDescriptorsAndMessages(
 if not _descriptor._USE_C_DESCRIPTORS:
     _globals["DESCRIPTOR"]._loaded_options = None
     _globals["DESCRIPTOR"]._serialized_options = b"Z\020internal/data/pb"
-    _globals["_DATASERVICE"]._serialized_start = 55
-    _globals["_DATASERVICE"]._serialized_end = 147
+    _globals["_DATASERVICE"]._serialized_start = 56
+    _globals["_DATASERVICE"]._serialized_end = 217
 # @@protoc_insertion_point(module_scope)
