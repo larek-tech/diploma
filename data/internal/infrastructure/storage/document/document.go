@@ -84,7 +84,7 @@ ORDER BY created_at DESC
 LIMIT $2 OFFSET $3;
 `
 	var docs []*document.Document
-	err := s.db.QueryStruct(ctx, &docs, sqlQuery, sourceID, size, offset)
+	err := s.db.QueryStructs(ctx, &docs, sqlQuery, sourceID, size, offset)
 	if err != nil {
 		return 0, nil, fmt.Errorf("failed to query documents: %w", err)
 	}
@@ -93,8 +93,7 @@ LIMIT $2 OFFSET $3;
 SELECT
 	COUNT(*)
 FROM documents
-WHERE source_id = $1
-ORDER BY created_at DESC;
+WHERE source_id = $1;
 	`
 	err = s.db.QueryStruct(ctx, &total, sqlQuery, sourceID)
 	if err != nil {

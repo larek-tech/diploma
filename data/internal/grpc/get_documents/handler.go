@@ -47,7 +47,7 @@ func (h Handler) GetDocuments(ctx context.Context, in *pb.GetDocumentsIn) (*pb.G
 		Size:      in.Size,
 		Page:      in.Page,
 		Total:     uint32(total),
-		Documents: []*pb.Document{},
+		Documents: pbDocs,
 	}, nil
 }
 

@@ -27,6 +27,7 @@ import (
 	sourceStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/source"
 	"github.com/larek-tech/diploma/data/internal/worker/kafka/create_source"
 	"github.com/larek-tech/storage/postgres"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -181,6 +182,7 @@ func run() int {
 			get_documents.New(documentStore),
 		),
 	)
+	reflection.Register(srv.GetSrv())
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
