@@ -29,10 +29,9 @@ class RAGPipeline:
             device=DEVICE,
         )
 
-    async def generate(
-        self,
-        request: ml_pb2_model.ProcessQueryRequest,
-    ) -> AsyncGenerator[tuple[ml_pb2_model.ProcessQueryResponse, list[str]], None]:
+    async def _prepare_chunks(
+        self, request: ml_pb2_model.ProcessQueryRequest
+    ) -> list[str]:
         questions = [request.query.content]
         if request.scenario.multiQuery.useMultiquery:
             questions += await get_multi_questions(
@@ -84,6 +83,13 @@ class RAGPipeline:
                 top_k=request.scenario.reranker.topK,
                 max_length=request.scenario.reranker.rerankerMaxLength,
             )
+        return chunks
+
+    async def generate_stream(
+        self,
+        request: ml_pb2_model.ProcessQueryRequest,
+    ) -> AsyncGenerator[tuple[str, list[str]], None]:
+        chunks = await self._prepare_chunks(request)
 
         stream = await self.ollama_client.generate(
             prompt=RAG_PROMPT.format(query=request.query.content, docs=chunks),
@@ -94,6 +100,22 @@ class RAGPipeline:
             top_p=request.scenario.model.topP,
             system=request.scenario.model.systemPrompt,
         )
-        # TODO: Refactor
         async for token in stream:
             yield token, chunks
+
+    async def generate(
+        self,
+        request: ml_pb2_model.ProcessQueryRequest,
+    ) -> tuple[str, list[str]]:
+        chunks = await self._prepare_chunks(request)
+
+        response = await self.ollama_client.generate(
+            prompt=RAG_PROMPT.format(query=request.query.content, docs=chunks),
+            model=request.scenario.model.modelName,
+            stream=False,
+            temprature=request.scenario.model.temperature,
+            top_k=request.scenario.model.topK,
+            top_p=request.scenario.model.topP,
+            system=request.scenario.model.systemPrompt,
+        )
+        return response, chunks

@@ -17,6 +17,8 @@ DATA_SERVICE_HOST = os.getenv("DATA_SERVICE_HOST")
 DEFAULT_RERANKER_NAME = os.environ["DEFAULT_RERANKER_NAME"]
 ML_SERVICE_PORT = os.getenv("ML_SERVICE_PORT")
 HF_TOKEN = os.getenv("HF_TOKEN")
+DEFAULT_REDIS_URL = os.getenv("DEFAULT_REDIS_URL")
+DEFAULT_EMBEDER_MODEL = os.getenv("DEFAULT_EMBEDER_MODEL")
 
 MULTI_QUESTION_PROMPT = """
 Переформулируй вопрос: {query}. Предложите {n_questions} различных вариантов, которые помогут рассмотреть тему с разных сторон.
