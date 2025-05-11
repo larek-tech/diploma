@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>WebSocket Chat Tester with Auth</title>
@@ -9,7 +10,9 @@
             margin: 20px;
         }
 
-        textarea, input, select {
+        textarea,
+        input,
+        select {
             width: 100%;
             margin: 5px 0;
         }
@@ -26,8 +29,11 @@
         }
     </style>
 </head>
-<body>
-<h1>WebSocket Chat Tester with JWT Auth</h1>
+<label for="httpBaseUrl">HTTP Base URL:</label>
+<input id="httpBaseUrl" type="text" value="http://localhost:9000">
+<label for="wsBaseUrl">WebSocket Base URL:</label>
+<input id="wsBaseUrl" type="text" value="ws://localhost:9000">
+
 
 <h3>Login</h3>
 <input id="email" placeholder="Email" type="email" value="test@test.com">
@@ -42,7 +48,56 @@
 <button onclick="deleteChat()">🗑️ Delete Selected Chat</button>
 <button onclick="getHistory()">📜 Get History</button>
 <button onclick="connectWebSocket()">🔌 Connect WebSocket</button>
+<h3>Scenario Configuration</h3>
+<fieldset>
+    <legend>LLM Model</legend>
+    <label for="llmModelName">Model Name:</label>
+    <input id="llmModelName" type="text" value="llama3.2:1b">
+    <label for="llmTemperature">Temperature (0-2):</label>
+    <input id="llmTemperature" type="number" step="0.01" value="0.7">
+    <label for="llmTopK">Top K:</label>
+    <input id="llmTopK" type="number" value="50">
+    <label for="llmTopP">Top P (0-1):</label>
+    <input id="llmTopP" type="number" step="0.01" value="0.9">
+    <label for="llmSystemPrompt">System Prompt:</label>
+    <textarea id="llmSystemPrompt">You are a helpful assistant.</textarea>
+</fieldset>
+<fieldset>
+    <legend>MultiQuery Options <input type="checkbox" id="enableMultiQuery"></label>
+        <div id="multiQueryFields" style="display:none;">
+            <label for="mqUseMultiquery">Use Multiquery:</label>
+            <input id="mqUseMultiquery" type="checkbox" checked>
+            <label for="mqNQueries">Number of Queries:</label>
+            <input id="mqNQueries" type="number" value="3">
+            <label for="mqQueryModelName">Query Model Name (optional):</label>
+            <input id="mqQueryModelName" type="text" value="giga-chat-pro">
+        </div>
+</fieldset>
+<fieldset>
+    <legend>Reranker Options <input type="checkbox" id="enableReranker"></label>
+        <div id="rerankerFields" style="display:none;">
+            <label for="rerankUseRerank">Use Rerank:</label>
+            <input id="rerankUseRerank" type="checkbox" checked>
+            <label for="rerankRerankerModel">Reranker Model:</label>
+            <input id="rerankRerankerModel" type="text" value="BAAI/bge-reranker-v2-m3">
+            <label for="rerankRerankerMaxLength">Reranker Max Length:</label>
+            <input id="rerankRerankerMaxLength" type="number" value="512">
+            <label for="rerankTopK">Top K (after rerank):</label>
+            <input id="rerankTopK" type="number" value="3">
+        </div>
+</fieldset>
 
+<fieldset>
+    <legend>Vector Search Options <input type="checkbox" id="enableVectorSearch"></label>
+        <div id="vectorSearchFields" style="display:none;">
+            <label for="vsTopN">Top N (chunks from vector search):</label>
+            <input id="vsTopN" type="number" value="10">
+            <label for="vsThreshold">Threshold (0-1):</label>
+            <input id="vsThreshold" type="number" step="0.01" value="0.7">
+            <label for="vsSearchByQuery">Search By Query:</label>
+            <input id="vsSearchByQuery" type="checkbox" checked>
+        </div>
+</fieldset>
 <h3>Send Message</h3>
 <select id="msgType">
     <option value="auth">auth</option>
@@ -61,13 +116,30 @@
 
 <h3>Messages</h3>
 <div id="messages"></div>
-
 <script>
-    let token = '';
+    document.getElementById('enableMultiQuery').addEventListener('change', function () {
+        document.getElementById('multiQueryFields').style.display = this.checked ? 'block' : 'none';
+    });
+    document.getElementById('enableReranker').addEventListener('change', function () {
+        document.getElementById('rerankerFields').style.display = this.checked ? 'block' : 'none';
+    });
+    document.getElementById('enableVectorSearch').addEventListener('change', function () {
+        document.getElementById('vectorSearchFields').style.display = this.checked ? 'block' : 'none';
+    });
+</script>
+<script>
     let socket = null;
     let currentChatId = null;
-
+    let token = ''; // Initialize token
     let sourceIDs = [];
+
+    function getHttpBaseUrl() {
+        return document.getElementById('httpBaseUrl').value;
+    }
+
+    function getWsBaseUrl() {
+        return document.getElementById('wsBaseUrl').value;
+    }
 
     function addSourceId() {
         const input = document.getElementById('sourceIdInput');
@@ -107,10 +179,11 @@
     async function login() {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        const res = await fetch('http://localhost:9000/auth/v1/login', {
+        const httpBase = getHttpBaseUrl();
+        const res = await fetch(`${httpBase}/auth/v1/login`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email, password})
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
         });
 
         if (!res.ok) {
@@ -125,8 +198,9 @@
     }
 
     async function getChatList() {
-        const res = await fetch('http://localhost:9000/api/v1/chat/list', {
-            headers: {'Authorization': `Bearer ${token}`}
+        const httpBase = getHttpBaseUrl();
+        const res = await fetch(`${httpBase}/api/v1/chat/list`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
         const data = await res.json();
@@ -151,9 +225,10 @@
 
 
     async function createChat() {
-        const res = await fetch('http://localhost:9000/api/v1/chat/', {
+        const httpBase = getHttpBaseUrl();
+        const res = await fetch(`${httpBase}/api/v1/chat/`, {
             method: 'POST',
-            headers: {'Authorization': `Bearer ${token}`}
+            headers: { 'Authorization': `Bearer ${token}` }
         });
         const chat = await res.json();
         log(`Created chat: ${chat.id}`);
@@ -162,9 +237,10 @@
 
     async function deleteChat() {
         if (!currentChatId) return alert('Select a chat');
-        await fetch(`http://localhost:9000/api/v1/chat/${currentChatId}`, {
+        const httpBase = getHttpBaseUrl();
+        await fetch(`${httpBase}/api/v1/chat/${currentChatId}`, {
             method: 'DELETE',
-            headers: {'Authorization': `Bearer ${token}`}
+            headers: { 'Authorization': `Bearer ${token}` }
         });
         log(`Deleted chat ${currentChatId}`);
         getChatList();
@@ -178,8 +254,9 @@
 
     async function getHistory() {
         if (!currentChatId) return alert('Select a chat');
-        const res = await fetch(`http://localhost:9000/api/v1/chat/history/${currentChatId}`, {
-            headers: {'Authorization': `Bearer ${token}`}
+        const httpBase = getHttpBaseUrl();
+        const res = await fetch(`${httpBase}/api/v1/chat/history/${currentChatId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
         const history = await res.json();
         log(`History for ${currentChatId}: ${JSON.stringify(history)}`);
@@ -190,7 +267,8 @@
         if (!token) return alert('Login first');
         if (socket) socket.close();
 
-        socket = new WebSocket(`ws://localhost:9000/api/v1/chat/ws/${currentChatId}`);
+        const wsBase = getWsBaseUrl();
+        socket = new WebSocket(`${wsBase}/api/v1/chat/ws/${currentChatId}`);
 
         socket.onopen = () => {
             log('WebSocket connected');
@@ -201,7 +279,7 @@
                 isChunked: false,
                 isLast: true,
                 sourceIDs: [],
-                queryMetadata: {}
+                queryMetadata: {} // Ensure queryMetadata exists
             };
             socket.send(JSON.stringify(authMsg));
             log(`Sent auth message`);
@@ -211,21 +289,64 @@
         socket.onerror = e => log('WebSocket error');
         socket.onclose = () => log('WebSocket closed');
     }
+    function getScenarioConfig() {
+        const scenario = {
+            // id: parseInt(document.getElementById('scenarioId').value) || 0, // Optional: if you have a scenario ID input
+            model: {
+                modelName: document.getElementById('llmModelName').value,
+                temperature: parseFloat(document.getElementById('llmTemperature').value),
+                topK: parseInt(document.getElementById('llmTopK').value),
+                topP: parseFloat(document.getElementById('llmTopP').value),
+                systemPrompt: document.getElementById('llmSystemPrompt').value
+            }
+        };
 
+        if (document.getElementById('enableMultiQuery').checked) {
+            scenario.multiQuery = {
+                useMultiquery: document.getElementById('mqUseMultiquery').checked,
+                nQueries: parseInt(document.getElementById('mqNQueries').value),
+            };
+            const mqModelName = document.getElementById('mqQueryModelName').value;
+            if (mqModelName) {
+                scenario.multiQuery.queryModelName = mqModelName;
+            }
+        }
+
+        if (document.getElementById('enableReranker').checked) {
+            scenario.reranker = {
+                useRerank: document.getElementById('rerankUseRerank').checked,
+                rerankerModel: document.getElementById('rerankRerankerModel').value,
+                rerankerMaxLength: parseInt(document.getElementById('rerankRerankerMaxLength').value),
+                topK: parseInt(document.getElementById('rerankTopK').value)
+            };
+        }
+
+        if (document.getElementById('enableVectorSearch').checked) {
+            scenario.vectorSearch = {
+                topN: parseInt(document.getElementById('vsTopN').value),
+                threshold: parseFloat(document.getElementById('vsThreshold').value),
+                searchByQuery: document.getElementById('vsSearchByQuery').checked
+            };
+        }
+        return scenario;
+    }
 
     function sendMessage() {
         if (!socket || socket.readyState !== WebSocket.OPEN) return alert('WebSocket not connected');
-        if (sourceIDs.length === 0) return alert('Please add at least one source ID');
+        // Removed the sourceIDs length check for now, adjust if it's strictly needed for all message types
+        // if (sourceIDs.length === 0) return alert('Please add at least one source ID');
+
+        const scenarioConfig = getScenarioConfig();
 
         const msg = {
             type: document.getElementById('msgType').value,
             content: document.getElementById('msgContent').value,
             isChunked: document.getElementById('isChunked').checked,
-            isLast: document.getElementById('isLast').checked,
-            sourceIDs: sourceIDs,
+            isLast: document.getElementById('isLast').checked, // Added isLast
+            sourceIDs: sourceIDs, // Added sourceIDs
             queryMetadata: {
-                domainID: null,
-                scenario: null
+                scenario: scenarioConfig
+                // domainID: "some-domain-if-needed" // Example if you have domainID input
             }
         };
         socket.send(JSON.stringify(msg));
@@ -235,4 +356,5 @@
 
 </script>
 </body>
+
 </html>
