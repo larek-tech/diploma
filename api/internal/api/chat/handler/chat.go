@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 
 	"github.com/gofiber/contrib/websocket"
 	"github.com/larek-tech/diploma/api/internal/api/chat/model"
@@ -14,6 +15,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/yogenyslav/pkg/errs"
 	"go.opentelemetry.io/otel/attribute"
+	"google.golang.org/grpc"
 )
 
 func closeHandler(code int, text string) error {
@@ -78,6 +80,25 @@ func (h *Handler) authorize(c *websocket.Conn, ctx context.Context) (*authpb.Use
 	return userMeta.GetMeta(), nil
 }
 
+func (h *Handler) receiveChunk(stream grpc.ServerStreamingClient[pb.ChunkedResponse]) (*model.SocketMessage, error) {
+	chunk, err := stream.Recv()
+	if err == io.EOF {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, errs.WrapErr(err, "receive next chunk")
+	}
+
+	msg := model.SocketMessage{
+		Type:      model.TypeChunk,
+		Content:   chunk.GetContent(),
+		IsChunked: true,
+	}
+	log.Debug().Str("content", msg.Content).Msg("got chunk")
+	return &msg, nil
+}
+
 // Chat handles websocket connection for sending messages.
 func (h *Handler) Chat(c *websocket.Conn) {
 	ctx := context.Background()
@@ -109,7 +130,8 @@ func (h *Handler) Chat(c *websocket.Conn) {
 	var (
 		msg        model.SocketMessage
 		processReq *pb.ProcessQueryRequest
-		chunk      *pb.ChunkedResponse
+		chunk      *model.SocketMessage
+		errStream  error
 	)
 
 	for {
@@ -141,6 +163,8 @@ func (h *Handler) Chat(c *websocket.Conn) {
 			}
 		}
 
+		ctx = context.WithValue(ctx, "chat-id", chatID)
+
 		processReq = &pb.ProcessQueryRequest{
 			UserId:     userMeta.GetUserId(),
 			ChatId:     chatID,
@@ -156,27 +180,23 @@ func (h *Handler) Chat(c *websocket.Conn) {
 			continue
 		}
 
-		chunk, err = stream.Recv()
-		if err != nil {
-			sendErr(c, errs.WrapErr(err), "read next chunk")
+		chunk, errStream = h.receiveChunk(stream)
+		for chunk != nil && errStream == nil {
+			sendMsg(c, chunk)
+			chunk, errStream = h.receiveChunk(stream)
+		}
+
+		if errStream != nil {
+			sendErr(c, errs.WrapErr(err), "receive next chunk")
 			continue
 		}
 
-		// not last chunk
-		if sourceIDs := chunk.GetSourceIds(); sourceIDs == nil {
-			msg = model.SocketMessage{
-				Type:      model.TypeChunk,
-				Content:   chunk.GetContent(),
-				IsChunked: true,
-			}
-		} else {
-			msg = model.SocketMessage{
-				Type:      model.TypeChunk,
-				IsChunked: true,
-				IsLast:    true,
-				SourceIDs: sourceIDs,
-			}
+		chunk = &model.SocketMessage{
+			Type:      model.TypeChunk,
+			IsChunked: true,
+			IsLast:    true,
+			SourceIDs: msg.SourceIDs,
 		}
-		sendMsg(c, &msg)
+		sendMsg(c, chunk)
 	}
 }

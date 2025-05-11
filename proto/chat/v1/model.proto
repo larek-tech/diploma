@@ -32,9 +32,8 @@ message Response {
   string chatId = 3;
   string content = 4;
   ResponseStatus status = 5;
-  optional bytes metadata = 6;
-  google.protobuf.Timestamp createdAt = 7;
-  google.protobuf.Timestamp updatedAt = 8;
+  google.protobuf.Timestamp createdAt = 6;
+  google.protobuf.Timestamp updatedAt = 7;
 };
 
 message Content {
