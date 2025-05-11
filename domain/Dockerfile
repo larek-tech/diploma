@@ -1,6 +1,6 @@
 FROM golang:1.24.2-alpine AS builder
 WORKDIR /builder
-
+ENV KAFKA_OPTS="-Djava.net.preferIPv4Stack=True"
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o ./main ./cmd/server/main.go
 

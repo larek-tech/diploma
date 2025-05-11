@@ -6,7 +6,7 @@ services:
     container_name: postgres_local
     restart: unless-stopped
     env_file:
-      - configs/data.env
+      - configs/data.migrator.env
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
@@ -48,18 +48,19 @@ services:
     depends_on:
       - postgres
     env_file:
-        - configs/data.env
+        - configs/data.crawler.env
     environment:
       POSTGRES_DB: ${CRAWLER_POSTGRES_DB:-master}
       POSTGRES_HOST: ${CRAWLER_POSTGRES_HOST:-postgres_local}
       POSTGRES_PORT: ${CRAWLER_POSTGRES_PORT:-5432}
       POSTGRES_USER: ${CRAWLER_POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${CRAWLER_POSTGRES_PASSWORD:-password}
-      OLLAMA_HOST: ${CRAWLER_OLLAMA_HOST:-http://ollama_local:11434}
+      OLLAMA_HOST: ${CRAWLER_OLLAMA_HOST:-http://ollama:11434}
       OLLAMA_MODEL: ${CRAWLER_OLLAMA_MODEL:-bge-m3:latest}
       KAFKA_SERVERS: ${CRAWLER_KAFKA_SERVERS:-kafka:29092}
     ports:
       - "9998:8080"
+      - "50051:50051"
   parser:
     build:
       context: ../data
@@ -69,7 +70,7 @@ services:
     depends_on:
       - postgres
     env_file:
-        - configs/data.env
+        - configs/data.parser.env
     environment:
       KAFKA_SERVERS: ${PARSER_KAFKA_SERVERS:-kafka:29092}
       POSTGRES_DB: ${PARSER_POSTGRES_DB:-master}
@@ -77,9 +78,9 @@ services:
       POSTGRES_PORT: ${PARSER_POSTGRES_PORT:-5432}
       POSTGRES_USER: ${PARSER_POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${PARSER_POSTGRES_PASSWORD:-password}
-      OLLAMA_LLM_ENDPOINT: ${PARSER_OLLAMA_LLM_ENDPOINT:-http://ollama_local:11434}
+      OLLAMA_LLM_ENDPOINT: ${PARSER_OLLAMA_LLM_ENDPOINT:-http://ollama:11434}
       OLLAMA_LLM_MODEL: ${PARSER_OLLAMA_LLM_MODEL:-llama3.2}
-      OLLAMA_EMBEDDER_ENDPOINT: ${PARSER_OLLAMA_EMBEDDER_ENDPOINT:-http://ollama_local:11434}
+      OLLAMA_EMBEDDER_ENDPOINT: ${PARSER_OLLAMA_EMBEDDER_ENDPOINT:-http://ollama:11434}
       OLLAMA_EMBEDDER_MODEL: ${PARSER_OLLAMA_EMBEDDER_MODEL:-bge-m3:latest}
       S3_ENDPOINT: ${PARSER_S3_ENDPOINT:-s3:9000}
       S3_ACCESS_KEY_ID: ${PARSER_S3_ACCESS_KEY_ID:-minio}

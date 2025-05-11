@@ -1,3 +1,7 @@
+networks:
+  deployment_diploma-net:
+    external: true
+
 volumes:
   pg_data:
     driver: local
@@ -22,8 +26,7 @@ services:
       context: ../api
       dockerfile: Dockerfile
     restart: always
-    volumes:
-      - configs/api.yaml:/prod/configs/config.yaml
+    
     ports:
       - "9000:9000"
     depends_on:
@@ -35,8 +38,6 @@ services:
       context: ../auth
       dockerfile: Dockerfile
     restart: always
-    volumes:
-      - configs/auth.yaml:/prod/configs/config.yaml
     ports:
       - "9001:9001"
     depends_on:
@@ -47,8 +48,6 @@ services:
       context: ../chat
       dockerfile: Dockerfile
     restart: always
-    volumes:
-      - configs/chat.yaml:/prod/configs/config.yaml
     ports:
       - "9002:9002"
     depends_on:
@@ -59,8 +58,6 @@ services:
       context: ../domain
       dockerfile: Dockerfile
     restart: always
-    volumes:
-      - configs/domain.yaml:/prod/configs/config.yaml
     ports:
       - "9003:9003"
     depends_on:
