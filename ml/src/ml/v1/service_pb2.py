@@ -4,18 +4,15 @@
 # source: ml/v1/service.proto
 # Protobuf Python Version: 5.29.0
 """Generated protocol buffer code."""
+
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import runtime_version as _runtime_version
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
+
 _runtime_version.ValidateProtobufRuntimeVersion(
-    _runtime_version.Domain.PUBLIC,
-    5,
-    29,
-    0,
-    '',
-    'ml/v1/service.proto'
+    _runtime_version.Domain.PUBLIC, 5, 29, 0, "", "ml/v1/service.proto"
 )
 # @@protoc_insertion_point(imports)
 
@@ -25,14 +22,18 @@ _sym_db = _symbol_database.Default()
 from ml.v1 import model_pb2 as ml_dot_v1_dot_model__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13ml/v1/service.proto\x12\x05pb.ml\x1a\x11ml/v1/model.proto2X\n\tMLService\x12K\n\x0cProcessQuery\x12\x1a.pb.ml.ProcessQueryRequest\x1a\x1b.pb.ml.ProcessQueryResponse\"\x00\x30\x01\x42\x14Z\x12internal/domain/pbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
+    b'\n\x13ml/v1/service.proto\x12\x05pb.ml\x1a\x11ml/v1/model.proto2\xac\x01\n\tMLService\x12K\n\x0cProcessQuery\x12\x1a.pb.ml.ProcessQueryRequest\x1a\x1b.pb.ml.ProcessQueryResponse"\x00\x30\x01\x12R\n\x0fProcessScenario\x12\x1d.pb.ml.ProcessScenarioRequest\x1a\x1e.pb.ml.ProcessScenarioResponse"\x00\x42\x10Z\x0einternal/ml/pbb\x06proto3'
+)
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'ml.v1.service_pb2', _globals)
+_builder.BuildTopDescriptorsAndMessages(
+    DESCRIPTOR, "ml.v1.service_pb2", _globals
+)
 if not _descriptor._USE_C_DESCRIPTORS:
-  _globals['DESCRIPTOR']._loaded_options = None
-  _globals['DESCRIPTOR']._serialized_options = b'Z\022internal/domain/pb'
-  _globals['_MLSERVICE']._serialized_start=49
-  _globals['_MLSERVICE']._serialized_end=137
+    _globals["DESCRIPTOR"]._loaded_options = None
+    _globals["DESCRIPTOR"]._serialized_options = b"Z\016internal/ml/pb"
+    _globals["_MLSERVICE"]._serialized_start = 50
+    _globals["_MLSERVICE"]._serialized_end = 222
 # @@protoc_insertion_point(module_scope)

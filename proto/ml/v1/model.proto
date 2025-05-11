@@ -62,3 +62,14 @@ message ProcessQueryResponse {
   Chunk chunk = 1;
   repeated string sourceIds = 2;
 };
+
+message ModelParams{
+  optional MultiQuery multiQuery = 1;
+  optional Reranker reranker = 2;
+  optional VectorSearch vectorSearch = 3;
+  LlmModel model = 4;
+};
+
+message GetOptimalParamsRequest{
+  repeated string sourceIds = 1;
+}

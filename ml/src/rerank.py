@@ -1,3 +1,4 @@
+import heapq
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
@@ -78,7 +79,6 @@ class Reranker:
                 self.reranker_model(**features).logits.squeeze().cpu().numpy()
             )
 
-        doc_score_pairs = list(zip(documents, scores, strict=False))
-        ranked_docs = sorted(doc_score_pairs, key=lambda x: x[1], reverse=True)
-
-        return list(zip(*ranked_docs[:top_k], strict=False))
+        doc_score_pairs = zip(documents, scores, strict=False)
+        top_docs = heapq.nlargest(top_k, doc_score_pairs, key=lambda x: x[1])
+        return [doc for doc, _ in top_docs]

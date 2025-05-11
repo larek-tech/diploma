@@ -1,6 +1,5 @@
 import asyncio
 
-import grpc
 from grpc import aio
 
 import data.v1.model_pb2 as pb
@@ -64,6 +63,28 @@ class AsyncDataServiceClient:
             useQuestions=use_questions,
         )
         return await self.stub.VectorSearch(request)
+
+    async def get_documents(
+        self, source_id: str, size: int = 10, page: int = 1
+    ) -> pb.GetDocumentsOut:
+        """Получает документы по source_id с пагинацией.
+
+        Parameters
+        ----------
+        source_id : str
+            Идентификатор источника.
+        size : int, optional
+            Количество документов на странице.
+        page : int, optional
+            Номер страницы.
+
+        Returns
+        -------
+        pb.GetDocumentsOut
+            Ответ с документами от сервера.
+        """
+        request = pb.GetDocumentsIn(sourceId=source_id, size=size, page=page)
+        return await self.stub.GetDocuments(request)
 
 
 async def main() -> None:
