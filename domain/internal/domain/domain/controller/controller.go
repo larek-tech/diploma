@@ -58,7 +58,7 @@ func (ctrl *Controller) checkDomainCreator(ctx context.Context, domainID int64, 
 	defer span.End()
 
 	roles := meta.GetRoles()
-	if !slices.Contains(roles, auth.AdminUserID) {
+	if !slices.Contains(roles, auth.AdminRoleID) {
 		domain, err := ctrl.dr.GetDomainByID(ctx, domainID, userID, roles)
 		if err != nil {
 			return errs.WrapErr(err)

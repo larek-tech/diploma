@@ -493,27 +493,27 @@ func (x *GetSourceRequest) GetSourceId() int64 {
 	return 0
 }
 
-type GetSourceResponse struct {
+type GetSourceIDsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Source        *Source                `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
+	SourceIds     []int64                `protobuf:"varint,1,rep,packed,name=sourceIds,proto3" json:"sourceIds,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetSourceResponse) Reset() {
-	*x = GetSourceResponse{}
+func (x *GetSourceIDsRequest) Reset() {
+	*x = GetSourceIDsRequest{}
 	mi := &file_domain_v1_source_model_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetSourceResponse) String() string {
+func (x *GetSourceIDsRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetSourceResponse) ProtoMessage() {}
+func (*GetSourceIDsRequest) ProtoMessage() {}
 
-func (x *GetSourceResponse) ProtoReflect() protoreflect.Message {
+func (x *GetSourceIDsRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_domain_v1_source_model_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -525,14 +525,58 @@ func (x *GetSourceResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSourceResponse.ProtoReflect.Descriptor instead.
-func (*GetSourceResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetSourceIDsRequest.ProtoReflect.Descriptor instead.
+func (*GetSourceIDsRequest) Descriptor() ([]byte, []int) {
 	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *GetSourceResponse) GetSource() *Source {
+func (x *GetSourceIDsRequest) GetSourceIds() []int64 {
 	if x != nil {
-		return x.Source
+		return x.SourceIds
+	}
+	return nil
+}
+
+type GetSourceIDsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SourceIds     []string               `protobuf:"bytes,2,rep,name=sourceIds,proto3" json:"sourceIds,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSourceIDsResponse) Reset() {
+	*x = GetSourceIDsResponse{}
+	mi := &file_domain_v1_source_model_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSourceIDsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSourceIDsResponse) ProtoMessage() {}
+
+func (x *GetSourceIDsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_domain_v1_source_model_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSourceIDsResponse.ProtoReflect.Descriptor instead.
+func (*GetSourceIDsResponse) Descriptor() ([]byte, []int) {
+	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetSourceIDsResponse) GetSourceIds() []string {
+	if x != nil {
+		return x.SourceIds
 	}
 	return nil
 }
@@ -550,7 +594,7 @@ type UpdateSourceRequest struct {
 
 func (x *UpdateSourceRequest) Reset() {
 	*x = UpdateSourceRequest{}
-	mi := &file_domain_v1_source_model_proto_msgTypes[6]
+	mi := &file_domain_v1_source_model_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -562,7 +606,7 @@ func (x *UpdateSourceRequest) String() string {
 func (*UpdateSourceRequest) ProtoMessage() {}
 
 func (x *UpdateSourceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_source_model_proto_msgTypes[6]
+	mi := &file_domain_v1_source_model_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -575,7 +619,7 @@ func (x *UpdateSourceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSourceRequest.ProtoReflect.Descriptor instead.
 func (*UpdateSourceRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{6}
+	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UpdateSourceRequest) GetSourceId() int64 {
@@ -622,7 +666,7 @@ type DeleteSourceRequest struct {
 
 func (x *DeleteSourceRequest) Reset() {
 	*x = DeleteSourceRequest{}
-	mi := &file_domain_v1_source_model_proto_msgTypes[7]
+	mi := &file_domain_v1_source_model_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -634,7 +678,7 @@ func (x *DeleteSourceRequest) String() string {
 func (*DeleteSourceRequest) ProtoMessage() {}
 
 func (x *DeleteSourceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_source_model_proto_msgTypes[7]
+	mi := &file_domain_v1_source_model_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -647,7 +691,7 @@ func (x *DeleteSourceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteSourceRequest.ProtoReflect.Descriptor instead.
 func (*DeleteSourceRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{7}
+	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *DeleteSourceRequest) GetSourceId() int64 {
@@ -667,7 +711,7 @@ type ListSourcesRequest struct {
 
 func (x *ListSourcesRequest) Reset() {
 	*x = ListSourcesRequest{}
-	mi := &file_domain_v1_source_model_proto_msgTypes[8]
+	mi := &file_domain_v1_source_model_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -679,7 +723,7 @@ func (x *ListSourcesRequest) String() string {
 func (*ListSourcesRequest) ProtoMessage() {}
 
 func (x *ListSourcesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_source_model_proto_msgTypes[8]
+	mi := &file_domain_v1_source_model_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -692,7 +736,7 @@ func (x *ListSourcesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSourcesRequest.ProtoReflect.Descriptor instead.
 func (*ListSourcesRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{8}
+	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ListSourcesRequest) GetOffset() uint64 {
@@ -718,7 +762,7 @@ type ListSourcesResponse struct {
 
 func (x *ListSourcesResponse) Reset() {
 	*x = ListSourcesResponse{}
-	mi := &file_domain_v1_source_model_proto_msgTypes[9]
+	mi := &file_domain_v1_source_model_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -730,7 +774,7 @@ func (x *ListSourcesResponse) String() string {
 func (*ListSourcesResponse) ProtoMessage() {}
 
 func (x *ListSourcesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_source_model_proto_msgTypes[9]
+	mi := &file_domain_v1_source_model_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -743,7 +787,7 @@ func (x *ListSourcesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSourcesResponse.ProtoReflect.Descriptor instead.
 func (*ListSourcesResponse) Descriptor() ([]byte, []int) {
-	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{9}
+	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ListSourcesResponse) GetSources() []*Source {
@@ -795,9 +839,11 @@ const file_domain_v1_source_model_proto_rawDesc = "" +
 	"\r_updateParamsB\x0e\n" +
 	"\f_credentials\".\n" +
 	"\x10GetSourceRequest\x12\x1a\n" +
-	"\bsourceId\x18\x01 \x01(\x03R\bsourceId\">\n" +
-	"\x11GetSourceResponse\x12)\n" +
-	"\x06source\x18\x01 \x01(\v2\x11.domain.v1.SourceR\x06source\"\x8b\x02\n" +
+	"\bsourceId\x18\x01 \x01(\x03R\bsourceId\"3\n" +
+	"\x13GetSourceIDsRequest\x12\x1c\n" +
+	"\tsourceIds\x18\x01 \x03(\x03R\tsourceIds\"4\n" +
+	"\x14GetSourceIDsResponse\x12\x1c\n" +
+	"\tsourceIds\x18\x02 \x03(\tR\tsourceIds\"\x8b\x02\n" +
 	"\x13UpdateSourceRequest\x12\x1a\n" +
 	"\bsourceId\x18\x01 \x01(\x03R\bsourceId\x12\x19\n" +
 	"\x05title\x18\x02 \x01(\tH\x00R\x05title\x88\x01\x01\x12\x1d\n" +
@@ -842,7 +888,7 @@ func file_domain_v1_source_model_proto_rawDescGZIP() []byte {
 }
 
 var file_domain_v1_source_model_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_domain_v1_source_model_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_domain_v1_source_model_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_domain_v1_source_model_proto_goTypes = []any{
 	(SourceType)(0),               // 0: domain.v1.SourceType
 	(SourceStatus)(0),             // 1: domain.v1.SourceStatus
@@ -851,30 +897,30 @@ var file_domain_v1_source_model_proto_goTypes = []any{
 	(*Source)(nil),                // 4: domain.v1.Source
 	(*CreateSourceRequest)(nil),   // 5: domain.v1.CreateSourceRequest
 	(*GetSourceRequest)(nil),      // 6: domain.v1.GetSourceRequest
-	(*GetSourceResponse)(nil),     // 7: domain.v1.GetSourceResponse
-	(*UpdateSourceRequest)(nil),   // 8: domain.v1.UpdateSourceRequest
-	(*DeleteSourceRequest)(nil),   // 9: domain.v1.DeleteSourceRequest
-	(*ListSourcesRequest)(nil),    // 10: domain.v1.ListSourcesRequest
-	(*ListSourcesResponse)(nil),   // 11: domain.v1.ListSourcesResponse
-	(*timestamppb.Timestamp)(nil), // 12: google.protobuf.Timestamp
+	(*GetSourceIDsRequest)(nil),   // 7: domain.v1.GetSourceIDsRequest
+	(*GetSourceIDsResponse)(nil),  // 8: domain.v1.GetSourceIDsResponse
+	(*UpdateSourceRequest)(nil),   // 9: domain.v1.UpdateSourceRequest
+	(*DeleteSourceRequest)(nil),   // 10: domain.v1.DeleteSourceRequest
+	(*ListSourcesRequest)(nil),    // 11: domain.v1.ListSourcesRequest
+	(*ListSourcesResponse)(nil),   // 12: domain.v1.ListSourcesResponse
+	(*timestamppb.Timestamp)(nil), // 13: google.protobuf.Timestamp
 }
 var file_domain_v1_source_model_proto_depIdxs = []int32{
 	2,  // 0: domain.v1.UpdateParams.cron:type_name -> domain.v1.CronFormat
 	0,  // 1: domain.v1.Source.typ:type_name -> domain.v1.SourceType
 	3,  // 2: domain.v1.Source.updateParams:type_name -> domain.v1.UpdateParams
 	1,  // 3: domain.v1.Source.status:type_name -> domain.v1.SourceStatus
-	12, // 4: domain.v1.Source.createdAt:type_name -> google.protobuf.Timestamp
-	12, // 5: domain.v1.Source.updatedAt:type_name -> google.protobuf.Timestamp
+	13, // 4: domain.v1.Source.createdAt:type_name -> google.protobuf.Timestamp
+	13, // 5: domain.v1.Source.updatedAt:type_name -> google.protobuf.Timestamp
 	0,  // 6: domain.v1.CreateSourceRequest.typ:type_name -> domain.v1.SourceType
 	3,  // 7: domain.v1.CreateSourceRequest.updateParams:type_name -> domain.v1.UpdateParams
-	4,  // 8: domain.v1.GetSourceResponse.source:type_name -> domain.v1.Source
-	3,  // 9: domain.v1.UpdateSourceRequest.updateParams:type_name -> domain.v1.UpdateParams
-	4,  // 10: domain.v1.ListSourcesResponse.sources:type_name -> domain.v1.Source
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	3,  // 8: domain.v1.UpdateSourceRequest.updateParams:type_name -> domain.v1.UpdateParams
+	4,  // 9: domain.v1.ListSourcesResponse.sources:type_name -> domain.v1.Source
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_domain_v1_source_model_proto_init() }
@@ -885,14 +931,14 @@ func file_domain_v1_source_model_proto_init() {
 	file_domain_v1_source_model_proto_msgTypes[1].OneofWrappers = []any{}
 	file_domain_v1_source_model_proto_msgTypes[2].OneofWrappers = []any{}
 	file_domain_v1_source_model_proto_msgTypes[3].OneofWrappers = []any{}
-	file_domain_v1_source_model_proto_msgTypes[6].OneofWrappers = []any{}
+	file_domain_v1_source_model_proto_msgTypes[7].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_domain_v1_source_model_proto_rawDesc), len(file_domain_v1_source_model_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

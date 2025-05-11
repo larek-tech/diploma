@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package domain.v1;
+option go_package = "internal/domain/pb";
+
+import "domain/v1/role_model.proto";
+import "google/protobuf/empty.proto";
+
+service RoleService {
+    rpc CreateRole(CreateRoleRequest) returns (Role) {};
+    rpc GetRole(GetRoleRequest) returns (Role) {};
+    rpc DeleteRole(DeleteRoleRequest) returns (google.protobuf.Empty) {};
+    rpc ListRoles(ListRolesRequest) returns (ListRolesResponse) {};
+    rpc SetRole(UpdateRoleRequest) returns (google.protobuf.Empty) {};
+    rpc RemoveRole(UpdateRoleRequest) returns (google.protobuf.Empty) {};
+};

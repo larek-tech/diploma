@@ -29,6 +29,7 @@ type Domain struct {
 	SourceIds     []int64                `protobuf:"varint,3,rep,packed,name=sourceIds,proto3" json:"sourceIds,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	ScenarioIds   []int64                `protobuf:"varint,6,rep,packed,name=scenarioIds,proto3" json:"scenarioIds,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -94,6 +95,13 @@ func (x *Domain) GetCreatedAt() *timestamppb.Timestamp {
 func (x *Domain) GetUpdatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.UpdatedAt
+	}
+	return nil
+}
+
+func (x *Domain) GetScenarioIds() []int64 {
+	if x != nil {
+		return x.ScenarioIds
 	}
 	return nil
 }
@@ -194,62 +202,19 @@ func (x *GetDomainRequest) GetDomainId() int64 {
 	return 0
 }
 
-type GetDomainResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Domain        *Domain                `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetDomainResponse) Reset() {
-	*x = GetDomainResponse{}
-	mi := &file_domain_v1_domain_model_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetDomainResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetDomainResponse) ProtoMessage() {}
-
-func (x *GetDomainResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_domain_model_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetDomainResponse.ProtoReflect.Descriptor instead.
-func (*GetDomainResponse) Descriptor() ([]byte, []int) {
-	return file_domain_v1_domain_model_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *GetDomainResponse) GetDomain() *Domain {
-	if x != nil {
-		return x.Domain
-	}
-	return nil
-}
-
 type UpdateDomainRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	DomainId      int64                  `protobuf:"varint,1,opt,name=domainId,proto3" json:"domainId,omitempty"`
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	SourceIds     []int64                `protobuf:"varint,3,rep,packed,name=sourceIds,proto3" json:"sourceIds,omitempty"`
+	ScenarioIds   []int64                `protobuf:"varint,4,rep,packed,name=scenarioIds,proto3" json:"scenarioIds,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UpdateDomainRequest) Reset() {
 	*x = UpdateDomainRequest{}
-	mi := &file_domain_v1_domain_model_proto_msgTypes[4]
+	mi := &file_domain_v1_domain_model_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -261,7 +226,7 @@ func (x *UpdateDomainRequest) String() string {
 func (*UpdateDomainRequest) ProtoMessage() {}
 
 func (x *UpdateDomainRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_domain_model_proto_msgTypes[4]
+	mi := &file_domain_v1_domain_model_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -274,7 +239,7 @@ func (x *UpdateDomainRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateDomainRequest.ProtoReflect.Descriptor instead.
 func (*UpdateDomainRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_domain_model_proto_rawDescGZIP(), []int{4}
+	return file_domain_v1_domain_model_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *UpdateDomainRequest) GetDomainId() int64 {
@@ -298,6 +263,13 @@ func (x *UpdateDomainRequest) GetSourceIds() []int64 {
 	return nil
 }
 
+func (x *UpdateDomainRequest) GetScenarioIds() []int64 {
+	if x != nil {
+		return x.ScenarioIds
+	}
+	return nil
+}
+
 type DeleteDomainRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	DomainId      int64                  `protobuf:"varint,1,opt,name=domainId,proto3" json:"domainId,omitempty"`
@@ -307,7 +279,7 @@ type DeleteDomainRequest struct {
 
 func (x *DeleteDomainRequest) Reset() {
 	*x = DeleteDomainRequest{}
-	mi := &file_domain_v1_domain_model_proto_msgTypes[5]
+	mi := &file_domain_v1_domain_model_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -319,7 +291,7 @@ func (x *DeleteDomainRequest) String() string {
 func (*DeleteDomainRequest) ProtoMessage() {}
 
 func (x *DeleteDomainRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_domain_model_proto_msgTypes[5]
+	mi := &file_domain_v1_domain_model_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -332,7 +304,7 @@ func (x *DeleteDomainRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteDomainRequest.ProtoReflect.Descriptor instead.
 func (*DeleteDomainRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_domain_model_proto_rawDescGZIP(), []int{5}
+	return file_domain_v1_domain_model_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DeleteDomainRequest) GetDomainId() int64 {
@@ -352,7 +324,7 @@ type ListDomainsRequest struct {
 
 func (x *ListDomainsRequest) Reset() {
 	*x = ListDomainsRequest{}
-	mi := &file_domain_v1_domain_model_proto_msgTypes[6]
+	mi := &file_domain_v1_domain_model_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -364,7 +336,7 @@ func (x *ListDomainsRequest) String() string {
 func (*ListDomainsRequest) ProtoMessage() {}
 
 func (x *ListDomainsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_domain_model_proto_msgTypes[6]
+	mi := &file_domain_v1_domain_model_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -377,7 +349,7 @@ func (x *ListDomainsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDomainsRequest.ProtoReflect.Descriptor instead.
 func (*ListDomainsRequest) Descriptor() ([]byte, []int) {
-	return file_domain_v1_domain_model_proto_rawDescGZIP(), []int{6}
+	return file_domain_v1_domain_model_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ListDomainsRequest) GetOffset() uint64 {
@@ -403,7 +375,7 @@ type ListDomainsResponse struct {
 
 func (x *ListDomainsResponse) Reset() {
 	*x = ListDomainsResponse{}
-	mi := &file_domain_v1_domain_model_proto_msgTypes[7]
+	mi := &file_domain_v1_domain_model_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -415,7 +387,7 @@ func (x *ListDomainsResponse) String() string {
 func (*ListDomainsResponse) ProtoMessage() {}
 
 func (x *ListDomainsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_domain_model_proto_msgTypes[7]
+	mi := &file_domain_v1_domain_model_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -428,7 +400,7 @@ func (x *ListDomainsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDomainsResponse.ProtoReflect.Descriptor instead.
 func (*ListDomainsResponse) Descriptor() ([]byte, []int) {
-	return file_domain_v1_domain_model_proto_rawDescGZIP(), []int{7}
+	return file_domain_v1_domain_model_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ListDomainsResponse) GetDomains() []*Domain {
@@ -442,24 +414,24 @@ var File_domain_v1_domain_model_proto protoreflect.FileDescriptor
 
 const file_domain_v1_domain_model_proto_rawDesc = "" +
 	"\n" +
-	"\x1cdomain/v1/domain_model.proto\x12\tdomain.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc0\x01\n" +
+	"\x1cdomain/v1/domain_model.proto\x12\tdomain.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe2\x01\n" +
 	"\x06Domain\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1c\n" +
 	"\tsourceIds\x18\x03 \x03(\x03R\tsourceIds\x128\n" +
 	"\tcreatedAt\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
-	"\tupdatedAt\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"I\n" +
+	"\tupdatedAt\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12 \n" +
+	"\vscenarioIds\x18\x06 \x03(\x03R\vscenarioIds\"I\n" +
 	"\x13CreateDomainRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x1c\n" +
 	"\tsourceIds\x18\x02 \x03(\x03R\tsourceIds\".\n" +
 	"\x10GetDomainRequest\x12\x1a\n" +
-	"\bdomainId\x18\x01 \x01(\x03R\bdomainId\">\n" +
-	"\x11GetDomainResponse\x12)\n" +
-	"\x06domain\x18\x01 \x01(\v2\x11.domain.v1.DomainR\x06domain\"e\n" +
+	"\bdomainId\x18\x01 \x01(\x03R\bdomainId\"\x87\x01\n" +
 	"\x13UpdateDomainRequest\x12\x1a\n" +
 	"\bdomainId\x18\x01 \x01(\x03R\bdomainId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1c\n" +
-	"\tsourceIds\x18\x03 \x03(\x03R\tsourceIds\"1\n" +
+	"\tsourceIds\x18\x03 \x03(\x03R\tsourceIds\x12 \n" +
+	"\vscenarioIds\x18\x04 \x03(\x03R\vscenarioIds\"1\n" +
 	"\x13DeleteDomainRequest\x12\x1a\n" +
 	"\bdomainId\x18\x01 \x01(\x03R\bdomainId\"B\n" +
 	"\x12ListDomainsRequest\x12\x16\n" +
@@ -480,28 +452,26 @@ func file_domain_v1_domain_model_proto_rawDescGZIP() []byte {
 	return file_domain_v1_domain_model_proto_rawDescData
 }
 
-var file_domain_v1_domain_model_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_domain_v1_domain_model_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_domain_v1_domain_model_proto_goTypes = []any{
 	(*Domain)(nil),                // 0: domain.v1.Domain
 	(*CreateDomainRequest)(nil),   // 1: domain.v1.CreateDomainRequest
 	(*GetDomainRequest)(nil),      // 2: domain.v1.GetDomainRequest
-	(*GetDomainResponse)(nil),     // 3: domain.v1.GetDomainResponse
-	(*UpdateDomainRequest)(nil),   // 4: domain.v1.UpdateDomainRequest
-	(*DeleteDomainRequest)(nil),   // 5: domain.v1.DeleteDomainRequest
-	(*ListDomainsRequest)(nil),    // 6: domain.v1.ListDomainsRequest
-	(*ListDomainsResponse)(nil),   // 7: domain.v1.ListDomainsResponse
-	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
+	(*UpdateDomainRequest)(nil),   // 3: domain.v1.UpdateDomainRequest
+	(*DeleteDomainRequest)(nil),   // 4: domain.v1.DeleteDomainRequest
+	(*ListDomainsRequest)(nil),    // 5: domain.v1.ListDomainsRequest
+	(*ListDomainsResponse)(nil),   // 6: domain.v1.ListDomainsResponse
+	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
 }
 var file_domain_v1_domain_model_proto_depIdxs = []int32{
-	8, // 0: domain.v1.Domain.createdAt:type_name -> google.protobuf.Timestamp
-	8, // 1: domain.v1.Domain.updatedAt:type_name -> google.protobuf.Timestamp
-	0, // 2: domain.v1.GetDomainResponse.domain:type_name -> domain.v1.Domain
-	0, // 3: domain.v1.ListDomainsResponse.domains:type_name -> domain.v1.Domain
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	7, // 0: domain.v1.Domain.createdAt:type_name -> google.protobuf.Timestamp
+	7, // 1: domain.v1.Domain.updatedAt:type_name -> google.protobuf.Timestamp
+	0, // 2: domain.v1.ListDomainsResponse.domains:type_name -> domain.v1.Domain
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_domain_v1_domain_model_proto_init() }
@@ -515,7 +485,7 @@ func file_domain_v1_domain_model_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_domain_v1_domain_model_proto_rawDesc), len(file_domain_v1_domain_model_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

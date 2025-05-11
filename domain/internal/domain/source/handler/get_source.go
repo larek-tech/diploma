@@ -14,7 +14,7 @@ import (
 )
 
 // GetSource returns source by id.
-func (h *Handler) GetSource(ctx context.Context, req *pb.GetSourceRequest) (*pb.GetSourceResponse, error) {
+func (h *Handler) GetSource(ctx context.Context, req *pb.GetSourceRequest) (*pb.Source, error) {
 	meta, err := auth.GetUserMeta(ctx)
 	if err != nil {
 		log.Err(errs.WrapErr(err)).Msg("get user meta")

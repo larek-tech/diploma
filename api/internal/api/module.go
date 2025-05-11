@@ -21,7 +21,7 @@ import (
 // SetupRoutes maps api routes.
 func SetupRoutes(
 	api fiber.Router,
-	domainConn, chatConn, authConn *grpc.ClientConn,
+	domainConn, chatConn, authConn, mlConn *grpc.ClientConn,
 	tracer trace.Tracer,
 	wsConfig websocket.Config,
 ) {
@@ -30,7 +30,12 @@ func SetupRoutes(
 	source.SetupRoutes(sourceRouter, sourceHandler)
 
 	domainRouter := api.Group("/domain")
-	domainHandler := dh.New(domainpb.NewDomainServiceClient(domainConn))
+	domainHandler := dh.New(
+		domainpb.NewDomainServiceClient(domainConn),
+		domainpb.NewScenarioServiceClient(domainConn),
+		domainpb.NewSourceServiceClient(domainConn),
+		domainpb.NewMLServiceClient(mlConn),
+	)
 	domain.SetupRoutes(domainRouter, domainHandler)
 
 	scenarioRouter := api.Group("/scenario")

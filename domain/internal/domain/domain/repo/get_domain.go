@@ -8,7 +8,7 @@ import (
 )
 
 const getDomainByID = `
-	select id, title, user_id, source_ids, created_at, updated_at
+	select id, title, user_id, source_ids, scenario_ids, created_at, updated_at
 	from domain.domain
 		where id = (
 			select id

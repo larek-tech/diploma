@@ -20,11 +20,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ScenarioService_CreateScenario_FullMethodName = "/domain.v1.ScenarioService/CreateScenario"
-	ScenarioService_GetScenario_FullMethodName    = "/domain.v1.ScenarioService/GetScenario"
-	ScenarioService_UpdateScenario_FullMethodName = "/domain.v1.ScenarioService/UpdateScenario"
-	ScenarioService_DeleteScenario_FullMethodName = "/domain.v1.ScenarioService/DeleteScenario"
-	ScenarioService_ListScenarios_FullMethodName  = "/domain.v1.ScenarioService/ListScenarios"
+	ScenarioService_CreateScenario_FullMethodName     = "/domain.v1.ScenarioService/CreateScenario"
+	ScenarioService_GetScenario_FullMethodName        = "/domain.v1.ScenarioService/GetScenario"
+	ScenarioService_GetDefaultScenario_FullMethodName = "/domain.v1.ScenarioService/GetDefaultScenario"
+	ScenarioService_UpdateScenario_FullMethodName     = "/domain.v1.ScenarioService/UpdateScenario"
+	ScenarioService_DeleteScenario_FullMethodName     = "/domain.v1.ScenarioService/DeleteScenario"
+	ScenarioService_ListScenarios_FullMethodName      = "/domain.v1.ScenarioService/ListScenarios"
 )
 
 // ScenarioServiceClient is the client API for ScenarioService service.
@@ -32,7 +33,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ScenarioServiceClient interface {
 	CreateScenario(ctx context.Context, in *CreateScenarioRequest, opts ...grpc.CallOption) (*Scenario, error)
-	GetScenario(ctx context.Context, in *GetScenarioRequest, opts ...grpc.CallOption) (*GetScenarioResponse, error)
+	GetScenario(ctx context.Context, in *GetScenarioRequest, opts ...grpc.CallOption) (*Scenario, error)
+	GetDefaultScenario(ctx context.Context, in *GetDefaultScenarioRequest, opts ...grpc.CallOption) (*Scenario, error)
 	UpdateScenario(ctx context.Context, in *UpdateScenarioRequest, opts ...grpc.CallOption) (*Scenario, error)
 	DeleteScenario(ctx context.Context, in *DeleteScenarioRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListScenarios(ctx context.Context, in *ListScenariosRequest, opts ...grpc.CallOption) (*ListScenariosResponse, error)
@@ -56,10 +58,20 @@ func (c *scenarioServiceClient) CreateScenario(ctx context.Context, in *CreateSc
 	return out, nil
 }
 
-func (c *scenarioServiceClient) GetScenario(ctx context.Context, in *GetScenarioRequest, opts ...grpc.CallOption) (*GetScenarioResponse, error) {
+func (c *scenarioServiceClient) GetScenario(ctx context.Context, in *GetScenarioRequest, opts ...grpc.CallOption) (*Scenario, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetScenarioResponse)
+	out := new(Scenario)
 	err := c.cc.Invoke(ctx, ScenarioService_GetScenario_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scenarioServiceClient) GetDefaultScenario(ctx context.Context, in *GetDefaultScenarioRequest, opts ...grpc.CallOption) (*Scenario, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Scenario)
+	err := c.cc.Invoke(ctx, ScenarioService_GetDefaultScenario_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +113,8 @@ func (c *scenarioServiceClient) ListScenarios(ctx context.Context, in *ListScena
 // for forward compatibility.
 type ScenarioServiceServer interface {
 	CreateScenario(context.Context, *CreateScenarioRequest) (*Scenario, error)
-	GetScenario(context.Context, *GetScenarioRequest) (*GetScenarioResponse, error)
+	GetScenario(context.Context, *GetScenarioRequest) (*Scenario, error)
+	GetDefaultScenario(context.Context, *GetDefaultScenarioRequest) (*Scenario, error)
 	UpdateScenario(context.Context, *UpdateScenarioRequest) (*Scenario, error)
 	DeleteScenario(context.Context, *DeleteScenarioRequest) (*emptypb.Empty, error)
 	ListScenarios(context.Context, *ListScenariosRequest) (*ListScenariosResponse, error)
@@ -118,8 +131,11 @@ type UnimplementedScenarioServiceServer struct{}
 func (UnimplementedScenarioServiceServer) CreateScenario(context.Context, *CreateScenarioRequest) (*Scenario, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateScenario not implemented")
 }
-func (UnimplementedScenarioServiceServer) GetScenario(context.Context, *GetScenarioRequest) (*GetScenarioResponse, error) {
+func (UnimplementedScenarioServiceServer) GetScenario(context.Context, *GetScenarioRequest) (*Scenario, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetScenario not implemented")
+}
+func (UnimplementedScenarioServiceServer) GetDefaultScenario(context.Context, *GetDefaultScenarioRequest) (*Scenario, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDefaultScenario not implemented")
 }
 func (UnimplementedScenarioServiceServer) UpdateScenario(context.Context, *UpdateScenarioRequest) (*Scenario, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateScenario not implemented")
@@ -183,6 +199,24 @@ func _ScenarioService_GetScenario_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ScenarioServiceServer).GetScenario(ctx, req.(*GetScenarioRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScenarioService_GetDefaultScenario_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDefaultScenarioRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScenarioServiceServer).GetDefaultScenario(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ScenarioService_GetDefaultScenario_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScenarioServiceServer).GetDefaultScenario(ctx, req.(*GetDefaultScenarioRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -255,6 +289,10 @@ var ScenarioService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetScenario",
 			Handler:    _ScenarioService_GetScenario_Handler,
+		},
+		{
+			MethodName: "GetDefaultScenario",
+			Handler:    _ScenarioService_GetDefaultScenario_Handler,
 		},
 		{
 			MethodName: "UpdateScenario",

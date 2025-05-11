@@ -60,12 +60,16 @@ definitions:
     type: object
   pb.CreateScenarioRequest:
     properties:
+      domainId:
+        type: integer
       model:
         $ref: '#/definitions/pb.LlmModel'
       multiQuery:
         $ref: '#/definitions/pb.MultiQuery'
       reranker:
         $ref: '#/definitions/pb.Reranker'
+      title:
+        type: string
       vectorSearch:
         $ref: '#/definitions/pb.VectorSearch'
     type: object
@@ -105,6 +109,10 @@ definitions:
         $ref: '#/definitions/timestamppb.Timestamp'
       id:
         type: integer
+      scenarioIds:
+        items:
+          type: integer
+        type: array
       sourceIds:
         items:
           type: integer
@@ -113,21 +121,6 @@ definitions:
         type: string
       updatedAt:
         $ref: '#/definitions/timestamppb.Timestamp'
-    type: object
-  pb.GetDomainResponse:
-    properties:
-      domain:
-        $ref: '#/definitions/pb.Domain'
-    type: object
-  pb.GetScenarioResponse:
-    properties:
-      scenario:
-        $ref: '#/definitions/pb.Scenario'
-    type: object
-  pb.GetSourceResponse:
-    properties:
-      source:
-        $ref: '#/definitions/pb.Source'
     type: object
   pb.ListChatsResponse:
     properties:
@@ -243,10 +236,6 @@ definitions:
         $ref: '#/definitions/timestamppb.Timestamp'
       id:
         type: integer
-      metadata:
-        items:
-          type: integer
-        type: array
       queryId:
         type: integer
       status:
@@ -274,6 +263,8 @@ definitions:
     properties:
       createdAt:
         $ref: '#/definitions/timestamppb.Timestamp'
+      domainId:
+        type: integer
       id:
         type: integer
       model:
@@ -282,6 +273,8 @@ definitions:
         $ref: '#/definitions/pb.MultiQuery'
       reranker:
         $ref: '#/definitions/pb.Reranker'
+      title:
+        type: string
       updatedAt:
         $ref: '#/definitions/timestamppb.Timestamp'
       vectorSearch:
@@ -344,6 +337,10 @@ definitions:
     properties:
       domainId:
         type: integer
+      scenarioIds:
+        items:
+          type: integer
+        type: array
       sourceIds:
         items:
           type: integer
@@ -387,6 +384,8 @@ definitions:
         type: number
       threshold:
         type: number
+      title:
+        type: string
       topN:
         description: Сколько чанков забирать при векторном поиске.
         type: integer
@@ -713,7 +712,7 @@ paths:
         "200":
           description: Domain
           schema:
-            $ref: '#/definitions/pb.GetDomainResponse'
+            $ref: '#/definitions/pb.Domain'
         "400":
           description: Failed to get domain
           schema:
@@ -812,7 +811,7 @@ paths:
         "200":
           description: Permitted roles
           schema:
-            $ref: '#/definitions/pb.GetDomainResponse'
+            $ref: '#/definitions/pb.Domain'
         "404":
           description: Domain not found
           schema:
@@ -871,7 +870,7 @@ paths:
         "200":
           description: Permitted users
           schema:
-            $ref: '#/definitions/pb.GetDomainResponse'
+            $ref: '#/definitions/pb.Domain'
         "404":
           description: Domain not found
           schema:
@@ -988,7 +987,7 @@ paths:
         "200":
           description: Scenario
           schema:
-            $ref: '#/definitions/pb.GetScenarioResponse'
+            $ref: '#/definitions/pb.Scenario'
         "400":
           description: Failed to get scenario
           schema:
@@ -1145,7 +1144,7 @@ paths:
         "200":
           description: Source
           schema:
-            $ref: '#/definitions/pb.GetSourceResponse'
+            $ref: '#/definitions/pb.Source'
         "400":
           description: Failed to get source
           schema:
@@ -1244,7 +1243,7 @@ paths:
         "200":
           description: Permitted roles
           schema:
-            $ref: '#/definitions/pb.GetSourceResponse'
+            $ref: '#/definitions/pb.Source'
         "404":
           description: Source not found
           schema:
@@ -1303,7 +1302,7 @@ paths:
         "200":
           description: Permitted users
           schema:
-            $ref: '#/definitions/pb.GetSourceResponse'
+            $ref: '#/definitions/pb.Source'
         "404":
           description: Source not found
           schema:

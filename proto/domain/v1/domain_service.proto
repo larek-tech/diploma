@@ -9,7 +9,7 @@ import "domain/v1/common_model.proto";
 
 service DomainService {
   rpc CreateDomain(CreateDomainRequest) returns (Domain) {};
-  rpc GetDomain(GetDomainRequest) returns (GetDomainResponse) {};
+  rpc GetDomain(GetDomainRequest) returns (Domain) {};
   rpc UpdateDomain(UpdateDomainRequest) returns (Domain) {};
   rpc DeleteDomain(DeleteDomainRequest) returns (google.protobuf.Empty) {};
   rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {};

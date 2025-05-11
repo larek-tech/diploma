@@ -22,3 +22,6 @@ domain_service:
 chat_service:
   host: chat
   port: 9002
+ml_service:
+  host: ml
+  port: 8888

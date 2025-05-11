@@ -58,8 +58,12 @@ message GetSourceRequest {
   int64 sourceId = 1;
 };
 
-message GetSourceResponse {
-  Source source = 1;
+message GetSourceIDsRequest {
+  repeated int64 sourceIds = 1;
+};
+
+message GetSourceIDsResponse {
+  repeated string sourceIds = 2;
 };
 
 message UpdateSourceRequest {

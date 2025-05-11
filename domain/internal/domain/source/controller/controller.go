@@ -6,6 +6,7 @@ import (
 	"slices"
 
 	"github.com/IBM/sarama"
+	"github.com/google/uuid"
 	"github.com/larek-tech/diploma/domain/internal/auth"
 	authpb "github.com/larek-tech/diploma/domain/internal/auth/pb"
 	"github.com/larek-tech/diploma/domain/internal/domain/source/model"
@@ -30,6 +31,7 @@ var (
 type sourceRepo interface {
 	InsertSource(ctx context.Context, s model.SourceDao) (int64, error)
 	GetSourceByID(ctx context.Context, id, userID int64, roleIDs []int64) (model.SourceDao, error)
+	GetSourceIDs(ctx context.Context, sourceID, userID int64, roleIDs []int64) (uuid.UUID, error)
 	UpdateSource(ctx context.Context, s model.SourceDao, userID int64, roleIDs []int64) error
 	DeleteSource(ctx context.Context, id, userID int64, roleIDs []int64) error
 	ListSources(ctx context.Context, userID int64, roleIDs []int64, offset, limit uint64) ([]model.SourceDao, error)
@@ -80,7 +82,7 @@ func (ctrl *Controller) checkSourceCreator(ctx context.Context, sourceID int64, 
 	defer span.End()
 
 	roles := meta.GetRoles()
-	if !slices.Contains(roles, auth.AdminUserID) {
+	if !slices.Contains(roles, auth.AdminRoleID) {
 		source, err := ctrl.sr.GetSourceByID(ctx, sourceID, userID, roles)
 		if err != nil {
 			return errs.WrapErr(err)

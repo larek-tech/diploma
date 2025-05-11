@@ -17,10 +17,10 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			domainID	path		int						true	"Requested domain ID"
-//	@Success		200			{object}	pb.GetDomainResponse	"Domain"
-//	@Failure		400			{object}	string					"Failed to get domain"
-//	@Failure		404			{object}	string					"Domain not found"
+//	@Param			domainID	path		int			true	"Requested domain ID"
+//	@Success		200			{object}	pb.Domain	"Domain"
+//	@Failure		400			{object}	string		"Failed to get domain"
+//	@Failure		404			{object}	string		"Domain not found"
 //	@Router			/api/v1/domain/{id} [get]
 func (h *Handler) GetDomain(c *fiber.Ctx) error {
 	var req pb.GetDomainRequest
@@ -37,10 +37,6 @@ func (h *Handler) GetDomain(c *fiber.Ctx) error {
 			return errs.WrapErr(shared.ErrDomainNotFound, err.Error())
 		}
 		return errs.WrapErr(shared.ErrGetDomain, err.Error())
-	}
-
-	if resp.GetDomain() == nil {
-		return errs.WrapErr(shared.ErrDomainNotFound)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(resp)

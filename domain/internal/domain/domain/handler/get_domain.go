@@ -14,7 +14,7 @@ import (
 )
 
 // GetDomain returns domain by id.
-func (h *Handler) GetDomain(ctx context.Context, req *pb.GetDomainRequest) (*pb.GetDomainResponse, error) {
+func (h *Handler) GetDomain(ctx context.Context, req *pb.GetDomainRequest) (*pb.Domain, error) {
 	meta, err := auth.GetUserMeta(ctx)
 	if err != nil {
 		log.Err(errs.WrapErr(err)).Msg("get user meta")

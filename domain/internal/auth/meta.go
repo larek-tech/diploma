@@ -21,6 +21,8 @@ const (
 var (
 	// ErrNoAuthMetadata is an error when no required auth metadata was found.
 	ErrNoAuthMetadata = errors.New("no auth metadata in context")
+	// ErrRequireAdmin is an error when user has no admin access to operation.
+	ErrRequireAdmin = errors.New("forbidden, admin rights required")
 )
 
 // GetUserMeta retrieves auth metadata from incoming gRPC context.

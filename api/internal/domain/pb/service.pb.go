@@ -9,6 +9,7 @@ package pb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	unsafe "unsafe"
 )
@@ -24,19 +25,28 @@ var File_ml_v1_service_proto protoreflect.FileDescriptor
 
 const file_ml_v1_service_proto_rawDesc = "" +
 	"\n" +
-	"\x13ml/v1/service.proto\x12\x05pb.ml\x1a\x11ml/v1/model.proto2X\n" +
+	"\x13ml/v1/service.proto\x12\x05pb.ml\x1a\x11ml/v1/model.proto\x1a\x1bgoogle/protobuf/empty.proto2\xe4\x01\n" +
 	"\tMLService\x12K\n" +
-	"\fProcessQuery\x12\x1a.pb.ml.ProcessQueryRequest\x1a\x1b.pb.ml.ProcessQueryResponse\"\x000\x01B\x14Z\x12internal/domain/pbb\x06proto3"
+	"\fProcessQuery\x12\x1a.pb.ml.ProcessQueryRequest\x1a\x1b.pb.ml.ProcessQueryResponse\"\x000\x01\x12@\n" +
+	"\x10GetDefaultParams\x12\x16.google.protobuf.Empty\x1a\x12.pb.ml.ModelParams\"\x00\x12H\n" +
+	"\x10GetOptimalParams\x12\x1e.pb.ml.GetOptimalParamsRequest\x1a\x12.pb.ml.ModelParams\"\x00B\x14Z\x12internal/domain/pbb\x06proto3"
 
 var file_ml_v1_service_proto_goTypes = []any{
-	(*ProcessQueryRequest)(nil),  // 0: pb.ml.ProcessQueryRequest
-	(*ProcessQueryResponse)(nil), // 1: pb.ml.ProcessQueryResponse
+	(*ProcessQueryRequest)(nil),     // 0: pb.ml.ProcessQueryRequest
+	(*emptypb.Empty)(nil),           // 1: google.protobuf.Empty
+	(*GetOptimalParamsRequest)(nil), // 2: pb.ml.GetOptimalParamsRequest
+	(*ProcessQueryResponse)(nil),    // 3: pb.ml.ProcessQueryResponse
+	(*ModelParams)(nil),             // 4: pb.ml.ModelParams
 }
 var file_ml_v1_service_proto_depIdxs = []int32{
 	0, // 0: pb.ml.MLService.ProcessQuery:input_type -> pb.ml.ProcessQueryRequest
-	1, // 1: pb.ml.MLService.ProcessQuery:output_type -> pb.ml.ProcessQueryResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	1, // 1: pb.ml.MLService.GetDefaultParams:input_type -> google.protobuf.Empty
+	2, // 2: pb.ml.MLService.GetOptimalParams:input_type -> pb.ml.GetOptimalParamsRequest
+	3, // 3: pb.ml.MLService.ProcessQuery:output_type -> pb.ml.ProcessQueryResponse
+	4, // 4: pb.ml.MLService.GetDefaultParams:output_type -> pb.ml.ModelParams
+	4, // 5: pb.ml.MLService.GetOptimalParams:output_type -> pb.ml.ModelParams
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

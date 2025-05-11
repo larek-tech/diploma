@@ -11,7 +11,7 @@ import (
 )
 
 // GetSource returns source by id.
-func (ctrl *Controller) GetSource(ctx context.Context, sourceID int64, meta *authpb.UserAuthMetadata) (*pb.GetSourceResponse, error) {
+func (ctrl *Controller) GetSource(ctx context.Context, sourceID int64, meta *authpb.UserAuthMetadata) (*pb.Source, error) {
 	ctx, span := ctrl.tracer.Start(
 		ctx,
 		"Controller.GetSource",
@@ -27,5 +27,5 @@ func (ctrl *Controller) GetSource(ctx context.Context, sourceID int64, meta *aut
 		return nil, errs.WrapErr(err)
 	}
 
-	return &pb.GetSourceResponse{Source: source.ToProto()}, nil
+	return source.ToProto(), nil
 }

@@ -25,10 +25,10 @@ var File_domain_v1_domain_service_proto protoreflect.FileDescriptor
 
 const file_domain_v1_domain_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1edomain/v1/domain_service.proto\x12\tdomain.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cdomain/v1/domain_model.proto\x1a\x1cdomain/v1/common_model.proto2\xd5\x05\n" +
+	"\x1edomain/v1/domain_service.proto\x12\tdomain.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cdomain/v1/domain_model.proto\x1a\x1cdomain/v1/common_model.proto2\xca\x05\n" +
 	"\rDomainService\x12C\n" +
-	"\fCreateDomain\x12\x1e.domain.v1.CreateDomainRequest\x1a\x11.domain.v1.Domain\"\x00\x12H\n" +
-	"\tGetDomain\x12\x1b.domain.v1.GetDomainRequest\x1a\x1c.domain.v1.GetDomainResponse\"\x00\x12C\n" +
+	"\fCreateDomain\x12\x1e.domain.v1.CreateDomainRequest\x1a\x11.domain.v1.Domain\"\x00\x12=\n" +
+	"\tGetDomain\x12\x1b.domain.v1.GetDomainRequest\x1a\x11.domain.v1.Domain\"\x00\x12C\n" +
 	"\fUpdateDomain\x12\x1e.domain.v1.UpdateDomainRequest\x1a\x11.domain.v1.Domain\"\x00\x12H\n" +
 	"\fDeleteDomain\x12\x1e.domain.v1.DeleteDomainRequest\x1a\x16.google.protobuf.Empty\"\x00\x12N\n" +
 	"\vListDomains\x12\x1d.domain.v1.ListDomainsRequest\x1a\x1e.domain.v1.ListDomainsResponse\"\x00\x12Z\n" +
@@ -47,9 +47,8 @@ var file_domain_v1_domain_service_proto_goTypes = []any{
 	(*PermittedUsers)(nil),                // 6: domain.v1.PermittedUsers
 	(*PermittedRoles)(nil),                // 7: domain.v1.PermittedRoles
 	(*Domain)(nil),                        // 8: domain.v1.Domain
-	(*GetDomainResponse)(nil),             // 9: domain.v1.GetDomainResponse
-	(*emptypb.Empty)(nil),                 // 10: google.protobuf.Empty
-	(*ListDomainsResponse)(nil),           // 11: domain.v1.ListDomainsResponse
+	(*emptypb.Empty)(nil),                 // 9: google.protobuf.Empty
+	(*ListDomainsResponse)(nil),           // 10: domain.v1.ListDomainsResponse
 }
 var file_domain_v1_domain_service_proto_depIdxs = []int32{
 	0,  // 0: domain.v1.DomainService.CreateDomain:input_type -> domain.v1.CreateDomainRequest
@@ -62,10 +61,10 @@ var file_domain_v1_domain_service_proto_depIdxs = []int32{
 	5,  // 7: domain.v1.DomainService.GetPermittedRoles:input_type -> domain.v1.GetResourcePermissionsRequest
 	7,  // 8: domain.v1.DomainService.UpdatePermittedRoles:input_type -> domain.v1.PermittedRoles
 	8,  // 9: domain.v1.DomainService.CreateDomain:output_type -> domain.v1.Domain
-	9,  // 10: domain.v1.DomainService.GetDomain:output_type -> domain.v1.GetDomainResponse
+	8,  // 10: domain.v1.DomainService.GetDomain:output_type -> domain.v1.Domain
 	8,  // 11: domain.v1.DomainService.UpdateDomain:output_type -> domain.v1.Domain
-	10, // 12: domain.v1.DomainService.DeleteDomain:output_type -> google.protobuf.Empty
-	11, // 13: domain.v1.DomainService.ListDomains:output_type -> domain.v1.ListDomainsResponse
+	9,  // 12: domain.v1.DomainService.DeleteDomain:output_type -> google.protobuf.Empty
+	10, // 13: domain.v1.DomainService.ListDomains:output_type -> domain.v1.ListDomainsResponse
 	6,  // 14: domain.v1.DomainService.GetPermittedUsers:output_type -> domain.v1.PermittedUsers
 	6,  // 15: domain.v1.DomainService.UpdatePermittedUsers:output_type -> domain.v1.PermittedUsers
 	7,  // 16: domain.v1.DomainService.GetPermittedRoles:output_type -> domain.v1.PermittedRoles

@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,7 +20,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MLService_ProcessQuery_FullMethodName = "/pb.ml.MLService/ProcessQuery"
+	MLService_ProcessQuery_FullMethodName     = "/pb.ml.MLService/ProcessQuery"
+	MLService_GetDefaultParams_FullMethodName = "/pb.ml.MLService/GetDefaultParams"
+	MLService_GetOptimalParams_FullMethodName = "/pb.ml.MLService/GetOptimalParams"
 )
 
 // MLServiceClient is the client API for MLService service.
@@ -27,6 +30,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MLServiceClient interface {
 	ProcessQuery(ctx context.Context, in *ProcessQueryRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ProcessQueryResponse], error)
+	GetDefaultParams(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ModelParams, error)
+	GetOptimalParams(ctx context.Context, in *GetOptimalParamsRequest, opts ...grpc.CallOption) (*ModelParams, error)
 }
 
 type mLServiceClient struct {
@@ -56,11 +61,33 @@ func (c *mLServiceClient) ProcessQuery(ctx context.Context, in *ProcessQueryRequ
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MLService_ProcessQueryClient = grpc.ServerStreamingClient[ProcessQueryResponse]
 
+func (c *mLServiceClient) GetDefaultParams(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ModelParams, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ModelParams)
+	err := c.cc.Invoke(ctx, MLService_GetDefaultParams_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mLServiceClient) GetOptimalParams(ctx context.Context, in *GetOptimalParamsRequest, opts ...grpc.CallOption) (*ModelParams, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ModelParams)
+	err := c.cc.Invoke(ctx, MLService_GetOptimalParams_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MLServiceServer is the server API for MLService service.
 // All implementations must embed UnimplementedMLServiceServer
 // for forward compatibility.
 type MLServiceServer interface {
 	ProcessQuery(*ProcessQueryRequest, grpc.ServerStreamingServer[ProcessQueryResponse]) error
+	GetDefaultParams(context.Context, *emptypb.Empty) (*ModelParams, error)
+	GetOptimalParams(context.Context, *GetOptimalParamsRequest) (*ModelParams, error)
 	mustEmbedUnimplementedMLServiceServer()
 }
 
@@ -73,6 +100,12 @@ type UnimplementedMLServiceServer struct{}
 
 func (UnimplementedMLServiceServer) ProcessQuery(*ProcessQueryRequest, grpc.ServerStreamingServer[ProcessQueryResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method ProcessQuery not implemented")
+}
+func (UnimplementedMLServiceServer) GetDefaultParams(context.Context, *emptypb.Empty) (*ModelParams, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDefaultParams not implemented")
+}
+func (UnimplementedMLServiceServer) GetOptimalParams(context.Context, *GetOptimalParamsRequest) (*ModelParams, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOptimalParams not implemented")
 }
 func (UnimplementedMLServiceServer) mustEmbedUnimplementedMLServiceServer() {}
 func (UnimplementedMLServiceServer) testEmbeddedByValue()                   {}
@@ -106,13 +139,58 @@ func _MLService_ProcessQuery_Handler(srv interface{}, stream grpc.ServerStream) 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MLService_ProcessQueryServer = grpc.ServerStreamingServer[ProcessQueryResponse]
 
+func _MLService_GetDefaultParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MLServiceServer).GetDefaultParams(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MLService_GetDefaultParams_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MLServiceServer).GetDefaultParams(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MLService_GetOptimalParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOptimalParamsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MLServiceServer).GetOptimalParams(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MLService_GetOptimalParams_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MLServiceServer).GetOptimalParams(ctx, req.(*GetOptimalParamsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MLService_ServiceDesc is the grpc.ServiceDesc for MLService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var MLService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "pb.ml.MLService",
 	HandlerType: (*MLServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetDefaultParams",
+			Handler:    _MLService_GetDefaultParams_Handler,
+		},
+		{
+			MethodName: "GetOptimalParams",
+			Handler:    _MLService_GetOptimalParams_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "ProcessQuery",
