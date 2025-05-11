@@ -58,7 +58,7 @@ func (ctrl *Controller) CreateSource(ctx context.Context, req *pb.CreateSourceRe
 }
 
 func (ctrl *Controller) saveSourceData(ctx context.Context, source model.SourceDao, meta *authpb.UserAuthMetadata) error {
-	ctx, span := ctrl.tracer.Start(ctx, "Controller.saveSourceData")
+	_, span := ctrl.tracer.Start(ctx, "Controller.saveSourceData")
 	defer span.End()
 
 	dataMsg := model.DataMessage{
@@ -107,8 +107,12 @@ func (ctrl *Controller) getParsingResult(source model.SourceDao, meta *authpb.Us
 		select {
 		case err := <-ctrl.errCh:
 			log.Err(errs.WrapErr(err)).Msg("consuming source status topic failed")
+			return
 		case msg := <-ctrl.statusCh:
+			log.Debug().Str("msg", string(msg.Value)).Msg("got parsing status message")
+
 			if string(msg.Key) != strconv.FormatInt(source.ID, 10) {
+				ctrl.statusCh <- msg
 				continue
 			}
 
@@ -128,13 +132,18 @@ func (ctrl *Controller) getParsingResult(source model.SourceDao, meta *authpb.Us
 				failed = true
 			}
 
-			if (!startedParsing && status == model.StatusParsing) || failed {
+			if (!startedParsing && status == model.StatusParsing) || status == model.StatusReady || failed {
 				startedParsing = true
 
 				source.Status = status
 				if err := ctrl.sr.UpdateSource(ctx, source, meta.GetUserId(), meta.GetRoles()); err != nil {
 					log.Warn().Err(errs.WrapErr(err)).Msg("can't properly update source status")
 				}
+			}
+
+			if status == model.StatusReady {
+				log.Info().Str("sourceID", resp.SourceID).Msg("processed successfully")
+				return
 			}
 
 			if failed {
