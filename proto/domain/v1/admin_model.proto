@@ -3,7 +3,33 @@ syntax = "proto3";
 package domain.v1;
 option go_package = "internal/domain/pb";
 
-import "domain/v1/common_model.proto";
+import "google/protobuf/timestamp.proto";
+
+message User {
+  int64 id = 1;
+  string email = 2;
+  google.protobuf.Timestamp createdAt = 3;
+  google.protobuf.Timestamp updatedAt = 4;
+}
+
+message CreateUserRequest {
+  string email = 1;
+  string password = 2;
+};
+
+message GetUserRequest {
+  int64 userId = 1;
+};
+
+message UpdateUserRequest {
+  int64 userId = 1;
+  string email = 2;
+  string password = 3;
+};
+
+message DeleteUserRequest {
+  int64 userId = 1;
+};
 
 message ListUsersRequest {
   uint64 offset = 1;

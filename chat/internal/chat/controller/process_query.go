@@ -152,11 +152,15 @@ func (ctrl *Controller) ProcessQuery(
 		case <-processCtx.Done():
 			return
 		case <-streamCtx.Done():
-			log.Info().Int64("queryID", queryID).Msg("processing successfully finished")
 			out <- &pb.ChunkedResponse{
 				QueryId:   queryID,
 				SourceIds: q.SourceIDs,
 			}
+			log.Debug().
+				Int64("queryID", resp.QueryID).
+				Any("sourceIDs", q.SourceIDs).
+				Msg("got chunk")
+			log.Info().Int64("queryID", queryID).Msg("processing successfully finished")
 			return
 		default:
 			if err = ctrl.receiveChunk(streamCtx, success, stream, out, &resp, &contentBuff); err != nil {
@@ -195,13 +199,14 @@ func (ctrl *Controller) receiveChunk(
 		return errs.WrapErr(err, "write chunk")
 	}
 
-	curContent := buff.String()
+	log.Debug().Int64("queryID", resp.QueryID).Str("content", content).Msg("got chunk")
+
 	out <- &pb.ChunkedResponse{
 		QueryId: resp.QueryID,
-		Content: curContent,
+		Content: content,
 	}
 
-	resp.Content = curContent
+	resp.Content = buff.String()
 	resp.Status = model.StatusProcessing
 	if err = ctrl.cr.UpdateResponse(ctx, *resp); err != nil {
 		return errs.WrapErr(err, "append chunk to response")

@@ -95,7 +95,6 @@ type ResponseDao struct {
 	ChatID    uuid.UUID      `db:"chat_id"`
 	Content   string         `db:"content"`
 	Status    ResponseStatus `db:"status"`
-	Metadata  []byte         `db:"metadata"`
 	CreatedAt time.Time      `db:"created_at"`
 	UpdatedAt time.Time      `db:"updated_at"`
 }
@@ -108,7 +107,6 @@ func (r *ResponseDao) ToProto() *pb.Response {
 		ChatId:    r.ChatID.String(),
 		Content:   r.Content,
 		Status:    pb.ResponseStatus(r.Status),
-		Metadata:  r.Metadata,
 		CreatedAt: timestamppb.New(r.CreatedAt),
 		UpdatedAt: timestamppb.New(r.UpdatedAt),
 	}

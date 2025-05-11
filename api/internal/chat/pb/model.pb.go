@@ -195,9 +195,8 @@ type Response struct {
 	ChatId        string                 `protobuf:"bytes,3,opt,name=chatId,proto3" json:"chatId,omitempty"`
 	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`
 	Status        ResponseStatus         `protobuf:"varint,5,opt,name=status,proto3,enum=chat.v1.ResponseStatus" json:"status,omitempty"`
-	Metadata      []byte                 `protobuf:"bytes,6,opt,name=metadata,proto3,oneof" json:"metadata,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -265,13 +264,6 @@ func (x *Response) GetStatus() ResponseStatus {
 		return x.Status
 	}
 	return ResponseStatus_RESPONSE_UNDEFINED
-}
-
-func (x *Response) GetMetadata() []byte {
-	if x != nil {
-		return x.Metadata
-	}
-	return nil
 }
 
 func (x *Response) GetCreatedAt() *timestamppb.Timestamp {
@@ -919,17 +911,15 @@ const file_chat_v1_model_proto_rawDesc = "" +
 	"\tcreatedAt\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAtB\v\n" +
 	"\t_domainIdB\r\n" +
 	"\v_scenarioIdB\v\n" +
-	"\t_metadata\"\xb9\x02\n" +
+	"\t_metadata\"\x8b\x02\n" +
 	"\bResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x18\n" +
 	"\aqueryId\x18\x02 \x01(\x03R\aqueryId\x12\x16\n" +
 	"\x06chatId\x18\x03 \x01(\tR\x06chatId\x12\x18\n" +
 	"\acontent\x18\x04 \x01(\tR\acontent\x12/\n" +
-	"\x06status\x18\x05 \x01(\x0e2\x17.chat.v1.ResponseStatusR\x06status\x12\x1f\n" +
-	"\bmetadata\x18\x06 \x01(\fH\x00R\bmetadata\x88\x01\x01\x128\n" +
-	"\tcreatedAt\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
-	"\tupdatedAt\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\v\n" +
-	"\t_metadata\"^\n" +
+	"\x06status\x18\x05 \x01(\x0e2\x17.chat.v1.ResponseStatusR\x06status\x128\n" +
+	"\tcreatedAt\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
+	"\tupdatedAt\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"^\n" +
 	"\aContent\x12$\n" +
 	"\x05query\x18\x01 \x01(\v2\x0e.chat.v1.QueryR\x05query\x12-\n" +
 	"\bresponse\x18\x02 \x01(\v2\x11.chat.v1.ResponseR\bresponse\"\xe4\x01\n" +
@@ -1036,7 +1026,6 @@ func file_chat_v1_model_proto_init() {
 		return
 	}
 	file_chat_v1_model_proto_msgTypes[0].OneofWrappers = []any{}
-	file_chat_v1_model_proto_msgTypes[1].OneofWrappers = []any{}
 	file_chat_v1_model_proto_msgTypes[11].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

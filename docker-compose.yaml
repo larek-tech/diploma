@@ -274,6 +274,8 @@ services:
       context: ml
       dockerfile: Dockerfile
     restart: always
+    env_file:
+      - ml/.env
     ports:
       - "8888:8888"
     volumes:

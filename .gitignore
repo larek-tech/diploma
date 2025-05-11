@@ -35,5 +35,6 @@ requests
 google.golang.org
 temp/
 config-local.yaml
+vendor/
 
 *.log

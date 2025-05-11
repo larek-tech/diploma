@@ -9,6 +9,7 @@ package pb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	unsafe "unsafe"
 )
@@ -24,19 +25,40 @@ var File_domain_v1_admin_service_proto protoreflect.FileDescriptor
 
 const file_domain_v1_admin_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1ddomain/v1/admin_service.proto\x12\tdomain.v1\x1a\x1bdomain/v1/admin_model.proto2X\n" +
-	"\fAdminService\x12H\n" +
+	"\x1ddomain/v1/admin_service.proto\x12\tdomain.v1\x1a\x1bdomain/v1/admin_model.proto\x1a\x1bgoogle/protobuf/empty.proto2\xd5\x02\n" +
+	"\fAdminService\x12=\n" +
+	"\n" +
+	"CreateUser\x12\x1c.domain.v1.CreateUserRequest\x1a\x0f.domain.v1.User\"\x00\x127\n" +
+	"\aGetUser\x12\x19.domain.v1.GetUserRequest\x1a\x0f.domain.v1.User\"\x00\x12=\n" +
+	"\n" +
+	"UpdateUser\x12\x1c.domain.v1.UpdateUserRequest\x1a\x0f.domain.v1.User\"\x00\x12D\n" +
+	"\n" +
+	"DeleteUser\x12\x1c.domain.v1.DeleteUserRequest\x1a\x16.google.protobuf.Empty\"\x00\x12H\n" +
 	"\tListUsers\x12\x1b.domain.v1.ListUsersRequest\x1a\x1c.domain.v1.ListUsersResponse\"\x00B\x14Z\x12internal/domain/pbb\x06proto3"
 
 var file_domain_v1_admin_service_proto_goTypes = []any{
-	(*ListUsersRequest)(nil),  // 0: domain.v1.ListUsersRequest
-	(*ListUsersResponse)(nil), // 1: domain.v1.ListUsersResponse
+	(*CreateUserRequest)(nil), // 0: domain.v1.CreateUserRequest
+	(*GetUserRequest)(nil),    // 1: domain.v1.GetUserRequest
+	(*UpdateUserRequest)(nil), // 2: domain.v1.UpdateUserRequest
+	(*DeleteUserRequest)(nil), // 3: domain.v1.DeleteUserRequest
+	(*ListUsersRequest)(nil),  // 4: domain.v1.ListUsersRequest
+	(*User)(nil),              // 5: domain.v1.User
+	(*emptypb.Empty)(nil),     // 6: google.protobuf.Empty
+	(*ListUsersResponse)(nil), // 7: domain.v1.ListUsersResponse
 }
 var file_domain_v1_admin_service_proto_depIdxs = []int32{
-	0, // 0: domain.v1.AdminService.ListUsers:input_type -> domain.v1.ListUsersRequest
-	1, // 1: domain.v1.AdminService.ListUsers:output_type -> domain.v1.ListUsersResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 0: domain.v1.AdminService.CreateUser:input_type -> domain.v1.CreateUserRequest
+	1, // 1: domain.v1.AdminService.GetUser:input_type -> domain.v1.GetUserRequest
+	2, // 2: domain.v1.AdminService.UpdateUser:input_type -> domain.v1.UpdateUserRequest
+	3, // 3: domain.v1.AdminService.DeleteUser:input_type -> domain.v1.DeleteUserRequest
+	4, // 4: domain.v1.AdminService.ListUsers:input_type -> domain.v1.ListUsersRequest
+	5, // 5: domain.v1.AdminService.CreateUser:output_type -> domain.v1.User
+	5, // 6: domain.v1.AdminService.GetUser:output_type -> domain.v1.User
+	5, // 7: domain.v1.AdminService.UpdateUser:output_type -> domain.v1.User
+	6, // 8: domain.v1.AdminService.DeleteUser:output_type -> google.protobuf.Empty
+	7, // 9: domain.v1.AdminService.ListUsers:output_type -> domain.v1.ListUsersResponse
+	5, // [5:10] is the sub-list for method output_type
+	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
