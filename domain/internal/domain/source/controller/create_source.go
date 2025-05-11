@@ -124,7 +124,7 @@ func (ctrl *Controller) getParsingResult(source model.SourceDao, meta *authpb.Us
 			if err := json.Unmarshal(msg.Value, &resp); err != nil {
 				log.Err(errs.WrapErr(err)).Msg("unmarshal parsing status message")
 				status = model.StatusFailed
-			} else {
+			} else if resp.Status != model.StatusUndefined {
 				status = resp.Status
 			}
 
