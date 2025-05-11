@@ -9,7 +9,7 @@ import (
 
 // Login godoc
 //
-//	@Summary		Login us
+//	@Summary		Login user.
 //	@Summary		Login user.
 //	@Description	Authorizes user with provided credentials.
 //	@Tags			auth

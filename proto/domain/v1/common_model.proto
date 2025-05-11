@@ -3,15 +3,6 @@ syntax = "proto3";
 package domain.v1;
 option go_package = "internal/domain/pb";
 
-import "google/protobuf/timestamp.proto";
-
-message User {
-  int64 id = 1;
-  string email = 2;
-  google.protobuf.Timestamp createdAt = 3;
-  google.protobuf.Timestamp updatedAt = 4;
-}
-
 message PermittedUsers {
   int64 resourceId = 1;
   repeated int64 userIds = 2;
