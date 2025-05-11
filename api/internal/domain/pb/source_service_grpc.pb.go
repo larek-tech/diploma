@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	SourceService_CreateSource_FullMethodName         = "/domain.v1.SourceService/CreateSource"
 	SourceService_GetSource_FullMethodName            = "/domain.v1.SourceService/GetSource"
+	SourceService_GetSourceIDs_FullMethodName         = "/domain.v1.SourceService/GetSourceIDs"
 	SourceService_UpdateSource_FullMethodName         = "/domain.v1.SourceService/UpdateSource"
 	SourceService_DeleteSource_FullMethodName         = "/domain.v1.SourceService/DeleteSource"
 	SourceService_ListSources_FullMethodName          = "/domain.v1.SourceService/ListSources"
@@ -36,7 +37,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SourceServiceClient interface {
 	CreateSource(ctx context.Context, in *CreateSourceRequest, opts ...grpc.CallOption) (*Source, error)
-	GetSource(ctx context.Context, in *GetSourceRequest, opts ...grpc.CallOption) (*GetSourceResponse, error)
+	GetSource(ctx context.Context, in *GetSourceRequest, opts ...grpc.CallOption) (*Source, error)
+	GetSourceIDs(ctx context.Context, in *GetSourceIDsRequest, opts ...grpc.CallOption) (*GetSourceIDsResponse, error)
 	UpdateSource(ctx context.Context, in *UpdateSourceRequest, opts ...grpc.CallOption) (*Source, error)
 	DeleteSource(ctx context.Context, in *DeleteSourceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListSources(ctx context.Context, in *ListSourcesRequest, opts ...grpc.CallOption) (*ListSourcesResponse, error)
@@ -64,10 +66,20 @@ func (c *sourceServiceClient) CreateSource(ctx context.Context, in *CreateSource
 	return out, nil
 }
 
-func (c *sourceServiceClient) GetSource(ctx context.Context, in *GetSourceRequest, opts ...grpc.CallOption) (*GetSourceResponse, error) {
+func (c *sourceServiceClient) GetSource(ctx context.Context, in *GetSourceRequest, opts ...grpc.CallOption) (*Source, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetSourceResponse)
+	out := new(Source)
 	err := c.cc.Invoke(ctx, SourceService_GetSource_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sourceServiceClient) GetSourceIDs(ctx context.Context, in *GetSourceIDsRequest, opts ...grpc.CallOption) (*GetSourceIDsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSourceIDsResponse)
+	err := c.cc.Invoke(ctx, SourceService_GetSourceIDs_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +161,8 @@ func (c *sourceServiceClient) UpdatePermittedRoles(ctx context.Context, in *Perm
 // for forward compatibility.
 type SourceServiceServer interface {
 	CreateSource(context.Context, *CreateSourceRequest) (*Source, error)
-	GetSource(context.Context, *GetSourceRequest) (*GetSourceResponse, error)
+	GetSource(context.Context, *GetSourceRequest) (*Source, error)
+	GetSourceIDs(context.Context, *GetSourceIDsRequest) (*GetSourceIDsResponse, error)
 	UpdateSource(context.Context, *UpdateSourceRequest) (*Source, error)
 	DeleteSource(context.Context, *DeleteSourceRequest) (*emptypb.Empty, error)
 	ListSources(context.Context, *ListSourcesRequest) (*ListSourcesResponse, error)
@@ -170,8 +183,11 @@ type UnimplementedSourceServiceServer struct{}
 func (UnimplementedSourceServiceServer) CreateSource(context.Context, *CreateSourceRequest) (*Source, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSource not implemented")
 }
-func (UnimplementedSourceServiceServer) GetSource(context.Context, *GetSourceRequest) (*GetSourceResponse, error) {
+func (UnimplementedSourceServiceServer) GetSource(context.Context, *GetSourceRequest) (*Source, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSource not implemented")
+}
+func (UnimplementedSourceServiceServer) GetSourceIDs(context.Context, *GetSourceIDsRequest) (*GetSourceIDsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSourceIDs not implemented")
 }
 func (UnimplementedSourceServiceServer) UpdateSource(context.Context, *UpdateSourceRequest) (*Source, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSource not implemented")
@@ -247,6 +263,24 @@ func _SourceService_GetSource_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SourceServiceServer).GetSource(ctx, req.(*GetSourceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SourceService_GetSourceIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSourceIDsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SourceServiceServer).GetSourceIDs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SourceService_GetSourceIDs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SourceServiceServer).GetSourceIDs(ctx, req.(*GetSourceIDsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -391,6 +425,10 @@ var SourceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSource",
 			Handler:    _SourceService_GetSource_Handler,
+		},
+		{
+			MethodName: "GetSourceIDs",
+			Handler:    _SourceService_GetSourceIDs_Handler,
 		},
 		{
 			MethodName: "UpdateSource",

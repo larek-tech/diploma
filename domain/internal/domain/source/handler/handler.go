@@ -19,7 +19,8 @@ var (
 
 type sourceController interface {
 	CreateSource(ctx context.Context, req *pb.CreateSourceRequest, meta *authpb.UserAuthMetadata) (*pb.Source, error)
-	GetSource(ctx context.Context, sourceID int64, meta *authpb.UserAuthMetadata) (*pb.GetSourceResponse, error)
+	GetSource(ctx context.Context, sourceID int64, meta *authpb.UserAuthMetadata) (*pb.Source, error)
+	GetSourceIDs(ctx context.Context, req *pb.GetSourceIDsRequest, meta *authpb.UserAuthMetadata) (*pb.GetSourceIDsResponse, error)
 	UpdateSource(ctx context.Context, req *pb.UpdateSourceRequest, meta *authpb.UserAuthMetadata) (*pb.Source, error)
 	DeleteSource(ctx context.Context, sourceID int64, meta *authpb.UserAuthMetadata) error
 	ListSources(ctx context.Context, req *pb.ListSourcesRequest, meta *authpb.UserAuthMetadata) (*pb.ListSourcesResponse, error)

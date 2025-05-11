@@ -17,9 +17,9 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			sourceID	path		int						true	"Requested source ID"
-//	@Success		200			{object}	pb.GetSourceResponse	"Permitted users"
-//	@Failure		404			{object}	string					"Source not found"
+//	@Param			sourceID	path		int			true	"Requested source ID"
+//	@Success		200			{object}	pb.Source	"Permitted users"
+//	@Failure		404			{object}	string		"Source not found"
 //	@Router			/api/v1/source/permissions/users/{id} [get]
 func (h *Handler) GetPermittedUsers(c *fiber.Ctx) error {
 	var req pb.GetResourcePermissionsRequest

@@ -14,7 +14,7 @@ import (
 )
 
 // GetScenario returns scenario by id.
-func (h *Handler) GetScenario(ctx context.Context, req *pb.GetScenarioRequest) (*pb.GetScenarioResponse, error) {
+func (h *Handler) GetScenario(ctx context.Context, req *pb.GetScenarioRequest) (*pb.Scenario, error) {
 	meta, err := auth.GetUserMeta(ctx)
 	if err != nil {
 		log.Err(errs.WrapErr(err)).Msg("get user meta")

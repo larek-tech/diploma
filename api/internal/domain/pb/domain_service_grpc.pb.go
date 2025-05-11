@@ -36,7 +36,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DomainServiceClient interface {
 	CreateDomain(ctx context.Context, in *CreateDomainRequest, opts ...grpc.CallOption) (*Domain, error)
-	GetDomain(ctx context.Context, in *GetDomainRequest, opts ...grpc.CallOption) (*GetDomainResponse, error)
+	GetDomain(ctx context.Context, in *GetDomainRequest, opts ...grpc.CallOption) (*Domain, error)
 	UpdateDomain(ctx context.Context, in *UpdateDomainRequest, opts ...grpc.CallOption) (*Domain, error)
 	DeleteDomain(ctx context.Context, in *DeleteDomainRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListDomains(ctx context.Context, in *ListDomainsRequest, opts ...grpc.CallOption) (*ListDomainsResponse, error)
@@ -64,9 +64,9 @@ func (c *domainServiceClient) CreateDomain(ctx context.Context, in *CreateDomain
 	return out, nil
 }
 
-func (c *domainServiceClient) GetDomain(ctx context.Context, in *GetDomainRequest, opts ...grpc.CallOption) (*GetDomainResponse, error) {
+func (c *domainServiceClient) GetDomain(ctx context.Context, in *GetDomainRequest, opts ...grpc.CallOption) (*Domain, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetDomainResponse)
+	out := new(Domain)
 	err := c.cc.Invoke(ctx, DomainService_GetDomain_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -149,7 +149,7 @@ func (c *domainServiceClient) UpdatePermittedRoles(ctx context.Context, in *Perm
 // for forward compatibility.
 type DomainServiceServer interface {
 	CreateDomain(context.Context, *CreateDomainRequest) (*Domain, error)
-	GetDomain(context.Context, *GetDomainRequest) (*GetDomainResponse, error)
+	GetDomain(context.Context, *GetDomainRequest) (*Domain, error)
 	UpdateDomain(context.Context, *UpdateDomainRequest) (*Domain, error)
 	DeleteDomain(context.Context, *DeleteDomainRequest) (*emptypb.Empty, error)
 	ListDomains(context.Context, *ListDomainsRequest) (*ListDomainsResponse, error)
@@ -170,7 +170,7 @@ type UnimplementedDomainServiceServer struct{}
 func (UnimplementedDomainServiceServer) CreateDomain(context.Context, *CreateDomainRequest) (*Domain, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateDomain not implemented")
 }
-func (UnimplementedDomainServiceServer) GetDomain(context.Context, *GetDomainRequest) (*GetDomainResponse, error) {
+func (UnimplementedDomainServiceServer) GetDomain(context.Context, *GetDomainRequest) (*Domain, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDomain not implemented")
 }
 func (UnimplementedDomainServiceServer) UpdateDomain(context.Context, *UpdateDomainRequest) (*Domain, error) {

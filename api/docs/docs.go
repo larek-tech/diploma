@@ -429,7 +429,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Permitted roles",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetDomainResponse"
+                            "$ref": "#/definitions/pb.Domain"
                         }
                     },
                     "404": {
@@ -522,7 +522,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Permitted users",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetDomainResponse"
+                            "$ref": "#/definitions/pb.Domain"
                         }
                     },
                     "404": {
@@ -615,7 +615,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Domain",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetDomainResponse"
+                            "$ref": "#/definitions/pb.Domain"
                         }
                     },
                     "400": {
@@ -862,7 +862,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Scenario",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetScenarioResponse"
+                            "$ref": "#/definitions/pb.Scenario"
                         }
                     },
                     "400": {
@@ -1109,7 +1109,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Permitted roles",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetSourceResponse"
+                            "$ref": "#/definitions/pb.Source"
                         }
                     },
                     "404": {
@@ -1202,7 +1202,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Permitted users",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetSourceResponse"
+                            "$ref": "#/definitions/pb.Source"
                         }
                     },
                     "404": {
@@ -1295,7 +1295,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Source",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetSourceResponse"
+                            "$ref": "#/definitions/pb.Source"
                         }
                     },
                     "400": {
@@ -1550,6 +1550,9 @@ const docTemplate = `{
         "pb.CreateScenarioRequest": {
             "type": "object",
             "properties": {
+                "domainId": {
+                    "type": "integer"
+                },
                 "model": {
                     "$ref": "#/definitions/pb.LlmModel"
                 },
@@ -1558,6 +1561,9 @@ const docTemplate = `{
                 },
                 "reranker": {
                     "$ref": "#/definitions/pb.Reranker"
+                },
+                "title": {
+                    "type": "string"
                 },
                 "vectorSearch": {
                     "$ref": "#/definitions/pb.VectorSearch"
@@ -1619,6 +1625,12 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "scenarioIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "sourceIds": {
                     "type": "array",
                     "items": {
@@ -1630,30 +1642,6 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
-                }
-            }
-        },
-        "pb.GetDomainResponse": {
-            "type": "object",
-            "properties": {
-                "domain": {
-                    "$ref": "#/definitions/pb.Domain"
-                }
-            }
-        },
-        "pb.GetScenarioResponse": {
-            "type": "object",
-            "properties": {
-                "scenario": {
-                    "$ref": "#/definitions/pb.Scenario"
-                }
-            }
-        },
-        "pb.GetSourceResponse": {
-            "type": "object",
-            "properties": {
-                "source": {
-                    "$ref": "#/definitions/pb.Source"
                 }
             }
         },
@@ -1833,12 +1821,6 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "metadata": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
                 "queryId": {
                     "type": "integer"
                 },
@@ -1875,6 +1857,9 @@ const docTemplate = `{
                 "createdAt": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
                 },
+                "domainId": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1886,6 +1871,9 @@ const docTemplate = `{
                 },
                 "reranker": {
                     "$ref": "#/definitions/pb.Reranker"
+                },
+                "title": {
+                    "type": "string"
                 },
                 "updatedAt": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
@@ -1974,6 +1962,12 @@ const docTemplate = `{
                 "domainId": {
                     "type": "integer"
                 },
+                "scenarioIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "sourceIds": {
                     "type": "array",
                     "items": {
@@ -2037,6 +2031,9 @@ const docTemplate = `{
                 },
                 "threshold": {
                     "type": "number"
+                },
+                "title": {
+                    "type": "string"
                 },
                 "topN": {
                     "description": "Сколько чанков забирать при векторном поиске.",

@@ -35,17 +35,15 @@ class DataServiceStub(object):
             channel: A grpc.Channel.
         """
         self.VectorSearch = channel.unary_unary(
-            "/data.v1.DataService/VectorSearch",
-            request_serializer=data_dot_v1_dot_model__pb2.VectorSearchRequest.SerializeToString,
-            response_deserializer=data_dot_v1_dot_model__pb2.VectorSearchResponse.FromString,
-            _registered_method=True,
-        )
+                '/data.v1.DataService/VectorSearch',
+                request_serializer=data_dot_v1_dot_model__pb2.VectorSearchRequest.SerializeToString,
+                response_deserializer=data_dot_v1_dot_model__pb2.VectorSearchResponse.FromString,
+                _registered_method=True)
         self.GetDocuments = channel.unary_unary(
-            "/data.v1.DataService/GetDocuments",
-            request_serializer=data_dot_v1_dot_model__pb2.GetDocumentsIn.SerializeToString,
-            response_deserializer=data_dot_v1_dot_model__pb2.GetDocumentsOut.FromString,
-            _registered_method=True,
-        )
+                '/data.v1.DataService/GetDocuments',
+                request_serializer=data_dot_v1_dot_model__pb2.GetDocumentsIn.SerializeToString,
+                response_deserializer=data_dot_v1_dot_model__pb2.GetDocumentsOut.FromString,
+                _registered_method=True)
 
 
 class DataServiceServicer(object):
@@ -60,22 +58,22 @@ class DataServiceServicer(object):
     def GetDocuments(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
 
 def add_DataServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        "VectorSearch": grpc.unary_unary_rpc_method_handler(
-            servicer.VectorSearch,
-            request_deserializer=data_dot_v1_dot_model__pb2.VectorSearchRequest.FromString,
-            response_serializer=data_dot_v1_dot_model__pb2.VectorSearchResponse.SerializeToString,
-        ),
-        "GetDocuments": grpc.unary_unary_rpc_method_handler(
-            servicer.GetDocuments,
-            request_deserializer=data_dot_v1_dot_model__pb2.GetDocumentsIn.FromString,
-            response_serializer=data_dot_v1_dot_model__pb2.GetDocumentsOut.SerializeToString,
-        ),
+            'VectorSearch': grpc.unary_unary_rpc_method_handler(
+                    servicer.VectorSearch,
+                    request_deserializer=data_dot_v1_dot_model__pb2.VectorSearchRequest.FromString,
+                    response_serializer=data_dot_v1_dot_model__pb2.VectorSearchResponse.SerializeToString,
+            ),
+            'GetDocuments': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetDocuments,
+                    request_deserializer=data_dot_v1_dot_model__pb2.GetDocumentsIn.FromString,
+                    response_serializer=data_dot_v1_dot_model__pb2.GetDocumentsOut.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'data.v1.DataService', rpc_method_handlers)
@@ -112,26 +110,23 @@ class DataService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def GetDocuments(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def GetDocuments(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/data.v1.DataService/GetDocuments",
+            '/data.v1.DataService/GetDocuments',
             data_dot_v1_dot_model__pb2.GetDocumentsIn.SerializeToString,
             data_dot_v1_dot_model__pb2.GetDocumentsOut.FromString,
             options,
@@ -142,5 +137,4 @@ class DataService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)

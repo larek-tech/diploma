@@ -15,7 +15,8 @@ const updateDomains = `
 			select coalesce(array_agg(s.internal_id), '{}')
 			from domain.source s
 			where s.internal_id = any($5)
-		)
+		),
+		scenario_ids = $7
 	where id = (
 	    select id
 	    from domain.get_permitted_domains($2, $3)
@@ -33,6 +34,7 @@ func (r *Repo) UpdateDomain(ctx context.Context, d model.DomainDao, userID int64
 		roleIDs,
 		d.Title,
 		d.SourceIDs,
+		d.ScenarioIds,
 	)
 	if err != nil {
 		return errs.WrapErr(err, "update domain")

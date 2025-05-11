@@ -9,6 +9,6 @@ import "ml/v1/model.proto";
 
 service MLService {
   rpc ProcessQuery (ProcessQueryRequest) returns (stream ProcessQueryResponse) {};
-  rpc GetDefaultParams (google.protobaf.Empty) returns (ModelParams) {};
+  rpc GetDefaultParams (google.protobuf.Empty) returns (ModelParams) {};
   rpc GetOptimalParams (GetOptimalParamsRequest) returns (ModelParams) {};
 };

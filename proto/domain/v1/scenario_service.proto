@@ -9,7 +9,8 @@ import "ml/v1/model.proto";
 
 service ScenarioService {
   rpc CreateScenario(CreateScenarioRequest) returns (pb.ml.Scenario) {};
-  rpc GetScenario(GetScenarioRequest) returns (GetScenarioResponse) {};
+  rpc GetScenario(GetScenarioRequest) returns (pb.ml.Scenario) {};
+  rpc GetDefaultScenario(GetDefaultScenarioRequest) returns (pb.ml.Scenario) {};
   rpc UpdateScenario(UpdateScenarioRequest) returns (pb.ml.Scenario) {};
   rpc DeleteScenario(DeleteScenarioRequest) returns (google.protobuf.Empty) {};
   rpc ListScenarios(ListScenariosRequest) returns(ListScenariosResponse) {};

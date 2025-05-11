@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package domain.v1;
+option go_package = "internal/domain/pb";
+
+import "domain/v1/user_model.proto";
+import "google/protobuf/empty.proto";
+
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (User) {};
+  rpc GetUser(GetUserRequest) returns (User) {};
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {};
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {};
+}

@@ -11,7 +11,7 @@ import (
 )
 
 // GetScenario returns scenario by id.
-func (ctrl *Controller) GetScenario(ctx context.Context, scenarioID int64, meta *authpb.UserAuthMetadata) (*pb.GetScenarioResponse, error) {
+func (ctrl *Controller) GetScenario(ctx context.Context, scenarioID int64, meta *authpb.UserAuthMetadata) (*pb.Scenario, error) {
 	ctx, span := ctrl.tracer.Start(
 		ctx,
 		"Controller.GetScenario",
@@ -27,5 +27,5 @@ func (ctrl *Controller) GetScenario(ctx context.Context, scenarioID int64, meta 
 		return nil, errs.WrapErr(err)
 	}
 
-	return &pb.GetScenarioResponse{Scenario: scenario.ToProto()}, nil
+	return scenario.ToProto(), nil
 }

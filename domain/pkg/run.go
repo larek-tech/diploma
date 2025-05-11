@@ -12,12 +12,18 @@ import (
 	dh "github.com/larek-tech/diploma/domain/internal/domain/domain/handler"
 	dr "github.com/larek-tech/diploma/domain/internal/domain/domain/repo"
 	"github.com/larek-tech/diploma/domain/internal/domain/pb"
+	rc "github.com/larek-tech/diploma/domain/internal/domain/role/controller"
+	rh "github.com/larek-tech/diploma/domain/internal/domain/role/handler"
+	rr "github.com/larek-tech/diploma/domain/internal/domain/role/repo"
 	scc "github.com/larek-tech/diploma/domain/internal/domain/scenario/controller"
 	sch "github.com/larek-tech/diploma/domain/internal/domain/scenario/handler"
 	scr "github.com/larek-tech/diploma/domain/internal/domain/scenario/repo"
 	sc "github.com/larek-tech/diploma/domain/internal/domain/source/controller"
 	sh "github.com/larek-tech/diploma/domain/internal/domain/source/handler"
 	sr "github.com/larek-tech/diploma/domain/internal/domain/source/repo"
+	uc "github.com/larek-tech/diploma/domain/internal/domain/user/controller"
+	uh "github.com/larek-tech/diploma/domain/internal/domain/user/handler"
+	ur "github.com/larek-tech/diploma/domain/internal/domain/user/repo"
 	"github.com/larek-tech/diploma/domain/pkg/kafka"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -130,6 +136,17 @@ func Run() error {
 	scenarioController := scc.New(scenarioRepo, tracer)
 	scenarioHandler := sch.New(scenarioController, tracer)
 	pb.RegisterScenarioServiceServer(srv.GetSrv(), scenarioHandler)
+
+	// Setup user module
+	userRepo := ur.New(pg)
+	userController := uc.New(userRepo, tracer, cfg.Server.Encryption)
+	userHandler := uh.New(userController)
+	pb.RegisterUserServiceServer(srv.GetSrv(), userHandler)
+
+	roleRepo := rr.New(pg)
+	roleController := rc.New(roleRepo, tracer)
+	roleHandler := rh.New(roleController)
+	pb.RegisterRoleServiceServer(srv.GetSrv(), roleHandler)
 
 	srv.Start()
 

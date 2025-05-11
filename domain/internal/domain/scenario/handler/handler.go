@@ -10,7 +10,8 @@ import (
 
 type scenarioController interface {
 	CreateScenario(ctx context.Context, req *pb.CreateScenarioRequest, meta *authpb.UserAuthMetadata) (*pb.Scenario, error)
-	GetScenario(ctx context.Context, sourceID int64, meta *authpb.UserAuthMetadata) (*pb.GetScenarioResponse, error)
+	GetScenario(ctx context.Context, sourceID int64, meta *authpb.UserAuthMetadata) (*pb.Scenario, error)
+	GetDefaultScenario(ctx context.Context, req *pb.GetDefaultScenarioRequest, meta *authpb.UserAuthMetadata) (*pb.Scenario, error)
 	UpdateScenario(ctx context.Context, req *pb.UpdateScenarioRequest, meta *authpb.UserAuthMetadata) (*pb.Scenario, error)
 	DeleteScenario(ctx context.Context, sourceID int64, meta *authpb.UserAuthMetadata) error
 	ListScenarios(ctx context.Context, req *pb.ListScenariosRequest, meta *authpb.UserAuthMetadata) (*pb.ListScenariosResponse, error)

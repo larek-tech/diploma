@@ -295,6 +295,8 @@ type Scenario struct {
 	Model         *LlmModel              `protobuf:"bytes,5,opt,name=model,proto3" json:"model,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	Title         string                 `protobuf:"bytes,8,opt,name=title,proto3" json:"title,omitempty"`
+	DomainId      int64                  `protobuf:"varint,9,opt,name=domainId,proto3" json:"domainId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -376,6 +378,20 @@ func (x *Scenario) GetUpdatedAt() *timestamppb.Timestamp {
 		return x.UpdatedAt
 	}
 	return nil
+}
+
+func (x *Scenario) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *Scenario) GetDomainId() int64 {
+	if x != nil {
+		return x.DomainId
+	}
+	return 0
 }
 
 type Query struct {
@@ -594,6 +610,118 @@ func (x *ProcessQueryResponse) GetSourceIds() []string {
 	return nil
 }
 
+type ModelParams struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MultiQuery    *MultiQuery            `protobuf:"bytes,1,opt,name=multiQuery,proto3,oneof" json:"multiQuery,omitempty"`
+	Reranker      *Reranker              `protobuf:"bytes,2,opt,name=reranker,proto3,oneof" json:"reranker,omitempty"`
+	VectorSearch  *VectorSearch          `protobuf:"bytes,3,opt,name=vectorSearch,proto3,oneof" json:"vectorSearch,omitempty"`
+	Model         *LlmModel              `protobuf:"bytes,4,opt,name=model,proto3" json:"model,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ModelParams) Reset() {
+	*x = ModelParams{}
+	mi := &file_ml_v1_model_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ModelParams) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ModelParams) ProtoMessage() {}
+
+func (x *ModelParams) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ModelParams.ProtoReflect.Descriptor instead.
+func (*ModelParams) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ModelParams) GetMultiQuery() *MultiQuery {
+	if x != nil {
+		return x.MultiQuery
+	}
+	return nil
+}
+
+func (x *ModelParams) GetReranker() *Reranker {
+	if x != nil {
+		return x.Reranker
+	}
+	return nil
+}
+
+func (x *ModelParams) GetVectorSearch() *VectorSearch {
+	if x != nil {
+		return x.VectorSearch
+	}
+	return nil
+}
+
+func (x *ModelParams) GetModel() *LlmModel {
+	if x != nil {
+		return x.Model
+	}
+	return nil
+}
+
+type GetOptimalParamsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SourceIds     []string               `protobuf:"bytes,1,rep,name=sourceIds,proto3" json:"sourceIds,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOptimalParamsRequest) Reset() {
+	*x = GetOptimalParamsRequest{}
+	mi := &file_ml_v1_model_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOptimalParamsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOptimalParamsRequest) ProtoMessage() {}
+
+func (x *GetOptimalParamsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOptimalParamsRequest.ProtoReflect.Descriptor instead.
+func (*GetOptimalParamsRequest) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetOptimalParamsRequest) GetSourceIds() []string {
+	if x != nil {
+		return x.SourceIds
+	}
+	return nil
+}
+
 var File_ml_v1_model_proto protoreflect.FileDescriptor
 
 const file_ml_v1_model_proto_rawDesc = "" +
@@ -619,7 +747,7 @@ const file_ml_v1_model_proto_rawDesc = "" +
 	"\fVectorSearch\x12\x12\n" +
 	"\x04topN\x18\x01 \x01(\x03R\x04topN\x12\x1c\n" +
 	"\tthreshold\x18\x02 \x01(\x02R\tthreshold\x12$\n" +
-	"\rsearchByQuery\x18\x03 \x01(\bR\rsearchByQuery\"\x8a\x03\n" +
+	"\rsearchByQuery\x18\x03 \x01(\bR\rsearchByQuery\"\xbc\x03\n" +
 	"\bScenario\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x126\n" +
 	"\n" +
@@ -629,7 +757,9 @@ const file_ml_v1_model_proto_rawDesc = "" +
 	"\fvectorSearch\x18\x04 \x01(\v2\x13.pb.ml.VectorSearchH\x02R\fvectorSearch\x88\x01\x01\x12%\n" +
 	"\x05model\x18\x05 \x01(\v2\x0f.pb.ml.LlmModelR\x05model\x128\n" +
 	"\tcreatedAt\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
-	"\tupdatedAt\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\r\n" +
+	"\tupdatedAt\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x14\n" +
+	"\x05title\x18\b \x01(\tR\x05title\x12\x1a\n" +
+	"\bdomainId\x18\t \x01(\x03R\bdomainIdB\r\n" +
 	"\v_multiQueryB\v\n" +
 	"\t_rerankerB\x0f\n" +
 	"\r_vectorSearch\"I\n" +
@@ -646,7 +776,19 @@ const file_ml_v1_model_proto_rawDesc = "" +
 	"\acontent\x18\x01 \x01(\tR\acontent\"X\n" +
 	"\x14ProcessQueryResponse\x12\"\n" +
 	"\x05chunk\x18\x01 \x01(\v2\f.pb.ml.ChunkR\x05chunk\x12\x1c\n" +
-	"\tsourceIds\x18\x02 \x03(\tR\tsourceIdsB\x14Z\x12internal/domain/pbb\x06proto3"
+	"\tsourceIds\x18\x02 \x03(\tR\tsourceIds\"\x89\x02\n" +
+	"\vModelParams\x126\n" +
+	"\n" +
+	"multiQuery\x18\x01 \x01(\v2\x11.pb.ml.MultiQueryH\x00R\n" +
+	"multiQuery\x88\x01\x01\x120\n" +
+	"\breranker\x18\x02 \x01(\v2\x0f.pb.ml.RerankerH\x01R\breranker\x88\x01\x01\x12<\n" +
+	"\fvectorSearch\x18\x03 \x01(\v2\x13.pb.ml.VectorSearchH\x02R\fvectorSearch\x88\x01\x01\x12%\n" +
+	"\x05model\x18\x04 \x01(\v2\x0f.pb.ml.LlmModelR\x05modelB\r\n" +
+	"\v_multiQueryB\v\n" +
+	"\t_rerankerB\x0f\n" +
+	"\r_vectorSearch\"7\n" +
+	"\x17GetOptimalParamsRequest\x12\x1c\n" +
+	"\tsourceIds\x18\x01 \x03(\tR\tsourceIdsB\x14Z\x12internal/domain/pbb\x06proto3"
 
 var (
 	file_ml_v1_model_proto_rawDescOnce sync.Once
@@ -660,34 +802,40 @@ func file_ml_v1_model_proto_rawDescGZIP() []byte {
 	return file_ml_v1_model_proto_rawDescData
 }
 
-var file_ml_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_ml_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_ml_v1_model_proto_goTypes = []any{
-	(*MultiQuery)(nil),            // 0: pb.ml.MultiQuery
-	(*Reranker)(nil),              // 1: pb.ml.Reranker
-	(*LlmModel)(nil),              // 2: pb.ml.LlmModel
-	(*VectorSearch)(nil),          // 3: pb.ml.VectorSearch
-	(*Scenario)(nil),              // 4: pb.ml.Scenario
-	(*Query)(nil),                 // 5: pb.ml.Query
-	(*ProcessQueryRequest)(nil),   // 6: pb.ml.ProcessQueryRequest
-	(*Chunk)(nil),                 // 7: pb.ml.Chunk
-	(*ProcessQueryResponse)(nil),  // 8: pb.ml.ProcessQueryResponse
-	(*timestamppb.Timestamp)(nil), // 9: google.protobuf.Timestamp
+	(*MultiQuery)(nil),              // 0: pb.ml.MultiQuery
+	(*Reranker)(nil),                // 1: pb.ml.Reranker
+	(*LlmModel)(nil),                // 2: pb.ml.LlmModel
+	(*VectorSearch)(nil),            // 3: pb.ml.VectorSearch
+	(*Scenario)(nil),                // 4: pb.ml.Scenario
+	(*Query)(nil),                   // 5: pb.ml.Query
+	(*ProcessQueryRequest)(nil),     // 6: pb.ml.ProcessQueryRequest
+	(*Chunk)(nil),                   // 7: pb.ml.Chunk
+	(*ProcessQueryResponse)(nil),    // 8: pb.ml.ProcessQueryResponse
+	(*ModelParams)(nil),             // 9: pb.ml.ModelParams
+	(*GetOptimalParamsRequest)(nil), // 10: pb.ml.GetOptimalParamsRequest
+	(*timestamppb.Timestamp)(nil),   // 11: google.protobuf.Timestamp
 }
 var file_ml_v1_model_proto_depIdxs = []int32{
-	0, // 0: pb.ml.Scenario.multiQuery:type_name -> pb.ml.MultiQuery
-	1, // 1: pb.ml.Scenario.reranker:type_name -> pb.ml.Reranker
-	3, // 2: pb.ml.Scenario.vectorSearch:type_name -> pb.ml.VectorSearch
-	2, // 3: pb.ml.Scenario.model:type_name -> pb.ml.LlmModel
-	9, // 4: pb.ml.Scenario.createdAt:type_name -> google.protobuf.Timestamp
-	9, // 5: pb.ml.Scenario.updatedAt:type_name -> google.protobuf.Timestamp
-	5, // 6: pb.ml.ProcessQueryRequest.query:type_name -> pb.ml.Query
-	4, // 7: pb.ml.ProcessQueryRequest.scenario:type_name -> pb.ml.Scenario
-	7, // 8: pb.ml.ProcessQueryResponse.chunk:type_name -> pb.ml.Chunk
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	0,  // 0: pb.ml.Scenario.multiQuery:type_name -> pb.ml.MultiQuery
+	1,  // 1: pb.ml.Scenario.reranker:type_name -> pb.ml.Reranker
+	3,  // 2: pb.ml.Scenario.vectorSearch:type_name -> pb.ml.VectorSearch
+	2,  // 3: pb.ml.Scenario.model:type_name -> pb.ml.LlmModel
+	11, // 4: pb.ml.Scenario.createdAt:type_name -> google.protobuf.Timestamp
+	11, // 5: pb.ml.Scenario.updatedAt:type_name -> google.protobuf.Timestamp
+	5,  // 6: pb.ml.ProcessQueryRequest.query:type_name -> pb.ml.Query
+	4,  // 7: pb.ml.ProcessQueryRequest.scenario:type_name -> pb.ml.Scenario
+	7,  // 8: pb.ml.ProcessQueryResponse.chunk:type_name -> pb.ml.Chunk
+	0,  // 9: pb.ml.ModelParams.multiQuery:type_name -> pb.ml.MultiQuery
+	1,  // 10: pb.ml.ModelParams.reranker:type_name -> pb.ml.Reranker
+	3,  // 11: pb.ml.ModelParams.vectorSearch:type_name -> pb.ml.VectorSearch
+	2,  // 12: pb.ml.ModelParams.model:type_name -> pb.ml.LlmModel
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_ml_v1_model_proto_init() }
@@ -698,13 +846,14 @@ func file_ml_v1_model_proto_init() {
 	file_ml_v1_model_proto_msgTypes[0].OneofWrappers = []any{}
 	file_ml_v1_model_proto_msgTypes[4].OneofWrappers = []any{}
 	file_ml_v1_model_proto_msgTypes[6].OneofWrappers = []any{}
+	file_ml_v1_model_proto_msgTypes[9].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ml_v1_model_proto_rawDesc), len(file_ml_v1_model_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
