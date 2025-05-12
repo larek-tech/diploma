@@ -10,7 +10,7 @@ import (
 const getDomainByID = `
 	select id, title, user_id, source_ids, scenario_ids, created_at, updated_at
 	from domain.domain
-		where id = (
+		where id in (
 			select id
 			from domain.get_permitted_domains($2, $3)
 			where id = $1
