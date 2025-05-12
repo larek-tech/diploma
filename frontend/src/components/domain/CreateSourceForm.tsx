@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -15,7 +15,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { DomainApiService } from '@/api/DomainApiService';
 import { CreateSourceRequest, Source, SourceType } from '@/api/models';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, File } from 'lucide-react';
+import { useDropzone } from 'react-dropzone';
 
 interface CreateSourceFormProps {
     onSourceCreated: (source: Source) => void;
@@ -48,12 +49,15 @@ export const CreateSourceForm = ({ onSourceCreated }: CreateSourceFormProps) => 
     const [isLoading, setIsLoading] = useState(false);
     const [showCronFields, setShowCronFields] = useState(false);
     const [showCredentialsField, setShowCredentialsField] = useState(false);
+    const [showFileUpload, setShowFileUpload] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState<File[] | null>(null);
 
     const {
         register,
         handleSubmit,
         setValue,
         reset,
+        watch,
         formState: { errors },
     } = useForm<SourceFormValues>({
         resolver: zodResolver(sourceSchema),
@@ -68,6 +72,17 @@ export const CreateSourceForm = ({ onSourceCreated }: CreateSourceFormProps) => 
 
         // Показываем поле для credentials только если тип TypeWithCredentials
         setShowCredentialsField(typeValue === SourceType.TypeWithCredentials);
+
+        // Показываем загрузку файла для TypeSingleFile и TypeArchivedFiles
+        setShowFileUpload(
+            typeValue === SourceType.TypeSingleFile || typeValue === SourceType.TypeArchivedFiles
+        );
+
+        // Сбрасываем значение content при смене типа
+        if (showFileUpload) {
+            setValue('content', '');
+            setSelectedFiles(null);
+        }
     };
 
     const handleCronToggle = (usesCron: boolean) => {
@@ -90,23 +105,130 @@ export const CreateSourceForm = ({ onSourceCreated }: CreateSourceFormProps) => 
         }
     };
 
+    // Функция кодирования файла в base64
+    const encodeFileToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                if (typeof reader.result === 'string') {
+                    // Удаляем префикс "data:application/..." из строки base64
+                    const base64String = reader.result.split(',')[1];
+                    resolve(base64String);
+                } else {
+                    reject(new Error('Не удалось прочитать файл как строку'));
+                }
+            };
+            reader.onerror = (error) => reject(error);
+        });
+    };
+
+    // Обработчик изменения файла
+    const handleFileChange = useCallback(
+        async (files: File[] | null) => {
+            setSelectedFiles(files);
+
+            if (files && files.length > 0) {
+                try {
+                    const base64 = await encodeFileToBase64(files[0]);
+                    setValue('content', base64);
+                } catch (error) {
+                    console.error('Ошибка кодирования файла в base64:', error);
+                }
+            }
+        },
+        [setValue]
+    );
+
+    // Пользовательский компонент для загрузки файла
+    const FileUploadArea = () => {
+        const onDrop = useCallback((acceptedFiles: File[]) => {
+            handleFileChange(acceptedFiles);
+        }, []);
+
+        const { getRootProps, getInputProps, isDragActive } = useDropzone({
+            onDrop,
+            maxFiles: 1,
+            multiple: false,
+            accept: {
+                'application/zip': ['.zip'],
+                'application/pdf': ['.pdf'],
+                'application/msword': ['.doc'],
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [
+                    '.docx',
+                ],
+                'text/plain': ['.txt'],
+                'application/json': ['.json'],
+                'text/html': ['.html', '.htm'],
+                'text/csv': ['.csv'],
+                'application/xml': ['.xml'],
+                'application/vnd.ms-excel': ['.xls'],
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+            },
+        });
+
+        const sourceType = watch('typ');
+        const acceptArchiveOnly = sourceType === SourceType.TypeArchivedFiles;
+
+        return (
+            <div
+                {...getRootProps()}
+                className={`border-2 border-dashed rounded-md p-6 text-center cursor-pointer hover:bg-gray-50 ${
+                    isDragActive ? 'border-primary' : 'border-gray-300'
+                }`}
+            >
+                <input {...getInputProps()} />
+                <div className='flex flex-col items-center justify-center'>
+                    <Upload className='w-10 h-10 mb-2 text-gray-400' />
+                    {selectedFiles && selectedFiles.length > 0 ? (
+                        <div className='flex items-center space-x-2'>
+                            <File className='w-5 h-5' />
+                            <span>{selectedFiles[0].name}</span>
+                        </div>
+                    ) : (
+                        <>
+                            <p className='text-sm text-gray-500'>
+                                {acceptArchiveOnly
+                                    ? 'Перетащите архив сюда или нажмите для выбора'
+                                    : 'Перетащите файл сюда или нажмите для выбора'}
+                            </p>
+                            <p className='text-xs text-gray-400 mt-1'>
+                                {acceptArchiveOnly
+                                    ? 'Только ZIP файлы'
+                                    : 'Поддерживаются PDF, DOC, DOCX, TXT, JSON, HTML, CSV, XML, XLS, XLSX'}
+                            </p>
+                        </>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     const onSubmit = async (data: SourceFormValues) => {
         try {
             setIsLoading(true);
 
-            // Конвертируем content в base64 если это еще не сделано
-            if (!data.content.startsWith('data:')) {
-                data.content = btoa(data.content);
+            // Для типов, требующих текстовый ввод (Web и S3)
+            if (data.typ === SourceType.TypeWeb || data.typ === SourceType.TypeWithCredentials) {
+                // Кодируем content в base64, если это еще не сделано
+                if (!data.content.startsWith('data:') && data.content.trim() !== '') {
+                    data.content = btoa(data.content);
+                }
             }
 
-            // Конвертируем credentials в base64 если заполнено
-            if (data.credentials && !data.credentials.startsWith('data:')) {
+            // Кодируем credentials в base64, если заполнено
+            if (
+                data.credentials &&
+                !data.credentials.startsWith('data:') &&
+                data.credentials.trim() !== ''
+            ) {
                 data.credentials = btoa(data.credentials);
             }
 
             const source = await DomainApiService.createSource(data as CreateSourceRequest);
             onSourceCreated(source);
             reset();
+            setSelectedFiles(null);
         } catch (error) {
             console.error('Ошибка при создании источника:', error);
         } finally {
@@ -146,19 +268,36 @@ export const CreateSourceForm = ({ onSourceCreated }: CreateSourceFormProps) => 
                 </Select>
             </div>
 
-            <div className='space-y-2'>
-                <Label htmlFor='content'>Содержимое</Label>
-                <Textarea
-                    id='content'
-                    {...register('content')}
-                    placeholder={
-                        showCredentialsField
-                            ? 'Ссылка на S3 хранилище (будет закодирована в base64)'
-                            : 'Ссылка или содержимое (будет закодировано в base64)'
-                    }
-                />
-                {errors.content && <p className='text-sm text-red-500'>{errors.content.message}</p>}
-            </div>
+            {showFileUpload ? (
+                <div className='space-y-2'>
+                    <Label>Загрузите файл</Label>
+                    <FileUploadArea />
+                    <input type='hidden' {...register('content')} />
+                    {errors.content && (
+                        <p className='text-sm text-red-500'>{errors.content.message}</p>
+                    )}
+                </div>
+            ) : (
+                <div className='space-y-2'>
+                    <Label htmlFor='content'>
+                        {watch('typ') === SourceType.TypeWeb ? 'URL веб-сайта' : 'Содержимое'}
+                    </Label>
+                    <Textarea
+                        id='content'
+                        {...register('content')}
+                        placeholder={
+                            watch('typ') === SourceType.TypeWeb
+                                ? 'Введите URL веб-сайта'
+                                : showCredentialsField
+                                ? 'Ссылка на S3 хранилище'
+                                : 'Содержимое источника'
+                        }
+                    />
+                    {errors.content && (
+                        <p className='text-sm text-red-500'>{errors.content.message}</p>
+                    )}
+                </div>
+            )}
 
             {showCredentialsField && (
                 <div className='space-y-2'>
@@ -166,7 +305,7 @@ export const CreateSourceForm = ({ onSourceCreated }: CreateSourceFormProps) => 
                     <Textarea
                         id='credentials'
                         {...register('credentials')}
-                        placeholder='Секретный ключ для доступа к S3 (будет закодирован в base64)'
+                        placeholder='Секретный ключ для доступа к S3'
                     />
                 </div>
             )}
