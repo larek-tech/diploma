@@ -31,7 +31,7 @@ services:
       postgres:
         condition: service_healthy
     env_file:
-        - configs/data.env
+        - configs/data.migrator.env
     environment:
       POSTGRES_DB: ${MIGRATOR_POSTGRES_DB:-master}
       POSTGRES_HOST: ${MIGRATOR_POSTGRES_HOST:-postgres_local}
@@ -49,15 +49,6 @@ services:
       - postgres
     env_file:
         - configs/data.crawler.env
-    environment:
-      POSTGRES_DB: ${CRAWLER_POSTGRES_DB:-master}
-      POSTGRES_HOST: ${CRAWLER_POSTGRES_HOST:-postgres_local}
-      POSTGRES_PORT: ${CRAWLER_POSTGRES_PORT:-5432}
-      POSTGRES_USER: ${CRAWLER_POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${CRAWLER_POSTGRES_PASSWORD:-password}
-      OLLAMA_HOST: ${CRAWLER_OLLAMA_HOST:-http://ollama:11434}
-      OLLAMA_MODEL: ${CRAWLER_OLLAMA_MODEL:-bge-m3:latest}
-      KAFKA_SERVERS: ${CRAWLER_KAFKA_SERVERS:-kafka:29092}
     ports:
       - "9998:8080"
       - "50051:50051"

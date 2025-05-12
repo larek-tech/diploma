@@ -89,7 +89,7 @@ func run() int {
 	kafkaHandlers := map[string]kafka.HandlerFunc{
 		"source": create_source.New(srcService, kafkaProducer).Handle,
 	}
-	kafkaConsumer, err := kafka.NewConsumer(*kafkaCfg, kafkaHandlers)
+	kafkaConsumer, err := kafka.NewConsumer(*kafkaCfg, "crawler", kafkaHandlers)
 	if err != nil {
 		// for now kafka can be disabled and we can accept messages from http and grpc
 		slog.Error("failed to create kafka consumer: %w", "err", err)

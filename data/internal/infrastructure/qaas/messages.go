@@ -28,7 +28,9 @@ type ObjectJob = DelayedJob[object_store.Object]
 type EmbedJob = DelayedJob[document.Document]
 
 type ParseStatusJob struct {
+	ExternalKey      string // идентификатор полученный от сторонней системы для обработки процесса обработки
 	SourceID         string
+	SiteJobID        string
 	SiteID           string
 	ParsePageJobsIDs []string
 	Delay            time.Duration

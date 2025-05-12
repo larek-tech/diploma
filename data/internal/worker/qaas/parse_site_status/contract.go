@@ -3,7 +3,6 @@ package parse_site_status
 import (
 	"context"
 
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 )
 
@@ -15,8 +14,8 @@ type (
 		GetProcessedPageCount(ctx context.Context, parseSiteJobID string) (int, error)
 		GetUnprocessedPageCount(ctx context.Context, parseSiteJobID string) (int, error)
 	}
-	// TODO: add kafka producer for status messages
+
 	kafkaProducer interface {
-		Produce(ctx context.Context, msg *kafka.Message) error
+		Produce(ctx context.Context, topic string, key []byte, value []byte) error
 	}
 )

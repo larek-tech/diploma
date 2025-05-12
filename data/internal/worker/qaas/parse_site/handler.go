@@ -32,7 +32,6 @@ func New(
 	}
 }
 
-// TODO: add count of currently running jobs
 func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, error) {
 	//qaas.SiteJob
 	var job qaas.SiteJob
@@ -47,6 +46,10 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 	if !ok || siteJobID == "" {
 		return true, fmt.Errorf("failed to get siteJobID from job")
 	}
+	externalKey, ok := job.Metadata["externalKey"]
+	if !ok {
+		return true, fmt.Errorf("missing external key in Metadata")
+	}
 
 	slog.Info("handled site job", "job", job)
 	currentSite := job.Payload
@@ -56,7 +59,8 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 		return true, err
 	}
 	metadata := map[string]any{
-		"siteJobID": siteJobID,
+		"siteJobID":   siteJobID,
+		"externalKey": externalKey.(string),
 	}
 	parseJobs := lo.Map(currentSite.AvailablePages, func(url string, _ int) any {
 		page, mapErr := site.NewPage(currentSite.ID, url)
@@ -81,16 +85,20 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 		return true, err
 	}
 
-	// TODO: send status job to check parsing status
 	publishOptions = []qaas.PublishOption{
 		qaas.WithQueue(qaas.ParseSiteStatusQueue),
 	}
-	_, err = h.pagePublisher.Publish(ctx, []any{qaas.ParseStatusJob{
+
+	statusJob := qaas.ParseStatusJob{
+		ExternalKey:      externalKey.(string),
 		SiteID:           currentSite.ID,
 		SourceID:         currentSite.SourceID,
 		ParsePageJobsIDs: parsePageJobIDs,
 		Delay:            StatusDelay,
-	}}, publishOptions...)
+		SiteJobID:        siteJobID.(string),
+	}
+
+	_, err = h.pagePublisher.Publish(ctx, []any{statusJob}, publishOptions...)
 	if err != nil {
 		slog.Error("failed to publish status job", "site", currentSite, "error", err)
 		return true, err

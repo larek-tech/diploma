@@ -14,8 +14,14 @@ func New(db db) *Storage {
 
 func (s Storage) IsAlreadyParsed(ctx context.Context, parseSiteJobID string) (bool, error) {
 	var count int
+	//SELECT COUNT(*) FROM web_parse_page WHERE payload->>'payload'->>'SiteID' = '546849b4-7052-46af-8043-b9852b074afd' AND processed_at IS NOT NULL;
 	err := s.db.QueryStruct(ctx, &count, `
-SELECT COUNT(*) FROM web_parse_page WHERE payload->>'siteJobID' = $1 AND processed_at IS NOT NULL;
+select
+	count(id)
+from web_parse_page
+where
+	payload -> 'payload' ->> 'ID' = $1
+limit 1;
 `, parseSiteJobID)
 	if err != nil {
 		return false, err
@@ -29,7 +35,13 @@ SELECT COUNT(*) FROM web_parse_page WHERE payload->>'siteJobID' = $1 AND process
 func (s Storage) GetProcessedPageCount(ctx context.Context, parseSiteJobID string) (int, error) {
 	var count int
 	err := s.db.QueryStruct(ctx, &count, `
-SELECT COUNT(*) FROM web_parse_page WHERE payload->>'siteJobID' = $1 AND processed_at IS NOT NULL;
+SELECT
+    COUNT(id) AS id_count
+FROM
+    web_parse_page
+WHERE
+    payload -> 'metadata' ->> 'siteJobID' = $1 AND
+	processed_at IS NOT NULL;
 `, parseSiteJobID)
 	if err != nil {
 		return 0, err
@@ -43,7 +55,13 @@ SELECT COUNT(*) FROM web_parse_page WHERE payload->>'siteJobID' = $1 AND process
 func (s Storage) GetUnprocessedPageCount(ctx context.Context, parseSiteJobID string) (int, error) {
 	var count int
 	err := s.db.QueryStruct(ctx, &count, `
-SELECT COUNT(*) FROM web_parse_page WHERE payload->>'siteJobID' = $1 AND processed_at IS NULL;
+SELECT
+    COUNT(id) AS id_count
+FROM
+    web_parse_page
+WHERE
+    payload -> 'metadata' ->> 'siteJobID' = $1 AND
+	processed_at IS NULL;
 `, parseSiteJobID)
 	if err != nil {
 		return 0, err
