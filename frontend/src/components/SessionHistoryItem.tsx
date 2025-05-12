@@ -57,7 +57,7 @@ const SessionHistoryItem = observer(({ session }: Props) => {
                 </h3>
                 <div className='flex items-center justify-between'>
                     <p className='text-gray-500 text-sm'>
-                        {new Date(session.created_at).toLocaleDateString()}
+                        {new Date(session.createdAt.seconds).toLocaleDateString()}
                     </p>
                     <button
                         onClick={(event) => {
