@@ -108,6 +108,11 @@ func (ctrl *Controller) getParsingResult(source model.SourceDao, meta *authpb.Us
 		case err := <-ctrl.errCh:
 			log.Err(errs.WrapErr(err)).Msg("consuming source status topic failed")
 			return
+		case <-time.After(time.Minute):
+			if !startedParsing {
+				log.Err(errs.WrapErr(ErrUpdateSourceStatus)).Msg("failed to start parsing")
+				return
+			}
 		case msg := <-ctrl.statusCh:
 			log.Debug().Str("msg", string(msg.Value)).Msg("got parsing status message")
 
