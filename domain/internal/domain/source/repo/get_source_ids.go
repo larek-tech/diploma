@@ -10,7 +10,7 @@ import (
 const getSourceIDs = `
 	select external_id
 	from domain.source
-	where internal_id = (
+	where internal_id in (
 		select internal_source_id
 		from domain.get_permitted_sources($2, $3)
 		where internal_source_id = $1

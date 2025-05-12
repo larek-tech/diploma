@@ -11,13 +11,13 @@ import (
 const updateDomains = `
 	update domain.domain
 	set title = $4,
-	    source_ids = (
+	    source_ids in (
 			select coalesce(array_agg(s.internal_id), '{}')
 			from domain.source s
 			where s.internal_id = any($5)
 		),
 		scenario_ids = $7
-	where id = (
+	where id in (
 	    select id
 	    from domain.get_permitted_domains($2, $3)
 	    where id = $1

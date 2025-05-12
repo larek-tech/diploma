@@ -21,7 +21,7 @@ const updateSource = `
 	    cron_minute = $12,
 		credentials = $13,
 		status = $14
-	where internal_id = (
+	where internal_id in (
 	    select internal_source_id
 	    from domain.get_permitted_sources($2, $3)
 	    where internal_source_id = $1

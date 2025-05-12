@@ -9,7 +9,7 @@ import (
 
 const deleteDomain = `
 	delete from domain.domain
-	where id = (
+	where id in (
 	    select id
 	    from domain.get_permitted_domains($2, $3)
 	    where id = $1

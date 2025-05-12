@@ -10,7 +10,7 @@ import (
 const getSourceByID = `
 	select internal_id, external_id, user_id, title, content, type, update_every_period, cron_week_day, cron_month, cron_day, cron_hour, cron_minute, credentials, status, created_at, updated_at
 	from domain.source
-		where internal_id = (
+		where internal_id in (
 			select internal_source_id
 			from domain.get_permitted_sources($2, $3)
 			where internal_source_id = $1
