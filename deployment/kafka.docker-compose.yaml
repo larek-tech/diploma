@@ -1,56 +1,34 @@
-networks:
-  diploma-net:
-    driver: bridge
-
 volumes:
-  zoo_data_log: null
-  zoo_data_secrets: null
-  zoo_data: null
-  kafka_data_cfg: null
-  kafka_data: null
-  kafka_data_secrets: null
+  kafka-data:
 
 services:
-  zookeeper:
-    image: 'confluentinc/cp-zookeeper:latest'
+  kafka:
+    image: apache/kafka:4.0.0
+    restart: unless-stopped
+    container_name: kafka
     environment:
-      ZOOKEEPER_SERVER_ID: 1
-      ZOOKEEPER_TICK_TIME: 2000
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_INIT_LIMIT: 5
-      ZOOKEEPER_SYNC_LIMIT: 2
-      ZOOKEEPER_SERVERS: 'zookeeper:2888:3888'
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller               # The node acts as both broker and controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093  # Ports for broker and controller
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.5:9092                  # External listener for clients
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER         # Listener name for inter-controller communication
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT  # Security protocol for listeners
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093    # Quorum voters for the controller in KRaft mode
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1           # Replication factor for the offsets topic
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1   # Replication factor for transaction logs
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1              # Minimum in-sync replicas for transactional logs
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0           # Initial delay before consumer group rebalancing
+      KAFKA_NUM_PARTITIONS: 1                             # Default number of partitions for new topics
+    ports:
+      - "9092:9092"     # Port for Kafka broker
+    volumes:
+      - kafka-data:/var/lib.kafka/data
     healthcheck:
-      test: 'echo stat | nc localhost 2181'
+      test:
+        [
+          "CMD-SHELL",
+          "./opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server 0.0.0.0:9092 > /dev/null 2>&1",
+        ]
       interval: 10s
       timeout: 10s
-      retries: 3
-    volumes:
-      - 'zoo_data_log:/var/lib/zookeeper/log'
-      - 'zoo_data_secrets:/etc/zookeeper/secrets'
-      - 'zoo_data:/var/lib/zookeeper/data'
-    ports:
-      - '2181:2181'
-      - '2888:2888'
-      - '3888:3888'
-  kafka:
-    image: 'confluentinc/cp-kafka:latest'
-    healthcheck:
-      test: 'ps augwwx | egrep [S]upportedKafka'
-    depends_on:
-      - zookeeper
-    ports:
-      - '9092:9092'
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_OPTS: '-Djava.net.preferIPv4Stack=True'
-      KAFKA_LISTENERS: 'LISTENER_INT://kafka:29092,LISTENER_EXT://0.0.0.0:9092'
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INT://kafka:29092,LISTENER_EXT://localhost:9092'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'LISTENER_INT:PLAINTEXT,LISTENER_EXT:PLAINTEXT'
-      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INT
-    volumes:
-      - 'kafka_data_cfg:/mnt/shared/config'
-      - 'kafka_data:/var/lib/kafka/data'
-      - 'kafka_data_secrets:/etc/kafka/secrets'
-
+      retries: 5
