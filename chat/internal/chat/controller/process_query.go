@@ -193,7 +193,7 @@ func (ctrl *Controller) receiveChunk(
 
 	sourceIDs := r.GetSourceIds()
 	if sourceIDs != nil {
-		content += "\nИсточники:" + strings.Join(sourceIDs, ", ")
+		content += "\nИсточники: [" + strings.Join(sourceIDs, ", ") + "]"
 	}
 
 	_, err = buff.WriteString(content)
