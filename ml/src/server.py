@@ -43,7 +43,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
         try:
             async for token in self.rag.generate_stream(request=request):
                 response = ml_pb2_model.ProcessQueryResponse(
-                    chunk=ml_pb2_model.Chunk(content=f"{token}"),
+                    chunk=ml_pb2_model.Chunk(content=f"{token[0]}"),
                     sourceIds=request.sourceIds,
                 )
 
