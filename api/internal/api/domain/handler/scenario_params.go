@@ -3,7 +3,10 @@ package handler
 import (
 	"context"
 
+	"github.com/larek-tech/diploma/api/internal/auth"
+	authpb "github.com/larek-tech/diploma/api/internal/auth/pb"
 	"github.com/larek-tech/diploma/api/internal/domain/pb"
+	"github.com/larek-tech/diploma/api/internal/shared"
 	"github.com/rs/zerolog/log"
 	"github.com/yogenyslav/pkg/errs"
 	"google.golang.org/grpc/codes"
@@ -51,7 +54,15 @@ func (h *Handler) checkDefaultScenario(ctx context.Context, domain *pb.Domain) (
 				return nil, errs.WrapErr(err)
 			}
 
-			go h.createOptimalScenario(context.Background(), resp)
+			userID := ctx.Value(shared.UserIDKey)
+			roles := ctx.Value(shared.UserRolesKey)
+
+			ctx = auth.PushUserMeta(ctx, &authpb.UserAuthMetadata{
+				UserId: userID.(int64),
+				Roles:  roles.([]int64),
+			})
+
+			go h.createOptimalScenario(ctx, resp)
 		}
 	}
 	return domain, nil
