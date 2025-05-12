@@ -7,10 +7,14 @@ import (
 	ch "github.com/larek-tech/diploma/api/internal/api/chat/handler"
 	"github.com/larek-tech/diploma/api/internal/api/domain"
 	dh "github.com/larek-tech/diploma/api/internal/api/domain/handler"
+	"github.com/larek-tech/diploma/api/internal/api/role"
+	rh "github.com/larek-tech/diploma/api/internal/api/role/handler"
 	"github.com/larek-tech/diploma/api/internal/api/scenario"
 	sch "github.com/larek-tech/diploma/api/internal/api/scenario/handler"
 	"github.com/larek-tech/diploma/api/internal/api/source"
 	sh "github.com/larek-tech/diploma/api/internal/api/source/handler"
+	"github.com/larek-tech/diploma/api/internal/api/user"
+	uh "github.com/larek-tech/diploma/api/internal/api/user/handler"
 	authpb "github.com/larek-tech/diploma/api/internal/auth/pb"
 	chatpb "github.com/larek-tech/diploma/api/internal/chat/pb"
 	domainpb "github.com/larek-tech/diploma/api/internal/domain/pb"
@@ -45,4 +49,12 @@ func SetupRoutes(
 	chatRouter := api.Group("/chat")
 	chatHandler := ch.New(chatpb.NewChatServiceClient(chatConn), authpb.NewAuthServiceClient(authConn), tracer)
 	chat.SetupRoutes(chatRouter, chatHandler, wsConfig)
+
+	userRouter := api.Group("/user")
+	userHandler := uh.New(domainpb.NewUserServiceClient(domainConn))
+	user.SetupRoutes(userRouter, userHandler)
+
+	roleRouter := api.Group("/role")
+	roleHandler := rh.New(domainpb.NewRoleServiceClient(domainConn))
+	role.SetupRoutes(roleRouter, roleHandler)
 }

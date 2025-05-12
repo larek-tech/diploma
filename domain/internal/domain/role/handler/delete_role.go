@@ -26,7 +26,7 @@ func (h *Handler) DeleteRole(ctx context.Context, req *pb.DeleteRoleRequest) (*e
 		if errors.Is(err, auth.ErrRequireAdmin) {
 			return nil, status.Error(codes.PermissionDenied, "admin role required")
 		}
-		return nil, status.Error(codes.PermissionDenied, "failed to delete role")
+		return nil, status.Error(codes.Internal, "failed to delete role")
 	}
 
 	return &emptypb.Empty{}, status.Error(codes.OK, "deleted role successfully")

@@ -17,10 +17,10 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			sourceID	path		int		true	"Source ID"
-//	@Success		204			{object}	string	"Source deleted"
-//	@Failure		400			{object}	string	"Failed to delete source"
-//	@Failure		404			{object}	string	"Source not found"
+//	@Param			id	path		int		true	"Source ID"
+//	@Success		204	{object}	string	"Source deleted"
+//	@Failure		400	{object}	string	"Failed to delete source"
+//	@Failure		404	{object}	string	"Source not found"
 //	@Router			/api/v1/source/{id} [delete]
 func (h *Handler) DeleteSource(c *fiber.Ctx) error {
 	var req pb.DeleteSourceRequest

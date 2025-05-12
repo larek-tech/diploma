@@ -17,10 +17,10 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			sourceID	path		int			true	"Requested source ID"
-//	@Success		200			{object}	pb.Source	"Source"
-//	@Failure		400			{object}	string		"Failed to get source"
-//	@Failure		404			{object}	string		"Source not found"
+//	@Param			id	path		int			true	"Requested source ID"
+//	@Success		200	{object}	pb.Source	"Source"
+//	@Failure		400	{object}	string		"Failed to get source"
+//	@Failure		404	{object}	string		"Source not found"
 //	@Router			/api/v1/source/{id} [get]
 func (h *Handler) GetSource(c *fiber.Ctx) error {
 	var req pb.GetSourceRequest

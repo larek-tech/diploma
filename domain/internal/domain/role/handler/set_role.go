@@ -27,7 +27,7 @@ func (h *Handler) SetRole(ctx context.Context, req *pb.UpdateRoleRequest) (*empt
 		if errors.Is(err, auth.ErrRequireAdmin) {
 			return nil, status.Error(codes.PermissionDenied, "admin role required")
 		}
-		return nil, status.Error(codes.PermissionDenied, "failed to set role")
+		return nil, status.Error(codes.Internal, "failed to set role")
 	}
 
 	return &emptypb.Empty{}, status.Error(codes.OK, "set role successfully")

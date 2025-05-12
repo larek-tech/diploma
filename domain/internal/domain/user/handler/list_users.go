@@ -22,7 +22,7 @@ func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.
 	resp, err := h.uc.ListUsers(ctx, req, meta)
 	if err != nil {
 		log.Err(errs.WrapErr(err)).Msg("list users")
-		return nil, status.Error(codes.Unauthenticated, "failed to list users")
+		return nil, status.Error(codes.Internal, "failed to list users")
 	}
 
 	return resp, status.Error(codes.OK, "got users list successfully")

@@ -26,7 +26,7 @@ func (h *Handler) CreateRole(ctx context.Context, req *pb.CreateRoleRequest) (*p
 		if errors.Is(err, auth.ErrRequireAdmin) {
 			return nil, status.Error(codes.PermissionDenied, "admin role required")
 		}
-		return nil, status.Error(codes.PermissionDenied, "failed to create role")
+		return nil, status.Error(codes.Internal, "failed to create role")
 	}
 
 	return resp, status.Error(codes.OK, "created role successfully")

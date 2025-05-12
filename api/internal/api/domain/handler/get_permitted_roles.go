@@ -17,9 +17,9 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			domainID	path		int			true	"Requested domain ID"
-//	@Success		200			{object}	pb.Domain	"Permitted roles"
-//	@Failure		404			{object}	string		"Domain not found"
+//	@Param			id	path		int			true	"Requested domain ID"
+//	@Success		200	{object}	pb.Domain	"Permitted roles"
+//	@Failure		404	{object}	string		"Domain not found"
 //	@Router			/api/v1/domain/permissions/roles/{id} [get]
 func (h *Handler) GetPermittedRoles(c *fiber.Ctx) error {
 	var req pb.GetResourcePermissionsRequest

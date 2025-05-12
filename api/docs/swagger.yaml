@@ -58,6 +58,11 @@ definitions:
       title:
         type: string
     type: object
+  pb.CreateRoleRequest:
+    properties:
+      name:
+        type: string
+    type: object
   pb.CreateScenarioRequest:
     properties:
       domainId:
@@ -89,6 +94,13 @@ definitions:
         $ref: '#/definitions/pb.SourceType'
       updateParams:
         $ref: '#/definitions/pb.UpdateParams'
+    type: object
+  pb.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
     type: object
   pb.CronFormat:
     properties:
@@ -136,6 +148,13 @@ definitions:
           $ref: '#/definitions/pb.Domain'
         type: array
     type: object
+  pb.ListRolesResponse:
+    properties:
+      roles:
+        items:
+          $ref: '#/definitions/pb.Role'
+        type: array
+    type: object
   pb.ListScenariosResponse:
     properties:
       scenarios:
@@ -148,6 +167,13 @@ definitions:
       sources:
         items:
           $ref: '#/definitions/pb.Source'
+        type: array
+    type: object
+  pb.ListUsersResponse:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/pb.User'
         type: array
     type: object
   pb.LlmModel:
@@ -259,6 +285,15 @@ definitions:
     - ResponseStatus_RESPONSE_SUCCESS
     - ResponseStatus_RESPONSE_ERROR
     - ResponseStatus_RESPONSE_CANCELED
+  pb.Role:
+    properties:
+      createdAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   pb.Scenario:
     properties:
       createdAt:
@@ -355,6 +390,13 @@ definitions:
       everyPeriod:
         type: integer
     type: object
+  pb.UpdateRoleRequest:
+    properties:
+      roleId:
+        type: integer
+      userId:
+        type: integer
+    type: object
   pb.UpdateScenarioRequest:
     properties:
       modelName:
@@ -412,6 +454,17 @@ definitions:
         type: string
       updateParams:
         $ref: '#/definitions/pb.UpdateParams'
+    type: object
+  pb.User:
+    properties:
+      createdAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      email:
+        type: string
+      id:
+        type: integer
+      updatedAt:
+        $ref: '#/definitions/timestamppb.Timestamp'
     type: object
   pb.UserAuthMetadata:
     properties:
@@ -673,7 +726,7 @@ paths:
       parameters:
       - description: Domain ID
         in: path
-        name: domainID
+        name: id
         required: true
         type: integer
       produces:
@@ -703,7 +756,7 @@ paths:
       parameters:
       - description: Requested domain ID
         in: path
-        name: domainID
+        name: id
         required: true
         type: integer
       produces:
@@ -733,7 +786,7 @@ paths:
       parameters:
       - description: Domain ID
         in: path
-        name: domainID
+        name: id
         required: true
         type: integer
       - description: Update params
@@ -802,7 +855,7 @@ paths:
       parameters:
       - description: Requested domain ID
         in: path
-        name: domainID
+        name: id
         required: true
         type: integer
       produces:
@@ -828,7 +881,7 @@ paths:
       parameters:
       - description: Requested domain ID
         in: path
-        name: domainID
+        name: id
         required: true
         type: integer
       - description: New list of permitted roles
@@ -861,7 +914,7 @@ paths:
       parameters:
       - description: Requested domain ID
         in: path
-        name: domainID
+        name: id
         required: true
         type: integer
       produces:
@@ -887,7 +940,7 @@ paths:
       parameters:
       - description: Requested domain ID
         in: path
-        name: domainID
+        name: id
         required: true
         type: integer
       - description: New list of permitted users
@@ -912,6 +965,195 @@ paths:
       summary: Update permitted users.
       tags:
       - domain
+  /api/v1/role/:
+    post:
+      consumes:
+      - application/json
+      description: Create new role, only for admins.
+      parameters:
+      - description: Input data for creating role
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.CreateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Role successfully created
+          schema:
+            $ref: '#/definitions/pb.Role'
+        "400":
+          description: Failed to create role
+          schema:
+            type: string
+        "403":
+          description: Required admin role
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create new role.
+      tags:
+      - role
+  /api/v1/role/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete role by ID, only for admins.
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Role deleted
+          schema:
+            type: string
+        "400":
+          description: Failed to delete role
+          schema:
+            type: string
+        "403":
+          description: Required admin role
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete role.
+      tags:
+      - role
+    get:
+      consumes:
+      - application/json
+      description: Returns information about role.
+      parameters:
+      - description: Requested role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Role
+          schema:
+            $ref: '#/definitions/pb.Role'
+        "400":
+          description: Failed to get role
+          schema:
+            type: string
+        "403":
+          description: Required admin role
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get role.
+      tags:
+      - role
+  /api/v1/role/list:
+    get:
+      consumes:
+      - application/json
+      description: List roles.
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: Pagination limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of roles
+          schema:
+            $ref: '#/definitions/pb.ListRolesResponse'
+        "400":
+          description: Failed to list roles
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List roles.
+      tags:
+      - role
+  /api/v1/role/remove:
+    put:
+      consumes:
+      - application/json
+      description: Remove role from user's list, only for admins.
+      parameters:
+      - description: Remove role from user's list
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.UpdateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Role successfully removed
+          schema:
+            type: string
+        "400":
+          description: Failed to remove role
+          schema:
+            type: string
+        "403":
+          description: Required admin role
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Remove role.
+      tags:
+      - role
+  /api/v1/role/set:
+    put:
+      consumes:
+      - application/json
+      description: Add new role for user, only for admins.
+      parameters:
+      - description: Set role for user
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.UpdateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Role successfully set
+          schema:
+            type: string
+        "400":
+          description: Failed to set role
+          schema:
+            type: string
+        "403":
+          description: Required admin role
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Set role.
+      tags:
+      - role
   /api/v1/scenario/:
     post:
       consumes:
@@ -948,7 +1190,7 @@ paths:
       parameters:
       - description: Scenario ID
         in: path
-        name: scenarioID
+        name: id
         required: true
         type: integer
       produces:
@@ -978,7 +1220,7 @@ paths:
       parameters:
       - description: Requested scenario ID
         in: path
-        name: scenarioID
+        name: id
         required: true
         type: integer
       produces:
@@ -1008,7 +1250,7 @@ paths:
       parameters:
       - description: Scenario ID
         in: path
-        name: scenarioID
+        name: id
         required: true
         type: integer
       - description: Update params
@@ -1105,7 +1347,7 @@ paths:
       parameters:
       - description: Source ID
         in: path
-        name: sourceID
+        name: id
         required: true
         type: integer
       produces:
@@ -1135,7 +1377,7 @@ paths:
       parameters:
       - description: Requested source ID
         in: path
-        name: sourceID
+        name: id
         required: true
         type: integer
       produces:
@@ -1165,7 +1407,7 @@ paths:
       parameters:
       - description: Source ID
         in: path
-        name: sourceID
+        name: id
         required: true
         type: integer
       - description: Update params
@@ -1234,7 +1476,7 @@ paths:
       parameters:
       - description: Requested source ID
         in: path
-        name: sourceID
+        name: id
         required: true
         type: integer
       produces:
@@ -1260,7 +1502,7 @@ paths:
       parameters:
       - description: Requested source ID
         in: path
-        name: sourceID
+        name: id
         required: true
         type: integer
       - description: New list of permitted roles
@@ -1293,7 +1535,7 @@ paths:
       parameters:
       - description: Requested source ID
         in: path
-        name: sourceID
+        name: id
         required: true
         type: integer
       produces:
@@ -1319,7 +1561,7 @@ paths:
       parameters:
       - description: Requested source ID
         in: path
-        name: sourceID
+        name: id
         required: true
         type: integer
       - description: New list of permitted users
@@ -1344,6 +1586,131 @@ paths:
       summary: Update permitted users.
       tags:
       - source
+  /api/v1/user/:
+    post:
+      consumes:
+      - application/json
+      description: Create new user, only for admins.
+      parameters:
+      - description: Input data for creating user
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/pb.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User successfully created
+          schema:
+            $ref: '#/definitions/pb.User'
+        "400":
+          description: Failed to create user
+          schema:
+            type: string
+        "403":
+          description: Required admin role
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create new user.
+      tags:
+      - user
+  /api/v1/user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user by ID, only for admins.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: User deleted
+          schema:
+            type: string
+        "400":
+          description: Failed to delete user
+          schema:
+            type: string
+        "403":
+          description: Required admin role
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user.
+      tags:
+      - user
+    get:
+      consumes:
+      - application/json
+      description: Returns information about user.
+      parameters:
+      - description: Requested user ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User
+          schema:
+            $ref: '#/definitions/pb.User'
+        "400":
+          description: Failed to get user
+          schema:
+            type: string
+        "403":
+          description: Required admin role
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get user.
+      tags:
+      - user
+  /api/v1/user/list:
+    get:
+      consumes:
+      - application/json
+      description: List users.
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: Pagination limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            $ref: '#/definitions/pb.ListUsersResponse'
+        "400":
+          description: Failed to list users
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List users.
+      tags:
+      - user
   /auth/v1/login:
     post:
       consumes:

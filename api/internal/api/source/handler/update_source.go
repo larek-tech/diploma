@@ -17,11 +17,11 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			sourceID	path		int						true	"Source ID"
-//	@Param			req			body		pb.UpdateSourceRequest	true	"Update params"
-//	@Success		200			{object}	pb.Source				"Source updated"
-//	@Failure		400			{object}	string					"Failed to update source"
-//	@Failure		404			{object}	string					"Source not found"
+//	@Param			id	path		int						true	"Source ID"
+//	@Param			req	body		pb.UpdateSourceRequest	true	"Update params"
+//	@Success		200	{object}	pb.Source				"Source updated"
+//	@Failure		400	{object}	string					"Failed to update source"
+//	@Failure		404	{object}	string					"Source not found"
 //	@Router			/api/v1/source/{id} [put]
 func (h *Handler) UpdateSource(c *fiber.Ctx) error {
 	var req pb.UpdateSourceRequest

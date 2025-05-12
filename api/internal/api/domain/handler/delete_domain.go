@@ -17,10 +17,10 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			domainID	path		int		true	"Domain ID"
-//	@Success		204			{object}	string	"Domain deleted"
-//	@Failure		400			{object}	string	"Failed to delete domain"
-//	@Failure		404			{object}	string	"Domain not found"
+//	@Param			id	path		int		true	"Domain ID"
+//	@Success		204	{object}	string	"Domain deleted"
+//	@Failure		400	{object}	string	"Failed to delete domain"
+//	@Failure		404	{object}	string	"Domain not found"
 //	@Router			/api/v1/domain/{id} [delete]
 func (h *Handler) DeleteDomain(c *fiber.Ctx) error {
 	var req pb.DeleteDomainRequest
