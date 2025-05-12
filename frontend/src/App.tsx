@@ -8,6 +8,7 @@ import { Dashboard } from './components/Dashboard';
 import { Toaster } from './components/ui/toaster';
 import { Pages } from './router/constants';
 import { useEffect } from 'react';
+import CreateDomain from './pages/CreateDomain';
 
 function App() {
     useEffect(() => {
@@ -54,6 +55,16 @@ function App() {
                             <RequireAuth>
                                 <Dashboard>
                                     <Chat />
+                                </Dashboard>
+                            </RequireAuth>
+                        }
+                    />
+                    <Route
+                        path={`/${Pages.CreateDomain}`}
+                        element={
+                            <RequireAuth>
+                                <Dashboard>
+                                    <CreateDomain />
                                 </Dashboard>
                             </RequireAuth>
                         }
