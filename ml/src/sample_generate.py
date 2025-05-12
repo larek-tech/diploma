@@ -4,8 +4,10 @@ import json
 import anyio
 import redis.asyncio as redis
 
-from config import OLLAMA_BASE_URL, QA_PROMPT_TEMPLATE
+from config import DATA_SERVICE_HOST, OLLAMA_BASE_URL, QA_PROMPT_TEMPLATE
+from data_client import AsyncDataServiceClient
 from ollama_client import AsyncOllamaClient
+from utils.logger import logger
 
 
 def generate_structured_output_schema(n: int = 1) -> dict:
@@ -121,7 +123,17 @@ class SyntheticDatasetGenerator:
         await redis_client.close()
 
 
-async def main() -> None:
+async def generate_dataset(source_ids: list[str]) -> None:
+
+    # source_ids = ["0c03cad2-6af8-479d-bdad-58ae70c54eb5"]
+    # data_client = AsyncDataServiceClient(
+    #     host=DATA_SERVICE_HOST, port=DATA_SERVICE_HOST
+    # )
+    # chunks = []
+    # for source_id in source_ids:
+    #     response = await data_client.get_documents(source_id, size=10, page=10)
+    #     chunks += [doc.content for doc in response.documents]
+    # logger.info(chunks)
     chunks = [
         "Python — это язык программирования, широко используемый для веб-разработки, анализа данных, искусственного интеллекта и научных вычислений.",
         "Гравитация — это сила, с которой тела притягиваются друг к другу. Она зависит от массы объектов и расстояния между ними.",
