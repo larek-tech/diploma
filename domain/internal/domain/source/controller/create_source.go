@@ -132,6 +132,7 @@ consumeLoop:
 				status = model.StatusFailed
 			} else if resp.Status != model.StatusUndefined {
 				status = resp.Status
+				source.ExtID = resp.SourceID
 			}
 
 			if status == model.StatusFailed {
