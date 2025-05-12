@@ -152,15 +152,11 @@ func (ctrl *Controller) ProcessQuery(
 		case <-processCtx.Done():
 			return
 		case <-streamCtx.Done():
-			out <- &pb.ChunkedResponse{
-				QueryId:   queryID,
-				SourceIds: q.SourceIDs,
-			}
 			log.Debug().
 				Int64("queryID", resp.QueryID).
 				Any("sourceIDs", q.SourceIDs).
 				Msg("got chunk")
-			log.Info().Int64("queryID", queryID).Msg("processing successfully finished")
+			log.Info().Int64("queryID", queryID).Msg("stream successfully finished")
 			return
 		default:
 			if err = ctrl.receiveChunk(streamCtx, success, stream, out, &resp, &contentBuff); err != nil {
@@ -194,6 +190,12 @@ func (ctrl *Controller) receiveChunk(
 	}
 
 	content := r.GetChunk().Content
+
+	sourceIDs := r.GetSourceIds()
+	if sourceIDs != nil {
+		content += strings.Join(sourceIDs, ", ")
+	}
+	
 	_, err = buff.WriteString(content)
 	if err != nil {
 		return errs.WrapErr(err, "write chunk")
@@ -202,8 +204,9 @@ func (ctrl *Controller) receiveChunk(
 	log.Debug().Int64("queryID", resp.QueryID).Str("content", content).Msg("got chunk")
 
 	out <- &pb.ChunkedResponse{
-		QueryId: resp.QueryID,
-		Content: content,
+		QueryId:   resp.QueryID,
+		Content:   content,
+		SourceIds: sourceIDs,
 	}
 
 	resp.Content = buff.String()
