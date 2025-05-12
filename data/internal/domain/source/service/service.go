@@ -56,7 +56,8 @@ func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (
 				Payload: webSource,
 				Delay:   0,
 				Metadata: map[string]any{
-					"siteJobID": uuid.NewString(),
+					"siteJobID":   uuid.NewString(),
+					"externalKey": string(message.ExternalKey),
 				},
 			}}, publishOptions...)
 			if err != nil {

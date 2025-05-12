@@ -188,5 +188,5 @@ func getS3Credentials() s3.Credentials {
 	if endpoint == "" {
 		endpoint = "localhost:9000"
 	}
-	return s3.NewCredentials(endpoint, os.Getenv("S3_ACCESS_KEY_ID"), os.Getenv("S3_SECRET_ACCESS_KEY"))
+	return s3.NewCredentials(endpoint, os.Getenv("S3_ACCESS_KEY_ID"), os.Getenv("S3_SECRET_ACCESS_KEY"), true)
 }

@@ -21,6 +21,7 @@ type UpdateParams struct {
 
 // отправляем в source_topic
 type DataMessage struct {
+	ExternalKey  []byte
 	Title        string       `json:"title"`
 	Content      []byte       `json:"content"` // byte-строка с url или считанный файл
 	Type         Type         `json:"type"`

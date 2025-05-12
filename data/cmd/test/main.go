@@ -6,10 +6,8 @@ import (
 	"fmt"
 	"log/slog"
 
-	kafka2 "github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/kafka"
-	"github.com/larek-tech/diploma/data/internal/infrastructure/ptr"
 )
 
 func main() {
@@ -21,7 +19,7 @@ func main() {
 	}
 	producer, err := kafka.NewProducer(*kafkaCfg)
 	if err != nil {
-		slog.Error("failed to create kafka producer: %w", err)
+		slog.Error("failed to create kafka producer", "err", err)
 		return
 	}
 	str := "https://notes.kiriha.ru/sitemap.xml"
@@ -35,24 +33,13 @@ func main() {
 	}
 	payload, err := json.Marshal(testPayload)
 	if err != nil {
-		slog.Error("failed to marshal payload: %w", err)
+		slog.Error("failed to marshal payload", "err", err)
 		return
 	}
 
-	err = producer.Produce(ctx, &kafka2.Message{
-		TopicPartition: kafka2.TopicPartition{
-			Topic:       ptr.To("source"),
-			Partition:   0,
-			Offset:      0,
-			Metadata:    nil,
-			Error:       nil,
-			LeaderEpoch: nil,
-		},
-		Value: payload,
-		Key:   []byte("random msg id"),
-	})
+	err = producer.Produce(ctx, "source", []byte("some key"), payload)
 	if err != nil {
-		slog.Error("failed to produce message: %w", err)
+		slog.Error("failed to produce message", "err", err)
 		return
 	}
 }
