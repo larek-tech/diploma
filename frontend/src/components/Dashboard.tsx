@@ -1,4 +1,4 @@
-import { Building, CircleUser, Menu, Package2, SaveAll, SquarePen } from 'lucide-react';
+import { CircleUser, Menu, Package2, SquarePen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -153,18 +153,6 @@ const Navigation = () => {
                 <LoaderButton className='flex w-full items-center gap-3 rounded-lg px-3 py-2 my-2 text-muted-foreground transition-all hover:text-secondary hover:bg-slate-200 bg-slate-200'>
                     <SquarePen className='h-4 w-4' />
                     Новый чат
-                </LoaderButton>
-            </Link>
-            <Link to={`/${Pages.SavedPredictions}`} className='flex items-center gap-2'>
-                <LoaderButton className='flex w-full items-center gap-3 rounded-lg px-3 py-2 my-2 text-muted-foreground transition-all hover:text-secondary hover:bg-slate-200 bg-slate-200'>
-                    <SaveAll className='h-4 w-4' />
-                    Сохраненные планы
-                </LoaderButton>
-            </Link>
-            <Link to={`/${Pages.Organizatinos}`} className='flex items-center gap-2'>
-                <LoaderButton className='flex w-full items-center gap-3 rounded-lg px-3 py-2 my-2 text-muted-foreground transition-all hover:text-secondary hover:bg-slate-200 bg-slate-200'>
-                    <Building className='h-4 w-4' />
-                    Организации
                 </LoaderButton>
             </Link>
         </>

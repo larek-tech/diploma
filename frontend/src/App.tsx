@@ -6,8 +6,6 @@ import { AuthProvider } from './auth/AuthProvider';
 import { RequireUnauth } from './auth/RequireUnauth';
 import { Dashboard } from './components/Dashboard';
 import { Toaster } from './components/ui/toaster';
-import SavedPredictions from './pages/SavedPredictions';
-import Organizations from './pages/Organizations';
 import { Pages } from './router/constants';
 import { useEffect } from 'react';
 
@@ -46,26 +44,6 @@ function App() {
                             <RequireAuth>
                                 <Dashboard>
                                     <Chat />
-                                </Dashboard>
-                            </RequireAuth>
-                        }
-                    />
-                    <Route
-                        path={`/${Pages.SavedPredictions}`}
-                        element={
-                            <RequireAuth>
-                                <Dashboard>
-                                    <SavedPredictions />
-                                </Dashboard>
-                            </RequireAuth>
-                        }
-                    />
-                    <Route
-                        path={`/${Pages.Organizatinos}`}
-                        element={
-                            <RequireAuth>
-                                <Dashboard>
-                                    <Organizations />
                                 </Dashboard>
                             </RequireAuth>
                         }
