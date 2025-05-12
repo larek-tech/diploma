@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"fmt"
+
 	"github.com/larek-tech/diploma/api/internal/domain/pb"
 )
 
@@ -8,6 +10,9 @@ const (
 	domainIDParam = "id"
 	offsetParam   = "offset"
 	limitParam    = "limit"
+
+	defaultTitlePattern = "%s (сценарий по умолчанию)"
+	optimalTitlePattern = "%s (оптимальные параметры)"
 )
 
 // Handler implements domain methods on transport level.
@@ -31,4 +36,12 @@ func New(
 		sourceService:   sourceService,
 		mlService:       mlService,
 	}
+}
+
+func domainDefaultTitle(domainTitle string) string {
+	return fmt.Sprintf(defaultTitlePattern, domainTitle)
+}
+
+func domainOptimalTitle(domainTitle string) string {
+	return fmt.Sprintf(optimalTitlePattern, domainTitle)
 }

@@ -35,11 +35,16 @@ func (h *Handler) UpdateDomain(c *fiber.Ctx) error {
 	}
 	req.DomainId = int64(domainID)
 
-	resp, err := h.domainService.UpdateDomain(c.UserContext(), &req)
+	domain, err := h.domainService.UpdateDomain(c.UserContext(), &req)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			return errs.WrapErr(shared.ErrDomainNotFound, err.Error())
 		}
+		return errs.WrapErr(shared.ErrUpdateDomain, err.Error())
+	}
+
+	resp, err := h.checkDefaultScenario(c.UserContext(), domain)
+	if err != nil {
 		return errs.WrapErr(shared.ErrUpdateDomain, err.Error())
 	}
 
