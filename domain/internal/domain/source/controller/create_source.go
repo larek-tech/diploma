@@ -103,15 +103,16 @@ func (ctrl *Controller) getParsingResult(source model.SourceDao, meta *authpb.Us
 		failed         bool
 	)
 
+consumeLoop:
 	for {
 		select {
 		case err := <-ctrl.errCh:
 			log.Err(errs.WrapErr(err)).Msg("consuming source status topic failed")
-			return
+			break consumeLoop
 		case <-time.After(time.Minute):
 			if !startedParsing {
 				log.Err(errs.WrapErr(ErrUpdateSourceStatus)).Msg("failed to start parsing")
-				return
+				break consumeLoop
 			}
 		case msg := <-ctrl.statusCh:
 			log.Debug().Str("msg", string(msg.Value)).Msg("got parsing status message")
@@ -148,13 +149,14 @@ func (ctrl *Controller) getParsingResult(source model.SourceDao, meta *authpb.Us
 
 			if status == model.StatusReady {
 				log.Info().Str("sourceID", resp.SourceID).Msg("processed successfully")
-				return
+				break consumeLoop
 			}
 
 			if failed {
 				log.Err(errs.WrapErr(ErrUpdateSourceStatus)).Msg("get parsing result")
-				return
+				break consumeLoop
 			}
 		}
 	}
+	log.Info().Int64("sourceID", source.ID).Msg("finished consumer loop for parsing source")
 }
