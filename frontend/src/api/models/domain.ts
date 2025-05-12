@@ -61,6 +61,10 @@ export interface Domain {
     updatedAt: TimeStamp;
 }
 
+export interface DomainsResponse {
+    domains: Domain[];
+}
+
 export interface ScenarioModelConfig {
     modelName: string;
     systemPrompt: string;

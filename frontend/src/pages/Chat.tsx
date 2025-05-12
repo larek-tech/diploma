@@ -283,10 +283,6 @@ const Chat = observer(() => {
                                 <span className='sr-only'>Отправить</span>
                             </Button>
                         </div>
-                        <p className='text-xs text-center text-neutral-700 font-medium dark:text-gray-400'>
-                            Предсказания модели являются лишь рекомендациями. Пожалуйста, проверяйте
-                            важную информацию.
-                        </p>
                     </div>
                 </div>
             </div>

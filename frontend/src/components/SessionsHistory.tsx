@@ -28,8 +28,8 @@ const SessionsHistory = observer(() => {
                           .slice()
                           .sort(
                               (a, b) =>
-                                  new Date(b.created_at).getTime() -
-                                  new Date(a.created_at).getTime()
+                                  new Date(b.createdAt.seconds).getTime() -
+                                  new Date(a.createdAt.seconds).getTime()
                           )
                           .map((session) => (
                               <SessionHistoryItem session={session} key={session.id} />

@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth';
 import SessionsHistory from './SessionsHistory';
+import DomainsHistory from './DomainsHistory';
 import { LoaderButton } from './ui/loader-button';
 import { useEffect } from 'react';
 import { useStores } from '@/hooks/useStores';
@@ -39,14 +40,6 @@ export function Dashboard({ children }: DashboardProps) {
                 variant: 'destructive',
             });
         });
-
-        rootStore.getOrganizations().catch(() => {
-            toast({
-                title: 'Ошибка',
-                description: 'Не удалось загрузить организации',
-                variant: 'destructive',
-            });
-        });
     }, [rootStore]);
 
     return (
@@ -65,8 +58,9 @@ export function Dashboard({ children }: DashboardProps) {
                                 <Navigation />
                             </nav>
 
-                            <div className='p-6'>
+                            <div className='p-6 space-y-6'>
                                 <SessionsHistory />
+                                <DomainsHistory />
                             </div>
                         </div>
                     </div>
@@ -98,7 +92,10 @@ export function Dashboard({ children }: DashboardProps) {
                                     <Navigation />
                                 </nav>
 
-                                <SessionsHistory />
+                                <div className='space-y-6'>
+                                    <DomainsHistory />
+                                    <SessionsHistory />
+                                </div>
                             </SheetContent>
                         </Sheet>
 

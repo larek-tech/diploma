@@ -1,5 +1,5 @@
 import ChatApiService from '@/api/ChatApiService';
-import OrganizationsApiService from '@/api/OrganizationsApiService';
+import { DomainApiService } from '@/api/DomainApiService';
 import {
     ChatSession,
     DeleteSessionParams,
@@ -19,11 +19,8 @@ import {
     StockResponse,
     UNAUTHORIZED_ERR,
 } from '@/api/models';
-import {
-    GetUsersInOrganizationParams,
-    Organization,
-    UserInOrganization,
-} from '@/api/models/organizations';
+import { Domain } from '@/api/models/domain';
+import { Organization, UserInOrganization } from '@/api/models/organizations';
 import { LOCAL_STORAGE_KEY } from '@/auth/AuthProvider';
 import { WS_URL } from '@/config';
 import { makeAutoObservable, runInAction } from 'mobx';
@@ -31,6 +28,12 @@ import { makeAutoObservable, runInAction } from 'mobx';
 export class RootStore {
     sessions: ShortSession[] = [];
     sessionsLoading: boolean = false;
+
+    domains: Domain[] = [];
+    domainsLoading: boolean = false;
+    domainsOffset: number = 0;
+    domainsLimit: number = 10;
+    hasMoreDomains: boolean = true;
 
     activeSessionId: string | null = null;
     activeSession: ChatSession | null = null;
@@ -55,6 +58,7 @@ export class RootStore {
         makeAutoObservable(this);
 
         this.sessions = [];
+        this.domains = [];
     }
 
     async getSessions() {
@@ -67,6 +71,38 @@ export class RootStore {
             .finally(() => {
                 this.sessionsLoading = false;
             });
+    }
+
+    async getDomains(reset: boolean = false) {
+        this.domainsLoading = true;
+
+        if (reset) {
+            this.domainsOffset = 0;
+            this.domains = [];
+            this.hasMoreDomains = true;
+        }
+
+        try {
+            const response = await DomainApiService.getDomains(
+                this.domainsOffset,
+                this.domainsLimit
+            );
+
+            runInAction(() => {
+                if (response.domains.length < this.domainsLimit) {
+                    this.hasMoreDomains = false;
+                }
+
+                this.domains = [...this.domains, ...response.domains];
+                this.domainsOffset += this.domainsLimit;
+            });
+        } catch (error) {
+            console.error('Error loading domains:', error);
+        } finally {
+            runInAction(() => {
+                this.domainsLoading = false;
+            });
+        }
     }
 
     async deleteSession({ id }: DeleteSessionParams) {
@@ -385,36 +421,6 @@ export class RootStore {
         if (this.activeSessionId) {
             this.connectWebSocket(this.activeSessionId);
         }
-    }
-
-    async getOrganizations() {
-        this.isOrganizationsLoading = true;
-
-        return OrganizationsApiService.getOrganizations()
-            .then((organization) => {
-                this.adminOrganizations = organization;
-
-                if (organization.length > 0) {
-                    this.setSelectedOrganizationId(organization[0].id);
-                }
-
-                return organization;
-            })
-            .finally(() => {
-                this.isOrganizationsLoading = false;
-            });
-    }
-
-    async getUsersInOrganization({ organizationId }: GetUsersInOrganizationParams) {
-        this.isUsersInOrganizationLoading = true;
-
-        return OrganizationsApiService.getUsersInOrganization({ organizationId })
-            .then((users) => {
-                this.usersInOrganization = users;
-            })
-            .finally(() => {
-                this.isUsersInOrganizationLoading = false;
-            });
     }
 
     setIsUsersInOrganizationLoading(isLoading: boolean) {
