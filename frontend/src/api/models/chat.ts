@@ -1,11 +1,13 @@
 import { OutputJson } from './favorites';
 import { ModelResponseType, PredictionResponse, PurchasePlan, StockResponse } from './predict';
+import { Time } from './time';
 
 export interface ShortSession {
+    createdAt: Time;
     id: string;
     title: string;
-    created_at: string;
-    tg: boolean;
+    updatedAt: Time;
+    userId: number;
 }
 
 export interface ChatQuery {
@@ -40,7 +42,7 @@ export interface ChatSession {
 }
 
 export interface GetSessionsResponse {
-    sessions: ShortSession[];
+    chats: ShortSession[];
 }
 
 export interface CreateSessionResponse {

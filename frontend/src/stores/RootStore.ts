@@ -61,7 +61,7 @@ export class RootStore {
         this.sessionsLoading = true;
 
         return ChatApiService.getSessions()
-            .then(({ sessions }) => {
+            .then(({ chats: sessions }) => {
                 this.sessions = sessions;
             })
             .finally(() => {
