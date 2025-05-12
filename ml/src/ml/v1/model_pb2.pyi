@@ -53,7 +53,7 @@ class VectorSearch(_message.Message):
     def __init__(self, topN: _Optional[int] = ..., threshold: _Optional[float] = ..., searchByQuery: bool = ...) -> None: ...
 
 class Scenario(_message.Message):
-    __slots__ = ("id", "multiQuery", "reranker", "vectorSearch", "model", "createdAt", "updatedAt", "title", "domainId")
+    __slots__ = ("id", "multiQuery", "reranker", "vectorSearch", "model", "createdAt", "updatedAt")
     ID_FIELD_NUMBER: _ClassVar[int]
     MULTIQUERY_FIELD_NUMBER: _ClassVar[int]
     RERANKER_FIELD_NUMBER: _ClassVar[int]
@@ -70,9 +70,7 @@ class Scenario(_message.Message):
     model: LlmModel
     createdAt: _timestamp_pb2.Timestamp
     updatedAt: _timestamp_pb2.Timestamp
-    title: str
-    domainId: int
-    def __init__(self, id: _Optional[int] = ..., multiQuery: _Optional[_Union[MultiQuery, _Mapping]] = ..., reranker: _Optional[_Union[Reranker, _Mapping]] = ..., vectorSearch: _Optional[_Union[VectorSearch, _Mapping]] = ..., model: _Optional[_Union[LlmModel, _Mapping]] = ..., createdAt: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updatedAt: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., title: _Optional[str] = ..., domainId: _Optional[int] = ...) -> None: ...
+    def __init__(self, id: _Optional[int] = ..., multiQuery: _Optional[_Union[MultiQuery, _Mapping]] = ..., reranker: _Optional[_Union[Reranker, _Mapping]] = ..., vectorSearch: _Optional[_Union[VectorSearch, _Mapping]] = ..., model: _Optional[_Union[LlmModel, _Mapping]] = ..., createdAt: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updatedAt: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class Query(_message.Message):
     __slots__ = ("id", "userId", "content")
