@@ -193,9 +193,9 @@ func (ctrl *Controller) receiveChunk(
 
 	sourceIDs := r.GetSourceIds()
 	if sourceIDs != nil {
-		content += strings.Join(sourceIDs, ", ")
+		content += "\nИсточники:" + strings.Join(sourceIDs, ", ")
 	}
-	
+
 	_, err = buff.WriteString(content)
 	if err != nil {
 		return errs.WrapErr(err, "write chunk")
