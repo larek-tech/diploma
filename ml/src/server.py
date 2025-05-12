@@ -4,7 +4,6 @@ from concurrent import futures
 
 import grpc
 from grpc import aio
-from grpc_reflection.v1alpha import reflection
 
 import ml.v1.model_pb2 as ml_pb2_model
 import ml.v1.service_pb2 as ml_pbd_service
