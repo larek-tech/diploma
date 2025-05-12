@@ -11,7 +11,7 @@ import (
 const updateDomains = `
 	update domain.domain
 	set title = $4,
-	    source_ids in (
+	    source_ids = (
 			select coalesce(array_agg(s.internal_id), '{}')
 			from domain.source s
 			where s.internal_id = any($5)
