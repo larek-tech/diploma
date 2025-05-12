@@ -16,7 +16,7 @@ const updateDomains = `
 			from domain.source s
 			where s.internal_id = any($5)
 		),
-		scenario_ids = $7
+		scenario_ids = $6
 	where id in (
 	    select id
 	    from domain.get_permitted_domains($2, $3)
