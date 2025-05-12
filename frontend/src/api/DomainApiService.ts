@@ -4,6 +4,7 @@ import {
     CreateScenarioRequest,
     CreateSourceRequest,
     Domain,
+    DomainsResponse,
     Source,
     SourcesResponse,
 } from './models';
@@ -26,6 +27,13 @@ export class DomainApiService {
 
     static async createScenario(data: CreateScenarioRequest): Promise<unknown> {
         const response = await axiosInstance.post<unknown>('/api/v1/scenario', data);
+        return response.data;
+    }
+
+    static async getDomains(offset: number = 0, limit: number = 10): Promise<DomainsResponse> {
+        const response = await axiosInstance.get<DomainsResponse>('/api/v1/domain/list', {
+            params: { offset, limit },
+        });
         return response.data;
     }
 }
