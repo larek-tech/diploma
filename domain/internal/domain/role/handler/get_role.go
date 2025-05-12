@@ -26,7 +26,7 @@ func (h *Handler) GetRole(ctx context.Context, req *pb.GetRoleRequest) (*pb.Role
 		if errors.Is(err, auth.ErrRequireAdmin) {
 			return nil, status.Error(codes.PermissionDenied, "admin role required")
 		}
-		return nil, status.Error(codes.PermissionDenied, "failed to get role")
+		return nil, status.Error(codes.Internal, "failed to get role")
 	}
 
 	return resp, status.Error(codes.OK, "got role successfully")

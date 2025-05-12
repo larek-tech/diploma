@@ -17,10 +17,10 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			domainID	path		int					true	"Requested domain ID"
-//	@Param			req			body		pb.PermittedRoles	true	"New list of permitted roles"
-//	@Success		200			{object}	pb.PermittedRoles	"Updated roles permissions"
-//	@Failure		404			{object}	string				"Domain not found"
+//	@Param			id	path		int					true	"Requested domain ID"
+//	@Param			req	body		pb.PermittedRoles	true	"New list of permitted roles"
+//	@Success		200	{object}	pb.PermittedRoles	"Updated roles permissions"
+//	@Failure		404	{object}	string				"Domain not found"
 //	@Router			/api/v1/domain/permissions/roles/{id} [put]
 func (h *Handler) UpdatePermittedRoles(c *fiber.Ctx) error {
 	var req pb.PermittedRoles

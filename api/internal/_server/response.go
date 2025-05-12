@@ -97,6 +97,42 @@ var (
 			Msg:    "failed to cancel query processing",
 			Status: fiber.StatusBadRequest,
 		},
+		shared.ErrCreateUser: {
+			Msg:    "failed creating user",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrGetUser: {
+			Msg:    "failed getting user",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrDeleteUser: {
+			Msg:    "failed deleting user",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrListUsers: {
+			Msg:    "failed listing available users",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrCreateRole: {
+			Msg:    "failed creating role",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrGetRole: {
+			Msg:    "failed getting role",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrDeleteRole: {
+			Msg:    "failed deleting role",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrListRoles: {
+			Msg:    "failed listing available roles",
+			Status: fiber.StatusBadRequest,
+		},
+		shared.ErrUpdateRoleForUser: {
+			Msg:    "failed to set or remove user role",
+			Status: fiber.StatusBadRequest,
+		},
 		// 401
 		shared.ErrUnauthorized: {
 			Msg:    "unauthorized",

@@ -22,7 +22,7 @@ func (h *Handler) ListRoles(ctx context.Context, req *pb.ListRolesRequest) (*pb.
 	resp, err := h.rc.ListRoles(ctx, req, meta)
 	if err != nil {
 		log.Err(errs.WrapErr(err)).Msg("list roles")
-		return nil, status.Error(codes.Unauthenticated, "failed to list roles")
+		return nil, status.Error(codes.Internal, "failed to list roles")
 	}
 
 	return resp, status.Error(codes.OK, "got roles list successfully")

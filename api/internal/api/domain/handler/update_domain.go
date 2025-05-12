@@ -17,11 +17,11 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			domainID	path		int						true	"Domain ID"
-//	@Param			req			body		pb.UpdateDomainRequest	true	"Update params"
-//	@Success		200			{object}	pb.Domain				"Domain updated"
-//	@Failure		400			{object}	string					"Failed to update domain"
-//	@Failure		404			{object}	string					"Domain not found"
+//	@Param			id	path		int						true	"Domain ID"
+//	@Param			req	body		pb.UpdateDomainRequest	true	"Update params"
+//	@Success		200	{object}	pb.Domain				"Domain updated"
+//	@Failure		400	{object}	string					"Failed to update domain"
+//	@Failure		404	{object}	string					"Domain not found"
 //	@Router			/api/v1/domain/{id} [put]
 func (h *Handler) UpdateDomain(c *fiber.Ctx) error {
 	var req pb.UpdateDomainRequest

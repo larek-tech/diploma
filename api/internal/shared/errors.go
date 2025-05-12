@@ -54,6 +54,26 @@ var (
 	ErrListChats = errors.New("failed to list chats")
 	// ErrCancelQuery is an error when failed to cancel processing query.
 	ErrCancelQuery = errors.New("failed to cancel query")
+
+	// ErrCreateUser is an error when failed to create user.
+	ErrCreateUser = errors.New("failed to create user")
+	// ErrGetUser is an error when failed to get user.
+	ErrGetUser = errors.New("failed to get user")
+	// ErrDeleteUser is an error when failed to delete user.
+	ErrDeleteUser = errors.New("failed to delete user")
+	// ErrListUsers is an error when failed to list users.
+	ErrListUsers = errors.New("failed to list users")
+
+	// ErrCreateRole is an error when failed to create role.
+	ErrCreateRole = errors.New("failed to create role")
+	// ErrGetRole is an error when failed to get role.
+	ErrGetRole = errors.New("failed to get role")
+	// ErrDeleteRole is an error when failed to delete role.
+	ErrDeleteRole = errors.New("failed to delete role")
+	// ErrListRoles is an error when failed to list roles.
+	ErrListRoles = errors.New("failed to list roles")
+	// ErrUpdateRoleForUser is an error when failed to set/remove role for user.
+	ErrUpdateRoleForUser = errors.New("failed to update role for user")
 )
 
 // 401

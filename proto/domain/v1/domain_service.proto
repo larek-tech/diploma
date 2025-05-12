@@ -13,7 +13,6 @@ service DomainService {
   rpc UpdateDomain(UpdateDomainRequest) returns (Domain) {};
   rpc DeleteDomain(DeleteDomainRequest) returns (google.protobuf.Empty) {};
   rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {};
-  // TODO: нужна ли ручка GetDomainSources() или сделать несколько вызовов GetSourceByID()?
 
   rpc GetPermittedUsers(GetResourcePermissionsRequest) returns (PermittedUsers) {};
   rpc UpdatePermittedUsers(PermittedUsers) returns (PermittedUsers) {};

@@ -17,10 +17,10 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			domainID	path		int					true	"Requested domain ID"
-//	@Param			req			body		pb.PermittedUsers	true	"New list of permitted users"
-//	@Success		200			{object}	pb.PermittedUsers	"Updated users permissions"
-//	@Failure		404			{object}	string				"Domain not found"
+//	@Param			id	path		int					true	"Requested domain ID"
+//	@Param			req	body		pb.PermittedUsers	true	"New list of permitted users"
+//	@Success		200	{object}	pb.PermittedUsers	"Updated users permissions"
+//	@Failure		404	{object}	string				"Domain not found"
 //	@Router			/api/v1/domain/permissions/users/{id} [put]
 func (h *Handler) UpdatePermittedUsers(c *fiber.Ctx) error {
 	var req pb.PermittedUsers
