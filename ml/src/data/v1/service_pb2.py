@@ -4,15 +4,18 @@
 # source: data/v1/service.proto
 # Protobuf Python Version: 5.29.0
 """Generated protocol buffer code."""
-
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import runtime_version as _runtime_version
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
-
 _runtime_version.ValidateProtobufRuntimeVersion(
-    _runtime_version.Domain.PUBLIC, 5, 29, 0, "", "data/v1/service.proto"
+    _runtime_version.Domain.PUBLIC,
+    5,
+    29,
+    0,
+    '',
+    'data/v1/service.proto'
 )
 # @@protoc_insertion_point(imports)
 
@@ -22,18 +25,14 @@ _sym_db = _symbol_database.Default()
 from data.v1 import model_pb2 as data_dot_v1_dot_model__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
-    b'\n\x15\x64\x61ta/v1/service.proto\x12\x07\x64\x61ta.v1\x1a\x13\x64\x61ta/v1/model.proto2\xa1\x01\n\x0b\x44\x61taService\x12M\n\x0cVectorSearch\x12\x1c.data.v1.VectorSearchRequest\x1a\x1d.data.v1.VectorSearchResponse"\x00\x12\x43\n\x0cGetDocuments\x12\x17.data.v1.GetDocumentsIn\x1a\x18.data.v1.GetDocumentsOut"\x00\x42\x12Z\x10internal/data/pbb\x06proto3'
-)
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15\x64\x61ta/v1/service.proto\x12\x07\x64\x61ta.v1\x1a\x13\x64\x61ta/v1/model.proto2\xa1\x01\n\x0b\x44\x61taService\x12M\n\x0cVectorSearch\x12\x1c.data.v1.VectorSearchRequest\x1a\x1d.data.v1.VectorSearchResponse\"\x00\x12\x43\n\x0cGetDocuments\x12\x17.data.v1.GetDocumentsIn\x1a\x18.data.v1.GetDocumentsOut\"\x00\x42\x12Z\x10internal/data/pbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(
-    DESCRIPTOR, "data.v1.service_pb2", _globals
-)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'data.v1.service_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
-    _globals["DESCRIPTOR"]._loaded_options = None
-    _globals["DESCRIPTOR"]._serialized_options = b"Z\020internal/data/pb"
-    _globals["_DATASERVICE"]._serialized_start = 56
-    _globals["_DATASERVICE"]._serialized_end = 217
+  _globals['DESCRIPTOR']._loaded_options = None
+  _globals['DESCRIPTOR']._serialized_options = b'Z\020internal/data/pb'
+  _globals['_DATASERVICE']._serialized_start=56
+  _globals['_DATASERVICE']._serialized_end=217
 # @@protoc_insertion_point(module_scope)

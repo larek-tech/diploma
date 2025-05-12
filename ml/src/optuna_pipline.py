@@ -277,5 +277,8 @@ class OptunaPipeline:
                 logger.error(f"Trial failed: {e}")
                 context_precision_score, similarity_score = 0.0, 0.0
             study.tell(trial, [context_precision_score, similarity_score])
-
+        best_trial = max(
+            study.best_trials,
+            key=lambda t: (t.values[0], t.values[1])  # сортировка по двум метрикам
+        )
         return study.best_trials

@@ -5,7 +5,7 @@
 groups = ["default", "notebook"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:25a5a382de300ed93b82f94286d9a23eb92260f91eb5bf8126871d8e9375c15a"
+content_hash = "sha256:7e40950a51b92919dd85c9c9c7fe18bc6123c06159d9b1dbaf211bdf30d13439"
 
 [[metadata.targets]]
 requires_python = "==3.11.*"
@@ -578,6 +578,15 @@ files = [
 ]
 
 [[package]]
+name = "grpc-reflection"
+version = "1.0.0"
+summary = ""
+groups = ["default"]
+files = [
+    {file = "grpc-reflection-1.0.0.tar.gz", hash = "sha256:d3b32e2eb8919d558b6e737b939859128a005edab8493198537e7ef23f0129cf"},
+]
+
+[[package]]
 name = "grpcio"
 version = "1.71.0"
 requires_python = ">=3.9"
@@ -595,6 +604,21 @@ files = [
     {file = "grpcio-1.71.0-cp311-cp311-win32.whl", hash = "sha256:d6de81c9c00c8a23047136b11794b3584cdc1460ed7cbc10eada50614baa1444"},
     {file = "grpcio-1.71.0-cp311-cp311-win_amd64.whl", hash = "sha256:24e867651fc67717b6f896d5f0cac0ec863a8b5fb7d6441c2ab428f52c651c6b"},
     {file = "grpcio-1.71.0.tar.gz", hash = "sha256:2b85f7820475ad3edec209d3d89a7909ada16caab05d3f2e08a7e8ae3200a55c"},
+]
+
+[[package]]
+name = "grpcio-reflection"
+version = "1.71.0"
+requires_python = ">=3.9"
+summary = "Standard Protobuf Reflection Service for gRPC"
+groups = ["default"]
+dependencies = [
+    "grpcio>=1.71.0",
+    "protobuf<6.0dev,>=5.26.1",
+]
+files = [
+    {file = "grpcio_reflection-1.71.0-py3-none-any.whl", hash = "sha256:8c88bdd9c92fcdd4d5df119997be05ecd0d7e10d377ec4a5072db507d2894612"},
+    {file = "grpcio_reflection-1.71.0.tar.gz", hash = "sha256:51504e977057ffabe66d1ed55557b15e969c42bb3a1f28ee45d730dd5f983bb5"},
 ]
 
 [[package]]
