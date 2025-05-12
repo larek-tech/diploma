@@ -76,7 +76,7 @@ class AsyncOllamaClient:
     def _handle_regular_response(self, response: httpx.Response) -> str:
         """Обработка обычного (не потокового) ответа."""
         result = response.json()
-        return result.get("response", "")
+        return result.get("response", "")[0]
 
     async def _handle_stream_response(
         self, response: httpx.Response
@@ -85,7 +85,7 @@ class AsyncOllamaClient:
         async for line in response.aiter_lines():
             if line:
                 chunk = json.loads(line)
-                yield chunk.get("response", "")
+                yield chunk.get("response", "")[0]
 
 
 async def main() -> None:
