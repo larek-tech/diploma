@@ -17,10 +17,10 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			queryID	path		int		yes	"Query ID"
-//	@Success		204		{object}	pb.Chat	"Processing query successfully canceled"
-//	@Failure		400		{object}	string	"Failed to cancel query"
-//	@Failure		403		{object}	string	"No access to cancel query"
+//	@Param			id	path		int		yes	"Query ID"
+//	@Success		204	{object}	pb.Chat	"Processing query successfully canceled"
+//	@Failure		400	{object}	string	"Failed to cancel query"
+//	@Failure		403	{object}	string	"No access to cancel query"
 //	@Router			/api/v1/chat/cancel/{id} [post]
 func (h *Handler) CancelQuery(c *fiber.Ctx) error {
 	queryID, err := c.ParamsInt(queryIDParam)

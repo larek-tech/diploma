@@ -17,10 +17,10 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			chatID	path		string	yes	"Chat ID"
-//	@Success		200		{object}	pb.Chat	"Returned chat"
-//	@Failure		400		{object}	string	"Failed to get chat"
-//	@Failure		404		{object}	string	"Chat not found"
+//	@Param			id	path		string	yes	"Chat ID"
+//	@Success		200	{object}	pb.Chat	"Returned chat"
+//	@Failure		400	{object}	string	"Failed to get chat"
+//	@Failure		404	{object}	string	"Chat not found"
 //	@Router			/api/v1/chat/history/{id} [get]
 func (h *Handler) GetChat(c *fiber.Ctx) error {
 	chatID := c.Params(chatIDParam)

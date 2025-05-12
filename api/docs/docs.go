@@ -75,7 +75,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Query ID",
-                        "name": "queryID",
+                        "name": "id",
                         "in": "path"
                     }
                 ],
@@ -123,7 +123,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Chat ID",
-                        "name": "chatID",
+                        "name": "id",
                         "in": "path"
                     }
                 ],
@@ -221,7 +221,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Chat ID",
-                        "name": "chatID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -277,7 +277,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Chat ID",
-                        "name": "chatID",
+                        "name": "id",
                         "in": "path"
                     }
                 ],

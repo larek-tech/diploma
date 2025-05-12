@@ -540,7 +540,7 @@ paths:
       parameters:
       - description: Chat ID
         in: path
-        name: chatID
+        name: id
         type: string
       produces:
       - application/json
@@ -569,7 +569,7 @@ paths:
       parameters:
       - description: Chat ID
         in: path
-        name: chatID
+        name: id
         required: true
         type: integer
       - description: Update params
@@ -606,7 +606,7 @@ paths:
       parameters:
       - description: Query ID
         in: path
-        name: queryID
+        name: id
         type: integer
       produces:
       - application/json
@@ -636,7 +636,7 @@ paths:
       parameters:
       - description: Chat ID
         in: path
-        name: chatID
+        name: id
         type: string
       produces:
       - application/json
