@@ -30,7 +30,10 @@ func (h *Handler) CreateDomain(c *fiber.Ctx) error {
 		return errs.WrapErr(shared.ErrCreateDomain, err.Error())
 	}
 
-	resp, err := h.checkDefaultScenario(c.UserContext(), domain)
+	userID := c.Locals(shared.UserIDKey).(int64)
+	roles := c.Locals(shared.UserRolesKey).([]int64)
+
+	resp, err := h.checkDefaultScenario(c.UserContext(), domain, userID, roles)
 	if err != nil {
 		return errs.WrapErr(shared.ErrCreateDomain, err.Error())
 	}

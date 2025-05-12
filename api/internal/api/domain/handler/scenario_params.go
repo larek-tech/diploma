@@ -6,7 +6,6 @@ import (
 	"github.com/larek-tech/diploma/api/internal/auth"
 	authpb "github.com/larek-tech/diploma/api/internal/auth/pb"
 	"github.com/larek-tech/diploma/api/internal/domain/pb"
-	"github.com/larek-tech/diploma/api/internal/shared"
 	"github.com/rs/zerolog/log"
 	"github.com/yogenyslav/pkg/errs"
 	"google.golang.org/grpc/codes"
@@ -14,7 +13,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (h *Handler) checkDefaultScenario(ctx context.Context, domain *pb.Domain) (*pb.Domain, error) {
+func (h *Handler) checkDefaultScenario(ctx context.Context, domain *pb.Domain, userID int64, roles []int64) (*pb.Domain, error) {
 	defaultScenarioReq := &pb.GetDefaultScenarioRequest{
 		DefaultTitle: domainDefaultTitle(domain.Title),
 	}
@@ -54,12 +53,9 @@ func (h *Handler) checkDefaultScenario(ctx context.Context, domain *pb.Domain) (
 				return nil, errs.WrapErr(err)
 			}
 
-			userID := ctx.Value(shared.UserIDKey)
-			roles := ctx.Value(shared.UserRolesKey)
-
 			ctx = auth.PushUserMeta(ctx, &authpb.UserAuthMetadata{
-				UserId: userID.(int64),
-				Roles:  roles.([]int64),
+				UserId: userID,
+				Roles:  roles,
 			})
 
 			go h.createOptimalScenario(ctx, resp)
