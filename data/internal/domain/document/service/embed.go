@@ -11,10 +11,10 @@ import (
 
 const (
 	// ChunkSize is the size of each chunk in characters.
-	ChunkSize = 1024
+	ChunkSize = 8192
 	// ChunkOverlap is the number of overlapping characters between chunks.
 	ChunkOverlap  = 100
-	EmbeddingSize = 1024
+	EmbeddingSize = 8192
 )
 
 // embed embeds the document content into chunks and returns them.
