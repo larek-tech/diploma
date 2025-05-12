@@ -25,10 +25,11 @@ var File_domain_v1_source_service_proto protoreflect.FileDescriptor
 
 const file_domain_v1_source_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1edomain/v1/source_service.proto\x12\tdomain.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cdomain/v1/source_model.proto\x1a\x1cdomain/v1/common_model.proto2\xd5\x05\n" +
+	"\x1edomain/v1/source_service.proto\x12\tdomain.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cdomain/v1/source_model.proto\x1a\x1cdomain/v1/common_model.proto2\x9d\x06\n" +
 	"\rSourceService\x12C\n" +
-	"\fCreateSource\x12\x1e.domain.v1.CreateSourceRequest\x1a\x11.domain.v1.Source\"\x00\x12H\n" +
-	"\tGetSource\x12\x1b.domain.v1.GetSourceRequest\x1a\x1c.domain.v1.GetSourceResponse\"\x00\x12C\n" +
+	"\fCreateSource\x12\x1e.domain.v1.CreateSourceRequest\x1a\x11.domain.v1.Source\"\x00\x12=\n" +
+	"\tGetSource\x12\x1b.domain.v1.GetSourceRequest\x1a\x11.domain.v1.Source\"\x00\x12Q\n" +
+	"\fGetSourceIDs\x12\x1e.domain.v1.GetSourceIDsRequest\x1a\x1f.domain.v1.GetSourceIDsResponse\"\x00\x12C\n" +
 	"\fUpdateSource\x12\x1e.domain.v1.UpdateSourceRequest\x1a\x11.domain.v1.Source\"\x00\x12H\n" +
 	"\fDeleteSource\x12\x1e.domain.v1.DeleteSourceRequest\x1a\x16.google.protobuf.Empty\"\x00\x12N\n" +
 	"\vListSources\x12\x1d.domain.v1.ListSourcesRequest\x1a\x1e.domain.v1.ListSourcesResponse\"\x00\x12Z\n" +
@@ -40,38 +41,41 @@ const file_domain_v1_source_service_proto_rawDesc = "" +
 var file_domain_v1_source_service_proto_goTypes = []any{
 	(*CreateSourceRequest)(nil),           // 0: domain.v1.CreateSourceRequest
 	(*GetSourceRequest)(nil),              // 1: domain.v1.GetSourceRequest
-	(*UpdateSourceRequest)(nil),           // 2: domain.v1.UpdateSourceRequest
-	(*DeleteSourceRequest)(nil),           // 3: domain.v1.DeleteSourceRequest
-	(*ListSourcesRequest)(nil),            // 4: domain.v1.ListSourcesRequest
-	(*GetResourcePermissionsRequest)(nil), // 5: domain.v1.GetResourcePermissionsRequest
-	(*PermittedUsers)(nil),                // 6: domain.v1.PermittedUsers
-	(*PermittedRoles)(nil),                // 7: domain.v1.PermittedRoles
-	(*Source)(nil),                        // 8: domain.v1.Source
-	(*GetSourceResponse)(nil),             // 9: domain.v1.GetSourceResponse
-	(*emptypb.Empty)(nil),                 // 10: google.protobuf.Empty
-	(*ListSourcesResponse)(nil),           // 11: domain.v1.ListSourcesResponse
+	(*GetSourceIDsRequest)(nil),           // 2: domain.v1.GetSourceIDsRequest
+	(*UpdateSourceRequest)(nil),           // 3: domain.v1.UpdateSourceRequest
+	(*DeleteSourceRequest)(nil),           // 4: domain.v1.DeleteSourceRequest
+	(*ListSourcesRequest)(nil),            // 5: domain.v1.ListSourcesRequest
+	(*GetResourcePermissionsRequest)(nil), // 6: domain.v1.GetResourcePermissionsRequest
+	(*PermittedUsers)(nil),                // 7: domain.v1.PermittedUsers
+	(*PermittedRoles)(nil),                // 8: domain.v1.PermittedRoles
+	(*Source)(nil),                        // 9: domain.v1.Source
+	(*GetSourceIDsResponse)(nil),          // 10: domain.v1.GetSourceIDsResponse
+	(*emptypb.Empty)(nil),                 // 11: google.protobuf.Empty
+	(*ListSourcesResponse)(nil),           // 12: domain.v1.ListSourcesResponse
 }
 var file_domain_v1_source_service_proto_depIdxs = []int32{
 	0,  // 0: domain.v1.SourceService.CreateSource:input_type -> domain.v1.CreateSourceRequest
 	1,  // 1: domain.v1.SourceService.GetSource:input_type -> domain.v1.GetSourceRequest
-	2,  // 2: domain.v1.SourceService.UpdateSource:input_type -> domain.v1.UpdateSourceRequest
-	3,  // 3: domain.v1.SourceService.DeleteSource:input_type -> domain.v1.DeleteSourceRequest
-	4,  // 4: domain.v1.SourceService.ListSources:input_type -> domain.v1.ListSourcesRequest
-	5,  // 5: domain.v1.SourceService.GetPermittedUsers:input_type -> domain.v1.GetResourcePermissionsRequest
-	6,  // 6: domain.v1.SourceService.UpdatePermittedUsers:input_type -> domain.v1.PermittedUsers
-	5,  // 7: domain.v1.SourceService.GetPermittedRoles:input_type -> domain.v1.GetResourcePermissionsRequest
-	7,  // 8: domain.v1.SourceService.UpdatePermittedRoles:input_type -> domain.v1.PermittedRoles
-	8,  // 9: domain.v1.SourceService.CreateSource:output_type -> domain.v1.Source
-	9,  // 10: domain.v1.SourceService.GetSource:output_type -> domain.v1.GetSourceResponse
-	8,  // 11: domain.v1.SourceService.UpdateSource:output_type -> domain.v1.Source
-	10, // 12: domain.v1.SourceService.DeleteSource:output_type -> google.protobuf.Empty
-	11, // 13: domain.v1.SourceService.ListSources:output_type -> domain.v1.ListSourcesResponse
-	6,  // 14: domain.v1.SourceService.GetPermittedUsers:output_type -> domain.v1.PermittedUsers
-	6,  // 15: domain.v1.SourceService.UpdatePermittedUsers:output_type -> domain.v1.PermittedUsers
-	7,  // 16: domain.v1.SourceService.GetPermittedRoles:output_type -> domain.v1.PermittedRoles
-	7,  // 17: domain.v1.SourceService.UpdatePermittedRoles:output_type -> domain.v1.PermittedRoles
-	9,  // [9:18] is the sub-list for method output_type
-	0,  // [0:9] is the sub-list for method input_type
+	2,  // 2: domain.v1.SourceService.GetSourceIDs:input_type -> domain.v1.GetSourceIDsRequest
+	3,  // 3: domain.v1.SourceService.UpdateSource:input_type -> domain.v1.UpdateSourceRequest
+	4,  // 4: domain.v1.SourceService.DeleteSource:input_type -> domain.v1.DeleteSourceRequest
+	5,  // 5: domain.v1.SourceService.ListSources:input_type -> domain.v1.ListSourcesRequest
+	6,  // 6: domain.v1.SourceService.GetPermittedUsers:input_type -> domain.v1.GetResourcePermissionsRequest
+	7,  // 7: domain.v1.SourceService.UpdatePermittedUsers:input_type -> domain.v1.PermittedUsers
+	6,  // 8: domain.v1.SourceService.GetPermittedRoles:input_type -> domain.v1.GetResourcePermissionsRequest
+	8,  // 9: domain.v1.SourceService.UpdatePermittedRoles:input_type -> domain.v1.PermittedRoles
+	9,  // 10: domain.v1.SourceService.CreateSource:output_type -> domain.v1.Source
+	9,  // 11: domain.v1.SourceService.GetSource:output_type -> domain.v1.Source
+	10, // 12: domain.v1.SourceService.GetSourceIDs:output_type -> domain.v1.GetSourceIDsResponse
+	9,  // 13: domain.v1.SourceService.UpdateSource:output_type -> domain.v1.Source
+	11, // 14: domain.v1.SourceService.DeleteSource:output_type -> google.protobuf.Empty
+	12, // 15: domain.v1.SourceService.ListSources:output_type -> domain.v1.ListSourcesResponse
+	7,  // 16: domain.v1.SourceService.GetPermittedUsers:output_type -> domain.v1.PermittedUsers
+	7,  // 17: domain.v1.SourceService.UpdatePermittedUsers:output_type -> domain.v1.PermittedUsers
+	8,  // 18: domain.v1.SourceService.GetPermittedRoles:output_type -> domain.v1.PermittedRoles
+	8,  // 19: domain.v1.SourceService.UpdatePermittedRoles:output_type -> domain.v1.PermittedRoles
+	10, // [10:20] is the sub-list for method output_type
+	0,  // [0:10] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

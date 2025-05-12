@@ -11,7 +11,7 @@ import (
 )
 
 // GetDomain returns domain by id.
-func (ctrl *Controller) GetDomain(ctx context.Context, domainID int64, meta *authpb.UserAuthMetadata) (*pb.GetDomainResponse, error) {
+func (ctrl *Controller) GetDomain(ctx context.Context, domainID int64, meta *authpb.UserAuthMetadata) (*pb.Domain, error) {
 	ctx, span := ctrl.tracer.Start(
 		ctx,
 		"Controller.GetDomain",
@@ -27,5 +27,5 @@ func (ctrl *Controller) GetDomain(ctx context.Context, domainID int64, meta *aut
 		return nil, errs.WrapErr(err)
 	}
 
-	return &pb.GetDomainResponse{Domain: domain.ToProto()}, nil
+	return domain.ToProto(), nil
 }

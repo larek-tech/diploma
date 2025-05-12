@@ -17,11 +17,11 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			scenarioID	path		int							true	"Scenario ID"
-//	@Param			req			body		pb.UpdateScenarioRequest	true	"Update params"
-//	@Success		200			{object}	pb.Scenario					"Scenario updated"
-//	@Failure		400			{object}	string						"Failed to update scenario"
-//	@Failure		404			{object}	string						"Scenario not found"
+//	@Param			id	path		int							true	"Scenario ID"
+//	@Param			req	body		pb.UpdateScenarioRequest	true	"Update params"
+//	@Success		200	{object}	pb.Scenario					"Scenario updated"
+//	@Failure		400	{object}	string						"Failed to update scenario"
+//	@Failure		404	{object}	string						"Scenario not found"
 //	@Router			/api/v1/scenario/{id} [put]
 func (h *Handler) UpdateScenario(c *fiber.Ctx) error {
 	var req pb.UpdateScenarioRequest

@@ -40,6 +40,8 @@ message Scenario {
   LlmModel model = 5;
   google.protobuf.Timestamp createdAt = 6;
   google.protobuf.Timestamp updatedAt = 7;
+  string title = 8;
+  int64 domainId = 9;
 };
 
 message Query {

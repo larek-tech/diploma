@@ -11,6 +11,7 @@ message Domain {
   repeated int64 sourceIds = 3;
   google.protobuf.Timestamp createdAt = 4;
   google.protobuf.Timestamp updatedAt = 5;
+  repeated int64 scenarioIds = 6;
 };
 
 message CreateDomainRequest {
@@ -22,14 +23,11 @@ message GetDomainRequest {
   int64 domainId = 1;
 }
 
-message GetDomainResponse {
-  Domain domain = 1;
-};
-
 message UpdateDomainRequest {
   int64 domainId = 1;
   string title = 2;
   repeated int64 sourceIds = 3;
+  repeated int64 scenarioIds = 4;
 };
 
 message DeleteDomainRequest {

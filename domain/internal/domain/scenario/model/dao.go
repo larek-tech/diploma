@@ -10,6 +10,7 @@ import (
 // ScenarioDao is a model for scenario on data layer.
 type ScenarioDao struct {
 	ID                int64     `db:"id"`
+	Title             string    `db:"title"`
 	UserID            int64     `db:"user_id"`
 	UseMultiquery     bool      `db:"use_multiquery"`
 	NQueries          int64     `db:"n_queries"`
@@ -33,7 +34,8 @@ type ScenarioDao struct {
 // ToProto converts dao model into protobuf format.
 func (s *ScenarioDao) ToProto() *pb.Scenario {
 	return &pb.Scenario{
-		Id: s.ID,
+		Id:    s.ID,
+		Title: s.Title,
 		MultiQuery: &pb.MultiQuery{
 			UseMultiquery:  s.UseMultiquery,
 			NQueries:       s.NQueries,

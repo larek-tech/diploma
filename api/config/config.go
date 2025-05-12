@@ -4,7 +4,7 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 	server "github.com/larek-tech/diploma/api/internal/_server"
 	"github.com/yogenyslav/pkg/errs"
-	"github.com/yogenyslav/pkg/grpc_client"
+	grpcclient "github.com/yogenyslav/pkg/grpc_client"
 	"github.com/yogenyslav/pkg/infrastructure/tracing"
 	"github.com/yogenyslav/pkg/storage/postgres"
 )
@@ -18,6 +18,7 @@ type Config struct {
 	AuthService   grpcclient.Config `yaml:"auth_service"`
 	DomainService grpcclient.Config `yaml:"domain_service"`
 	ChatService   grpcclient.Config `yaml:"chat_service"`
+	MLService     grpcclient.Config `yaml:"ml_service"`
 }
 
 // New creates new Config.

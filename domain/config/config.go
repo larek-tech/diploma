@@ -5,17 +5,19 @@ import (
 	server "github.com/larek-tech/diploma/domain/internal/_server"
 	"github.com/larek-tech/diploma/domain/pkg/kafka"
 	"github.com/yogenyslav/pkg/errs"
+	grpcclient "github.com/yogenyslav/pkg/grpc_client"
 	"github.com/yogenyslav/pkg/infrastructure/tracing"
 	"github.com/yogenyslav/pkg/storage/postgres"
 )
 
 // Config is the application configuration.
 type Config struct {
-	LogLevel string          `yaml:"log_level"`
-	Server   server.Config   `yaml:"server"`
-	Postgres postgres.Config `yaml:"postgres"`
-	Jaeger   tracing.Config  `yaml:"jaeger"`
-	Kafka    kafka.Config    `yaml:"kafka"`
+	LogLevel  string            `yaml:"log_level"`
+	Server    server.Config     `yaml:"server"`
+	Postgres  postgres.Config   `yaml:"postgres"`
+	Jaeger    tracing.Config    `yaml:"jaeger"`
+	Kafka     kafka.Config      `yaml:"kafka"`
+	MLService grpcclient.Config `yaml:"ml_serivce"`
 }
 
 // New creates new Config.

@@ -111,10 +111,27 @@ func Run() error {
 	}
 	defer chatConn.Close()
 
+	mlConn, err := grpcclient.NewGrpcClient(
+		&cfg.MLService,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
+	)
+	if err != nil {
+		return errs.WrapErr(err, "create ml service client")
+	}
+
 	// Api routes with JWT middleware
 	apiRouter := srv.GetSrv().Group("/api/v1")
 	apiRouter.Use(middleware.Jwt(authService))
-	api.SetupRoutes(apiRouter, domainConn.Conn(), chatConn.Conn(), authConn.Conn(), tracer, cfg.Server.WsConfig())
+	api.SetupRoutes(
+		apiRouter,
+		domainConn.Conn(),
+		chatConn.Conn(),
+		authConn.Conn(),
+		mlConn.Conn(),
+		tracer,
+		cfg.Server.WsConfig(),
+	)
 
 	srv.Start()
 

@@ -25,7 +25,12 @@ func (h *Handler) CreateDomain(c *fiber.Ctx) error {
 		return errs.WrapErr(shared.ErrInvalidBody, err.Error())
 	}
 
-	resp, err := h.domainService.CreateDomain(c.UserContext(), &req)
+	domain, err := h.domainService.CreateDomain(c.UserContext(), &req)
+	if err != nil {
+		return errs.WrapErr(shared.ErrCreateDomain, err.Error())
+	}
+
+	resp, err := h.checkDefaultScenario(c.UserContext(), domain)
 	if err != nil {
 		return errs.WrapErr(shared.ErrCreateDomain, err.Error())
 	}

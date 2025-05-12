@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package domain.v1;
+option go_package = "internal/domain/pb";
+
+import "google/protobuf/timestamp.proto";
+
+message Role {
+  int64 id = 1;
+  string name = 2;
+  google.protobuf.Timestamp createdAt = 3;
+};
+
+message CreateRoleRequest{
+  string name = 1;
+};
+
+message GetRoleRequest{
+  int64 roleId = 1;
+};
+
+message UpdateRoleRequest{
+  int64 userId = 1;
+  int64 roleId = 2;
+};
+
+message DeleteRoleRequest{
+  int64 roleId = 1;
+};
+
+message ListRolesRequest{
+  uint64 offset = 1;
+  uint64 limit = 2;
+};
+
+message ListRolesResponse{
+  repeated Role roles = 1;
+};

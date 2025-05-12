@@ -17,10 +17,10 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			scenarioID	path		int		true	"Scenario ID"
-//	@Success		204			{object}	string	"Scenario deleted"
-//	@Failure		400			{object}	string	"Failed to delete scenario"
-//	@Failure		404			{object}	string	"Scenario not found"
+//	@Param			id	path		int		true	"Scenario ID"
+//	@Success		204	{object}	string	"Scenario deleted"
+//	@Failure		400	{object}	string	"Failed to delete scenario"
+//	@Failure		404	{object}	string	"Scenario not found"
 //	@Router			/api/v1/scenario/{id} [delete]
 func (h *Handler) DeleteScenario(c *fiber.Ctx) error {
 	var req pb.DeleteScenarioRequest

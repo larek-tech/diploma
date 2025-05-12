@@ -31,6 +31,7 @@ func (ctrl *Controller) UpdateDomain(ctx context.Context, req *pb.UpdateDomainRe
 
 	domain.Title = req.GetTitle()
 	domain.SourceIDs = req.GetSourceIds()
+	domain.ScenarioIds = req.GetScenarioIds()
 	domain.UpdatedAt = time.Now()
 
 	if err = ctrl.dr.UpdateDomain(ctx, domain, meta.GetUserId(), meta.GetRoles()); err != nil {

@@ -9,7 +9,8 @@ import "domain/v1/common_model.proto";
 
 service SourceService {
   rpc CreateSource(CreateSourceRequest) returns (Source) {};
-  rpc GetSource(GetSourceRequest) returns (GetSourceResponse) {};
+  rpc GetSource(GetSourceRequest) returns (Source) {};
+  rpc GetSourceIDs(GetSourceIDsRequest) returns (GetSourceIDsResponse) {};
   rpc UpdateSource(UpdateSourceRequest) returns (Source) {};
   rpc DeleteSource(DeleteSourceRequest) returns (google.protobuf.Empty) {};
   rpc ListSources(ListSourcesRequest) returns(ListSourcesResponse) {};

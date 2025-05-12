@@ -1,6 +1,7 @@
 log_level: "debug"
 server:
   grpc_port: 9003
+  encryption: "1F7006E3A96D34CAB69A15F365FED784"
 jaeger:
   host: "jaeger"
   port: 4318

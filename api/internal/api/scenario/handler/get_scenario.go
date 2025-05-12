@@ -17,10 +17,10 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			scenarioID	path		int						true	"Requested scenario ID"
-//	@Success		200			{object}	pb.GetScenarioResponse	"Scenario"
-//	@Failure		400			{object}	string					"Failed to get scenario"
-//	@Failure		404			{object}	string					"Scenario not found"
+//	@Param			id	path		int			true	"Requested scenario ID"
+//	@Success		200	{object}	pb.Scenario	"Scenario"
+//	@Failure		400	{object}	string		"Failed to get scenario"
+//	@Failure		404	{object}	string		"Scenario not found"
 //	@Router			/api/v1/scenario/{id} [get]
 func (h *Handler) GetScenario(c *fiber.Ctx) error {
 	var req pb.GetScenarioRequest
@@ -37,10 +37,6 @@ func (h *Handler) GetScenario(c *fiber.Ctx) error {
 			return errs.WrapErr(shared.ErrScenarioNotFound, err.Error())
 		}
 		return errs.WrapErr(shared.ErrGetScenario, err.Error())
-	}
-
-	if resp.GetScenario() == nil {
-		return errs.WrapErr(shared.ErrScenarioNotFound)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(resp)

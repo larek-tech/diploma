@@ -10,7 +10,7 @@ import (
 
 type domainController interface {
 	CreateDomain(ctx context.Context, req *pb.CreateDomainRequest, meta *authpb.UserAuthMetadata) (*pb.Domain, error)
-	GetDomain(ctx context.Context, domainID int64, meta *authpb.UserAuthMetadata) (*pb.GetDomainResponse, error)
+	GetDomain(ctx context.Context, domainID int64, meta *authpb.UserAuthMetadata) (*pb.Domain, error)
 	UpdateDomain(ctx context.Context, req *pb.UpdateDomainRequest, meta *authpb.UserAuthMetadata) (*pb.Domain, error)
 	DeleteDomain(ctx context.Context, domainID int64, meta *authpb.UserAuthMetadata) error
 	ListDomains(ctx context.Context, req *pb.ListDomainsRequest, meta *authpb.UserAuthMetadata) (*pb.ListDomainsResponse, error)

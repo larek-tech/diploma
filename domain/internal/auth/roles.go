@@ -1,6 +1,6 @@
 package auth
 
 const (
-	// AdminUserID id of admin role.
-	AdminUserID int64 = 1
+	// AdminRoleID id of admin role.
+	AdminRoleID int64 = 1
 )

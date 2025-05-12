@@ -420,7 +420,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Requested domain ID",
-                        "name": "domainID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -429,7 +429,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Permitted roles",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetDomainResponse"
+                            "$ref": "#/definitions/pb.Domain"
                         }
                     },
                     "404": {
@@ -461,7 +461,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Requested domain ID",
-                        "name": "domainID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -513,7 +513,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Requested domain ID",
-                        "name": "domainID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -522,7 +522,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Permitted users",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetDomainResponse"
+                            "$ref": "#/definitions/pb.Domain"
                         }
                     },
                     "404": {
@@ -554,7 +554,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Requested domain ID",
-                        "name": "domainID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -606,7 +606,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Requested domain ID",
-                        "name": "domainID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -615,7 +615,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Domain",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetDomainResponse"
+                            "$ref": "#/definitions/pb.Domain"
                         }
                     },
                     "400": {
@@ -653,7 +653,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Domain ID",
-                        "name": "domainID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -709,7 +709,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Domain ID",
-                        "name": "domainID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -729,6 +729,305 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create new role, only for admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "Create new role.",
+                "parameters": [
+                    {
+                        "description": "Input data for creating role",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.CreateRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Role successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Role"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to create role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List roles.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "List roles.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of roles",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListRolesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list roles",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/remove": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Remove role from user's list, only for admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "Remove role.",
+                "parameters": [
+                    {
+                        "description": "Remove role from user's list",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.UpdateRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Role successfully removed",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to remove role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/set": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add new role for user, only for admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "Set role.",
+                "parameters": [
+                    {
+                        "description": "Set role for user",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.UpdateRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Role successfully set",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to set role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns information about role.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "Get role.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested role ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Role",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Role"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to get role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete role by ID, only for admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "Delete role.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Role ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Role deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to delete role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
                         "schema": {
                             "type": "string"
                         }
@@ -853,7 +1152,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Requested scenario ID",
-                        "name": "scenarioID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -862,7 +1161,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Scenario",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetScenarioResponse"
+                            "$ref": "#/definitions/pb.Scenario"
                         }
                     },
                     "400": {
@@ -900,7 +1199,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Scenario ID",
-                        "name": "scenarioID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -956,7 +1255,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Scenario ID",
-                        "name": "scenarioID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -1100,7 +1399,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Requested source ID",
-                        "name": "sourceID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -1109,7 +1408,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Permitted roles",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetSourceResponse"
+                            "$ref": "#/definitions/pb.Source"
                         }
                     },
                     "404": {
@@ -1141,7 +1440,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Requested source ID",
-                        "name": "sourceID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -1193,7 +1492,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Requested source ID",
-                        "name": "sourceID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -1202,7 +1501,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Permitted users",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetSourceResponse"
+                            "$ref": "#/definitions/pb.Source"
                         }
                     },
                     "404": {
@@ -1234,7 +1533,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Requested source ID",
-                        "name": "sourceID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -1286,7 +1585,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Requested source ID",
-                        "name": "sourceID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -1295,7 +1594,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Source",
                         "schema": {
-                            "$ref": "#/definitions/pb.GetSourceResponse"
+                            "$ref": "#/definitions/pb.Source"
                         }
                     },
                     "400": {
@@ -1333,7 +1632,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Source ID",
-                        "name": "sourceID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -1389,7 +1688,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Source ID",
-                        "name": "sourceID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -1409,6 +1708,203 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create new user, only for admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Create new user.",
+                "parameters": [
+                    {
+                        "description": "Input data for creating user",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/pb.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to create user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List users.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "List users.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of users",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListUsersResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list users",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns information about user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get user.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested user ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User",
+                        "schema": {
+                            "$ref": "#/definitions/pb.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to get user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete user by ID, only for admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Delete user.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to delete user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
                         "schema": {
                             "type": "string"
                         }
@@ -1547,9 +2043,20 @@ const docTemplate = `{
                 }
             }
         },
+        "pb.CreateRoleRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "pb.CreateScenarioRequest": {
             "type": "object",
             "properties": {
+                "domainId": {
+                    "type": "integer"
+                },
                 "model": {
                     "$ref": "#/definitions/pb.LlmModel"
                 },
@@ -1558,6 +2065,9 @@ const docTemplate = `{
                 },
                 "reranker": {
                     "$ref": "#/definitions/pb.Reranker"
+                },
+                "title": {
+                    "type": "string"
                 },
                 "vectorSearch": {
                     "$ref": "#/definitions/pb.VectorSearch"
@@ -1590,6 +2100,17 @@ const docTemplate = `{
                 }
             }
         },
+        "pb.CreateUserRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "pb.CronFormat": {
             "type": "object",
             "properties": {
@@ -1619,6 +2140,12 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "scenarioIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "sourceIds": {
                     "type": "array",
                     "items": {
@@ -1630,30 +2157,6 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
-                }
-            }
-        },
-        "pb.GetDomainResponse": {
-            "type": "object",
-            "properties": {
-                "domain": {
-                    "$ref": "#/definitions/pb.Domain"
-                }
-            }
-        },
-        "pb.GetScenarioResponse": {
-            "type": "object",
-            "properties": {
-                "scenario": {
-                    "$ref": "#/definitions/pb.Scenario"
-                }
-            }
-        },
-        "pb.GetSourceResponse": {
-            "type": "object",
-            "properties": {
-                "source": {
-                    "$ref": "#/definitions/pb.Source"
                 }
             }
         },
@@ -1679,6 +2182,17 @@ const docTemplate = `{
                 }
             }
         },
+        "pb.ListRolesResponse": {
+            "type": "object",
+            "properties": {
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.Role"
+                    }
+                }
+            }
+        },
         "pb.ListScenariosResponse": {
             "type": "object",
             "properties": {
@@ -1697,6 +2211,17 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/pb.Source"
+                    }
+                }
+            }
+        },
+        "pb.ListUsersResponse": {
+            "type": "object",
+            "properties": {
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.User"
                     }
                 }
             }
@@ -1833,12 +2358,6 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "metadata": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
                 "queryId": {
                     "type": "integer"
                 },
@@ -1869,11 +2388,28 @@ const docTemplate = `{
                 "ResponseStatus_RESPONSE_CANCELED"
             ]
         },
+        "pb.Role": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "pb.Scenario": {
             "type": "object",
             "properties": {
                 "createdAt": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "domainId": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -1886,6 +2422,9 @@ const docTemplate = `{
                 },
                 "reranker": {
                     "$ref": "#/definitions/pb.Reranker"
+                },
+                "title": {
+                    "type": "string"
                 },
                 "updatedAt": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
@@ -1974,6 +2513,12 @@ const docTemplate = `{
                 "domainId": {
                     "type": "integer"
                 },
+                "scenarioIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "sourceIds": {
                     "type": "array",
                     "items": {
@@ -1992,6 +2537,17 @@ const docTemplate = `{
                     "$ref": "#/definitions/pb.CronFormat"
                 },
                 "everyPeriod": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pb.UpdateRoleRequest": {
+            "type": "object",
+            "properties": {
+                "roleId": {
+                    "type": "integer"
+                },
+                "userId": {
                     "type": "integer"
                 }
             }
@@ -2038,6 +2594,9 @@ const docTemplate = `{
                 "threshold": {
                     "type": "number"
                 },
+                "title": {
+                    "type": "string"
+                },
                 "topN": {
                     "description": "Сколько чанков забирать при векторном поиске.",
                     "type": "integer"
@@ -2076,6 +2635,23 @@ const docTemplate = `{
                 },
                 "updateParams": {
                     "$ref": "#/definitions/pb.UpdateParams"
+                }
+            }
+        },
+        "pb.User": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
                 }
             }
         },

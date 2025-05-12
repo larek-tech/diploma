@@ -6,18 +6,20 @@ option go_package = "internal/domain/pb";
 import "ml/v1/model.proto";
 
 message CreateScenarioRequest {
-  optional pb.ml.MultiQuery multiQuery = 1;
-  optional pb.ml.Reranker reranker = 2;
-  optional pb.ml.VectorSearch vectorSearch = 3;
-  pb.ml.LlmModel model = 4;
+  string title = 1;
+  optional pb.ml.MultiQuery multiQuery = 2;
+  optional pb.ml.Reranker reranker = 3;
+  optional pb.ml.VectorSearch vectorSearch = 4;
+  pb.ml.LlmModel model = 5;
+  int64 domainId = 6;
 };
 
 message GetScenarioRequest {
   int64 scenarioId = 1;
 };
 
-message GetScenarioResponse {
-  pb.ml.Scenario scenario = 1;
+message GetDefaultScenarioRequest {
+  string defaultTitle = 1;
 };
 
 message UpdateScenarioRequest {
@@ -37,6 +39,7 @@ message UpdateScenarioRequest {
   optional int64 topN = 14; // Сколько чанков забирать при векторном поиске.
   optional float threshold = 15;
   optional bool searchByQuery = 16;
+  string title = 17;
 };
 
 message DeleteScenarioRequest {
