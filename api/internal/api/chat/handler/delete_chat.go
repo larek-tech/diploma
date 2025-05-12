@@ -17,10 +17,10 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			chatID	path		string	yes	"Chat ID"
-//	@Success		204		{object}	pb.Chat	"Chat successfully deleted"
-//	@Failure		400		{object}	string	"Failed to delete chat"
-//	@Failure		404		{object}	string	"Chat not found"
+//	@Param			id	path		string	yes	"Chat ID"
+//	@Success		204	{object}	pb.Chat	"Chat successfully deleted"
+//	@Failure		400	{object}	string	"Failed to delete chat"
+//	@Failure		404	{object}	string	"Chat not found"
 //	@Router			/api/v1/chat/{id} [delete]
 func (h *Handler) DeleteChat(c *fiber.Ctx) error {
 	chatID := c.Params(chatIDParam)
