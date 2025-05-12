@@ -20,10 +20,6 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
     def __init__(self) -> None:
         super().__init__()
         self.rag = RAGPipeline()
-        self.optuna_optimizer = OptunaPipeline(
-            redis_url=DEFAULT_REDIS_URL,
-            embedings_model=DEFAULT_EMBEDER_MODEL,
-        )
 
     async def ProcessQuery(  # noqa: N802
         self,
@@ -57,27 +53,6 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
         except TimeoutError:
             logger.error(f"Timeout error processing request {request_id}")
             await context.abort(grpc.StatusCode.DEADLINE_EXCEEDED, "Timeout")
-
-    async def ProcessScenario(  # noqa: N802
-        self,
-        request: ml_pb2_model.ProcessScenarioRequest,
-        context: aio.ServicerContext,
-    ) -> ml_pb2_model.ProcessScenarioResponse:
-        client_ip = context.peer().split(":")[-1]
-
-        logger.info(
-            f"New request [For scenario {request.scenario.id} from {client_ip}"
-            f"\nDocuments: {len(request.sourceIds)}"
-        )
-        background_tasks = set()
-        task = asyncio.create_task(
-            await self.optuna_optimizer.study(request.sourceIds)
-        )
-        background_tasks.add(task)
-        task.add_done_callback(background_tasks.discard)
-        return ml_pb2_model.ProcessScenarioResponse(
-            status=True,
-        )
 
 async def serve() -> None:
     server = aio.server()
