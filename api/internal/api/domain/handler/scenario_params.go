@@ -51,7 +51,7 @@ func (h *Handler) checkDefaultScenario(ctx context.Context, domain *pb.Domain) (
 				return nil, errs.WrapErr(err)
 			}
 
-			go h.createOptimalScenario(ctx, resp)
+			go h.createOptimalScenario(context.Background(), resp)
 		}
 	}
 	return domain, nil
