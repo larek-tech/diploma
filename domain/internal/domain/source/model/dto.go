@@ -55,7 +55,7 @@ type DataMessage struct {
 
 // ParsingStatus status of processing source.
 type ParsingStatus struct {
-	SourceID  string       `json:"source_id"`
+	SourceID  string       `json:"source"`
 	JobID     string       `json:"job_id"`
 	Processed int          `json:"processed"`
 	Total     int          `json:"total"`
