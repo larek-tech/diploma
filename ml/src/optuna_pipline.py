@@ -14,7 +14,7 @@ from ragas.metrics import (
 )
 
 import ml.v1.model_pb2 as ml_pb2_model
-from config import DEFAULT_EMBEDER_MODEL, DEFAULT_REDIS_URL
+from config import DATA_SERVICE_HOST, DEFAULT_EMBEDER_MODEL, DEFAULT_REDIS_URL, OLLAMA_BASE_MODEL
 from RAG_pipeline import RAGPipeline
 from utils.logger import logger
 
@@ -35,6 +35,7 @@ class OptunaPipeline:
         self.redis_url = redis_url if redis_url else DEFAULT_REDIS_URL
         self.embedings_model = embedings_model
         self.embeder = OllamaEmbeddings(
+            base_url=f"http://{DATA_SERVICE_HOST}:11434",
             model=embedings_model
             if embedings_model
             else DEFAULT_EMBEDER_MODEL,
@@ -219,7 +220,7 @@ class OptunaPipeline:
                 ),
                 "topK": trial.suggest_int("model.topK", 1, 50),
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+                "modelName": OLLAMA_BASE_MODEL,
             },
             "multiQuery": {
                 "useMultiquery": trial.suggest_categorical(
@@ -360,7 +361,7 @@ class OptunaPipeline:
             ]
 
         model_params.model.modelName = (
-            "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M"
+            OLLAMA_BASE_MODEL
         )
         model_params.model.temperature = float(params["model.temperature"])
         model_params.model.topK = int(params["model.topK"])
@@ -391,7 +392,7 @@ async def main():
             "temperature": 0.7,
             "topK": 20,
             "topP": 0.9,
-            "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+            "modelName": OLLAMA_BASE_MODEL,
         },
         "multiQuery": {
             "useMultiquery": False,
@@ -432,7 +433,7 @@ def foo():
                 ),
                 "topK": trial.suggest_int("model.topK", 1, 50),
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+                "modelName": OLLAMA_BASE_MODEL,
             },
             # "multiQuery": {
             #     "useMultiquery": trial.suggest_categorical(
@@ -470,7 +471,7 @@ def foo():
                 ),
                 "topK": trial.suggest_int("model.topK", 1, 50),
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+                "modelName": OLLAMA_BASE_MODEL,
             },
             "multiQuery": {
                 "useMultiquery": trial.suggest_categorical(
@@ -508,7 +509,7 @@ def foo():
                 ),
                 "topK": trial.suggest_int("model.topK", 1, 50),
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+                "modelName": OLLAMA_BASE_MODEL,
             },
             # "multiQuery": {
             #     "useMultiquery": trial.suggest_categorical(
@@ -546,7 +547,7 @@ def foo():
                 ),
                 "topK": trial.suggest_int("model.topK", 1, 50),
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+                "modelName": OLLAMA_BASE_MODEL,
             },
             # "multiQuery": {
             #     "useMultiquery": trial.suggest_categorical(
@@ -584,7 +585,7 @@ def foo():
                 ),
                 "topK": trial.suggest_int("model.topK", 1, 50),
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+                "modelName": OLLAMA_BASE_MODEL,
             },
             "multiQuery": {
                 "useMultiquery": trial.suggest_categorical(
@@ -622,7 +623,7 @@ def foo():
                 ),
                 "topK": trial.suggest_int("model.topK", 1, 50),
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+                "modelName": OLLAMA_BASE_MODEL,
             },
             # "multiQuery": {
             #     "useMultiquery": trial.suggest_categorical(
@@ -660,7 +661,7 @@ def foo():
                 ),
                 "topK": trial.suggest_int("model.topK", 1, 50),
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+                "modelName": OLLAMA_BASE_MODEL,
             },
             "multiQuery": {
                 "useMultiquery": trial.suggest_categorical(
@@ -699,7 +700,7 @@ def foo():
                 ),
                 "topK": trial.suggest_int("model.topK", 1, 100),
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+                "modelName": OLLAMA_BASE_MODEL,
             },
             "multiQuery": {
                 "useMultiquery": trial.suggest_categorical(
