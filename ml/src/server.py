@@ -84,7 +84,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
                 prompt=FIRST_MESSAE_PROMPT.format(message=request.query),
                 model=OLLAMA_BASE_MODEL,
             )
-            return ml_pb2_model.ProcessFirstQueryResponse(message=response)
+            return ml_pb2_model.ProcessFirstQueryResponse(query=response)
         except grpc.RpcError as e:
             logger.error(
                 f"gRPC error processing request: {e.code()}: {e.details()}"
