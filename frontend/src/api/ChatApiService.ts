@@ -1,16 +1,15 @@
+import { get, post, del, put } from './http';
 import {
-    ChatSession,
-    CreateSessionResponse,
     DeleteSessionParams,
     GetSessionParams,
-    GetSessionsResponse,
     RenameSessionParams,
+    ChatSession,
+    GetSessionsResponse,
 } from './models';
-import { get, post, del, put } from './http';
 
 class ChatApiService {
     public async createSession() {
-        const response = await post<CreateSessionResponse>('/api/v1/chat', {});
+        const response = await post<ChatSession>('/api/v1/chat', {});
 
         return response;
     }
@@ -22,15 +21,15 @@ class ChatApiService {
     }
 
     public async renameSession({ id, title }: RenameSessionParams) {
-        await put(`/chat/session/rename`, { id, title });
+        await put(`api/v1/chat/${id}`, { title });
     }
 
     public async deleteSession({ id }: DeleteSessionParams) {
-        await del(`/chat/session/${id}`);
+        await del(`api/v1/chat/${id}`);
     }
 
     public async getSession({ id }: GetSessionParams) {
-        const response = await get<ChatSession>(`/chat/session/${id}`);
+        const response = await get<ChatSession>(`/api/v1/chat/history/${id}`);
 
         return response;
     }

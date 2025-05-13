@@ -92,14 +92,13 @@ export interface ScenarioVectorSearchConfig {
     topN: number;
 }
 
-export interface CreateScenarioRequest {
+export interface Scenario {
     domainId: number;
     model: ScenarioModelConfig;
     multiQuery: ScenarioMultiQueryConfig;
     reranker: ScenarioRerankerConfig;
     vectorSearch: ScenarioVectorSearchConfig;
 }
-
 export enum SourceType {
     TypeWeb = 1,
     TypeSingleFile = 2,

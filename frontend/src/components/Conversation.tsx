@@ -1,7 +1,7 @@
-import { ChatConversation } from '@/api/models';
 import UserMessage from './UserMessage';
 import ModelMessage from './ModelMessage';
 import { observer } from 'mobx-react-lite';
+import { ChatConversation } from '@/api/models';
 
 type Props = {
     conversation: ChatConversation;
@@ -11,13 +11,11 @@ type Props = {
 const Conversation = observer(({ conversation, isLastConversation }: Props) => {
     return (
         <div className='w-full'>
-            {conversation.outcomingMessage && (
-                <UserMessage message={conversation.outcomingMessage.prompt} />
-            )}
+            {conversation.query && <UserMessage message={conversation.query} />}
 
-            {conversation.incomingMessage && (
+            {conversation.response && (
                 <ModelMessage
-                    incomingMessage={conversation.incomingMessage}
+                    incomingMessage={conversation.response}
                     isLastMessage={isLastConversation}
                 />
             )}

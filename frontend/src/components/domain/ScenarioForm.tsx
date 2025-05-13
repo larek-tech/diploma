@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { DomainApiService } from '@/api/DomainApiService';
-import { CreateScenarioRequest } from '@/api/models';
+import { Scenario } from '@/api/models';
 import { Loader2 } from 'lucide-react';
 
 interface ScenarioFormProps {
@@ -17,7 +17,7 @@ export const ScenarioForm = ({ domainId, onScenarioCreated }: ScenarioFormProps)
     const [isLoading, setIsLoading] = useState(false);
     const [useMultiquery, setUseMultiquery] = useState(false);
     const [useRerank, setUseRerank] = useState(false);
-    const [scenarioData, setScenarioData] = useState<CreateScenarioRequest>({
+    const [scenarioData, setScenarioData] = useState<Scenario>({
         domainId,
         model: {
             modelName: '',

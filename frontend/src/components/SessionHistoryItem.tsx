@@ -1,4 +1,4 @@
-import { ShortSession } from '@/api/models';
+import { ShortChatSession } from '@/api/models';
 import { useStores } from '@/hooks/useStores';
 import { useState } from 'react';
 import { useToast } from './ui/use-toast';
@@ -8,7 +8,7 @@ import { Pages } from '@/router/constants';
 import { observer } from 'mobx-react-lite';
 
 type Props = {
-    session: ShortSession;
+    session: ShortChatSession;
 };
 
 const SessionHistoryItem = observer(({ session }: Props) => {

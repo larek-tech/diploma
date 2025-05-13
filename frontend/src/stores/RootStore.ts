@@ -1,32 +1,23 @@
 import ChatApiService from '@/api/ChatApiService';
 import { DomainApiService } from '@/api/DomainApiService';
 import {
-    ChatSession,
     DeleteSessionParams,
     GetSessionParams,
-    WSOutcomingMessage,
     RenameSessionParams,
-    ShortSession,
+    ShortChatSession,
+    ChatSession,
+    SessionContentMessages,
     DisplayedChat,
-    WSIncomingQuery,
-    IncomingMessageType,
-    IncomingMessageStatus,
     WSMessage,
-    WSIncomingChunk,
-    ChatCommand,
-    ModelResponseType,
-    PredictionResponse,
-    StockResponse,
-    UNAUTHORIZED_ERR,
+    WSMessageType,
 } from '@/api/models';
 import { Domain } from '@/api/models/domain';
-import { Organization, UserInOrganization } from '@/api/models/organizations';
 import { LOCAL_STORAGE_KEY } from '@/auth/AuthProvider';
 import { WS_URL } from '@/config';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 export class RootStore {
-    sessions: ShortSession[] = [];
+    sessions: ShortChatSession[] = [];
     sessionsLoading: boolean = false;
 
     domains: Domain[] = [];
@@ -45,14 +36,6 @@ export class RootStore {
     closedWebSocket: WebSocket | null = null;
 
     websocket: WebSocket | null = null;
-
-    adminOrganizations: Organization[] | null = null;
-    selectedAdminOrganization: Organization | null = null;
-    isOrganizationsLoading: boolean = false;
-    usersInOrganization: UserInOrganization[] = [];
-    isUsersInOrganizationLoading: boolean = false;
-
-    selectedOrganizationId: number | null = null;
 
     constructor() {
         makeAutoObservable(this);
@@ -130,38 +113,10 @@ export class RootStore {
         this.activeSession = session;
 
         this.activeDisplayedSession = {
-            messages: session.content.map((content) => {
-                const prediction =
-                    content.response.data_type === ModelResponseType.Prediction
-                        ? (content.response.data as PredictionResponse)
-                        : null;
-
-                const stocks =
-                    content.response.data_type === ModelResponseType.Stock
-                        ? (content.response.data as StockResponse)
-                        : null;
-
-                return {
-                    incomingMessage: {
-                        body: content.response.body,
-                        type: content.query.type as IncomingMessageType,
-                        status: content.query.status as IncomingMessageStatus,
-                        product: content.query.product,
-                        period: content.query.period,
-                        prediction: prediction
-                            ? {
-                                  forecast: prediction.forecast,
-                                  history: prediction.history,
-                              }
-                            : undefined,
-                        stocks: stocks?.data,
-                        outputJson: prediction?.output_json,
-                    },
-                    outcomingMessage: {
-                        prompt: content.query.prompt,
-                    },
-                };
-            }),
+            messages: session.content.map((message: SessionContentMessages) => ({
+                query: message.query.content,
+                response: message.response.content,
+            })),
         };
 
         this.connectWebSocket(session.id);
@@ -187,6 +142,20 @@ export class RootStore {
         });
     }
 
+    private getAuthWSMessage(): WSMessage {
+        const token = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) as string)?.user?.token;
+
+        return {
+            type: WSMessageType.Auth,
+            content: token,
+            isChunked: false,
+            isLast: true,
+            queryMetadata: {
+                domainID: 3,
+            },
+        };
+    }
+
     connectWebSocket(sessionId: string) {
         this.disconnectWebSocket();
 
@@ -196,11 +165,9 @@ export class RootStore {
             console.log('WebSocket connection opened');
 
             if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
-                this.websocket.send(
-                    JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) as string)?.user?.token
-                );
+                const wsMessage = this.getAuthWSMessage();
 
-                this.websocket.send(this.selectedOrganizationId?.toString() || '1');
+                this.websocket.send(JSON.stringify(wsMessage));
 
                 this.setChatDisabled(false);
             }
@@ -212,45 +179,47 @@ export class RootStore {
             const wsMessage: WSMessage = JSON.parse(event.data);
 
             runInAction(() => {
-                const data = wsMessage.data;
+                const data = wsMessage.content;
 
                 console.log(wsMessage);
 
-                if (wsMessage.err) {
-                    this.chatError = wsMessage.err;
+                console.log(data);
 
-                    if (wsMessage.err === UNAUTHORIZED_ERR) {
-                        localStorage.removeItem(LOCAL_STORAGE_KEY);
+                if (wsMessage.error) {
+                    this.chatError = wsMessage.error;
 
-                        window.location.href = '/login';
-                    }
+                    // if (wsMessage.err === UNAUTHORIZED_ERR) {
+                    //     localStorage.removeItem(LOCAL_STORAGE_KEY);
+
+                    //     window.location.href = '/login';
+                    // }
 
                     this.isModelAnswering = false;
                     this.isChatDisabled = false;
                 }
 
-                if (wsMessage.chunk && !wsMessage.finish) {
-                    // this.isModelAnswering = true;
-                    // this.isChatDisabled = true;
+                if (wsMessage.isChunked) {
+                    this.isModelAnswering = true;
+                    this.isChatDisabled = true;
 
-                    this.processIncomingChunk(data as WSIncomingChunk);
-                } else if (!wsMessage.chunk && wsMessage.data && !wsMessage.data_type) {
-                    //!wsMessage.data_type значит, что это ответ модели (prediction или stock)
-                    this.processIncomingQuery(data as WSIncomingQuery);
-                } else if (wsMessage.data_type === ModelResponseType.Prediction && wsMessage.data) {
-                    this.processIncomingPrediction(data as PredictionResponse);
-                } else if (wsMessage.data_type === ModelResponseType.Stock && wsMessage.data) {
-                    this.processIncomingStock(data as StockResponse);
+                    this.processIncomingChunk(data || '');
                 }
 
-                if (
-                    (wsMessage.finish || !wsMessage.chunk) &&
-                    !(wsMessage.data_type === ModelResponseType.Prediction)
-                ) {
+                // if (wsMessage.isChunked && !wsMessage.isLast) {
+                //     // this.isModelAnswering = true;
+                //     // this.isChatDisabled = true;
+
+                //     this.processIncomingChunk(data as WSIncomingChunk);
+                // } else if (!wsMessage.chunk && wsMessage.data && !wsMessage.data_type) {
+                //     //!wsMessage.data_type значит, что это ответ модели (prediction или stock)
+                //     this.processIncomingQuery(data as WSIncomingQuery);
+                // }
+
+                if (wsMessage.isLast || !wsMessage.isChunked) {
                     this.isModelAnswering = false;
                 }
 
-                if (wsMessage.finish || wsMessage.data_type === ModelResponseType.Stock) {
+                if (wsMessage.isLast) {
                     this.isChatDisabled = false;
                 }
             });
@@ -270,7 +239,7 @@ export class RootStore {
         };
     }
 
-    sendMessage(message: WSOutcomingMessage) {
+    sendMessage(message: WSMessage) {
         console.log('sendMessage', message);
 
         this.setIsModelAnswering(true);
@@ -283,7 +252,7 @@ export class RootStore {
         if (this.isFirstMessageInSession()) {
             this.renameSession({
                 id: this.activeSessionId as string,
-                title: message.prompt?.slice(0, 60) || 'Без названия',
+                title: message.content?.slice(0, 60) || 'Без названия',
             });
         }
 
@@ -297,7 +266,7 @@ export class RootStore {
         }
     }
 
-    addMessageToActiveSession(message: WSOutcomingMessage) {
+    addMessageToActiveSession(message: WSMessage) {
         if (!this.activeSessionId) {
             return;
         }
@@ -308,91 +277,36 @@ export class RootStore {
             }
 
             this.activeDisplayedSession?.messages.push({
-                outcomingMessage: {
-                    prompt: message.prompt || '',
-                },
+                query: message.content || '',
+                response: null,
             });
         });
     }
 
-    private processIncomingQuery(query: WSIncomingQuery) {
-        console.log('processIncomingQuery', query);
+    // private processIncomingQuery(query: WSMessage) {
+    //     console.log('processIncomingQuery', query);
 
-        if (this.activeSessionId && this.activeDisplayedSession?.messages.length) {
-            this.activeDisplayedSession.messages[
-                this.activeDisplayedSession.messages.length - 1
-            ].incomingMessage = {
-                body: query.prompt,
-                type: query.type as IncomingMessageType,
-                status: query.status as IncomingMessageStatus,
-                product: query.product,
-                period: query.period,
-            };
-        }
-    }
+    //     if (this.activeSessionId && this.activeDisplayedSession?.messages.length) {
+    //         this.activeDisplayedSession.messages[
+    //             this.activeDisplayedSession.messages.length - 1
+    //         ].incomingMessage = {
+    //             body: query.prompt,
+    //             type: query.type as IncomingMessageType,
+    //             status: query.status as IncomingMessageStatus,
+    //             product: query.product,
+    //             period: query.period,
+    //         };
+    //     }
+    // }
 
-    private processIncomingChunk({ info }: WSIncomingChunk) {
+    private processIncomingChunk(message: string) {
         if (this.activeSessionId && this.activeDisplayedSession?.messages.length) {
             const lastMessageIndex = this.activeDisplayedSession.messages.length - 1;
-            const lastMessageBody =
-                this.activeDisplayedSession.messages[lastMessageIndex].incomingMessage?.body;
+            const lastMessageBody = this.activeDisplayedSession.messages[lastMessageIndex].response;
 
-            this.activeDisplayedSession.messages[lastMessageIndex].incomingMessage = {
-                ...this.activeDisplayedSession.messages[lastMessageIndex].incomingMessage,
-                body: lastMessageBody ? lastMessageBody + info : info,
-                type: IncomingMessageType.Prediction,
-                status: IncomingMessageStatus.Valid,
-            };
-        }
-    }
-
-    private processIncomingPrediction(data: PredictionResponse) {
-        const { forecast, history } = data;
-        console.log('processIncomingPrediction', forecast, history);
-
-        const session = this.activeDisplayedSession;
-        if (!this.activeSessionId || !session?.messages.length) return;
-
-        const lastMessageIndex = session.messages.length - 1;
-        const lastMessage = session.messages[lastMessageIndex];
-
-        const incomingMessage = lastMessage.incomingMessage || {
-            body: '',
-            type: IncomingMessageType.Undefined,
-            status: IncomingMessageStatus.Valid,
-            prediction: { forecast, history },
-        };
-
-        incomingMessage.prediction = { forecast, history };
-        lastMessage.incomingMessage = incomingMessage;
-        lastMessage.incomingMessage.outputJson = data.output_json;
-        lastMessage.incomingMessage.type = IncomingMessageType.Prediction;
-
-        if (this.activeDisplayedSession) {
-            this.activeDisplayedSession.messages[lastMessageIndex] = lastMessage;
-        }
-    }
-
-    private processIncomingStock({ data }: StockResponse) {
-        console.log('processIncomingStock', data);
-
-        const session = this.activeDisplayedSession;
-        if (!this.activeSessionId || !session?.messages.length) return;
-
-        const lastMessageIndex = session.messages.length - 1;
-        const lastMessage = session.messages[lastMessageIndex];
-
-        const incomingMessage = lastMessage.incomingMessage || {
-            body: '',
-            type: IncomingMessageType.Undefined,
-            status: IncomingMessageStatus.Valid,
-        };
-
-        incomingMessage.stocks = data;
-        lastMessage.incomingMessage = incomingMessage;
-
-        if (this.activeDisplayedSession) {
-            this.activeDisplayedSession.messages[lastMessageIndex] = lastMessage;
+            this.activeDisplayedSession.messages[lastMessageIndex].response = lastMessageBody
+                ? lastMessageBody + message
+                : message;
         }
     }
 
@@ -405,9 +319,9 @@ export class RootStore {
     }
 
     cancelRequest() {
-        this.sendMessage({
-            command: ChatCommand.Cancel,
-        });
+        // this.sendMessage({
+        //     command: ChatCommand.Cancel,
+        // });
 
         this.setChatDisabled(false);
         this.setIsModelAnswering(false);
@@ -420,28 +334,6 @@ export class RootStore {
     private reconnectWebSocket() {
         if (this.activeSessionId) {
             this.connectWebSocket(this.activeSessionId);
-        }
-    }
-
-    setIsUsersInOrganizationLoading(isLoading: boolean) {
-        this.isUsersInOrganizationLoading = isLoading;
-    }
-
-    setSelectedAdminOrganization(organizationId: number) {
-        this.selectedAdminOrganization =
-            this.adminOrganizations?.find((organization) => organization.id === organizationId) ||
-            null;
-    }
-
-    setSelectedOrganizationId(organizationId: number) {
-        this.selectedOrganizationId = organizationId;
-    }
-
-    setUserNotifications(username: string, notifications: boolean) {
-        const user = this.usersInOrganization.find((user) => user.username === username);
-
-        if (user) {
-            user.notifications = notifications;
         }
     }
 }
