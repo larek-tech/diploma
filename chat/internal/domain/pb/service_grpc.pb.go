@@ -20,9 +20,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MLService_ProcessQuery_FullMethodName     = "/pb.ml.MLService/ProcessQuery"
-	MLService_GetDefaultParams_FullMethodName = "/pb.ml.MLService/GetDefaultParams"
-	MLService_GetOptimalParams_FullMethodName = "/pb.ml.MLService/GetOptimalParams"
+	MLService_ProcessQuery_FullMethodName      = "/pb.ml.MLService/ProcessQuery"
+	MLService_GetDefaultParams_FullMethodName  = "/pb.ml.MLService/GetDefaultParams"
+	MLService_GetOptimalParams_FullMethodName  = "/pb.ml.MLService/GetOptimalParams"
+	MLService_ProcessFirstQuery_FullMethodName = "/pb.ml.MLService/ProcessFirstQuery"
 )
 
 // MLServiceClient is the client API for MLService service.
@@ -32,6 +33,7 @@ type MLServiceClient interface {
 	ProcessQuery(ctx context.Context, in *ProcessQueryRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ProcessQueryResponse], error)
 	GetDefaultParams(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ModelParams, error)
 	GetOptimalParams(ctx context.Context, in *GetOptimalParamsRequest, opts ...grpc.CallOption) (*ModelParams, error)
+	ProcessFirstQuery(ctx context.Context, in *ProcessQueryRequest, opts ...grpc.CallOption) (*ProcessQueryResponse, error)
 }
 
 type mLServiceClient struct {
@@ -81,6 +83,16 @@ func (c *mLServiceClient) GetOptimalParams(ctx context.Context, in *GetOptimalPa
 	return out, nil
 }
 
+func (c *mLServiceClient) ProcessFirstQuery(ctx context.Context, in *ProcessQueryRequest, opts ...grpc.CallOption) (*ProcessQueryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ProcessQueryResponse)
+	err := c.cc.Invoke(ctx, MLService_ProcessFirstQuery_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MLServiceServer is the server API for MLService service.
 // All implementations must embed UnimplementedMLServiceServer
 // for forward compatibility.
@@ -88,6 +100,7 @@ type MLServiceServer interface {
 	ProcessQuery(*ProcessQueryRequest, grpc.ServerStreamingServer[ProcessQueryResponse]) error
 	GetDefaultParams(context.Context, *emptypb.Empty) (*ModelParams, error)
 	GetOptimalParams(context.Context, *GetOptimalParamsRequest) (*ModelParams, error)
+	ProcessFirstQuery(context.Context, *ProcessQueryRequest) (*ProcessQueryResponse, error)
 	mustEmbedUnimplementedMLServiceServer()
 }
 
@@ -106,6 +119,9 @@ func (UnimplementedMLServiceServer) GetDefaultParams(context.Context, *emptypb.E
 }
 func (UnimplementedMLServiceServer) GetOptimalParams(context.Context, *GetOptimalParamsRequest) (*ModelParams, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOptimalParams not implemented")
+}
+func (UnimplementedMLServiceServer) ProcessFirstQuery(context.Context, *ProcessQueryRequest) (*ProcessQueryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProcessFirstQuery not implemented")
 }
 func (UnimplementedMLServiceServer) mustEmbedUnimplementedMLServiceServer() {}
 func (UnimplementedMLServiceServer) testEmbeddedByValue()                   {}
@@ -175,6 +191,24 @@ func _MLService_GetOptimalParams_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MLService_ProcessFirstQuery_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProcessQueryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MLServiceServer).ProcessFirstQuery(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MLService_ProcessFirstQuery_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MLServiceServer).ProcessFirstQuery(ctx, req.(*ProcessQueryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MLService_ServiceDesc is the grpc.ServiceDesc for MLService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -189,6 +223,10 @@ var MLService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOptimalParams",
 			Handler:    _MLService_GetOptimalParams_Handler,
+		},
+		{
+			MethodName: "ProcessFirstQuery",
+			Handler:    _MLService_ProcessFirstQuery_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

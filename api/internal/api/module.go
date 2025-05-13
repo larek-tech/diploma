@@ -47,7 +47,12 @@ func SetupRoutes(
 	scenario.SetupRoutes(scenarioRouter, scenarioHandler)
 
 	chatRouter := api.Group("/chat")
-	chatHandler := ch.New(chatpb.NewChatServiceClient(chatConn), authpb.NewAuthServiceClient(authConn), tracer)
+	chatHandler := ch.New(
+		chatpb.NewChatServiceClient(chatConn),
+		authpb.NewAuthServiceClient(authConn),
+		domainpb.NewMLServiceClient(domainConn),
+		tracer,
+	)
 	chat.SetupRoutes(chatRouter, chatHandler, wsConfig)
 
 	userRouter := api.Group("/user")

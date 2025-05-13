@@ -11,11 +11,14 @@ import (
 	"github.com/larek-tech/diploma/api/internal/auth"
 	authpb "github.com/larek-tech/diploma/api/internal/auth/pb"
 	"github.com/larek-tech/diploma/api/internal/chat/pb"
+	domainpb "github.com/larek-tech/diploma/api/internal/domain/pb"
 	"github.com/larek-tech/diploma/api/internal/shared"
 	"github.com/rs/zerolog/log"
 	"github.com/yogenyslav/pkg/errs"
 	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func closeHandler(code int, text string) error {
@@ -127,12 +130,28 @@ func (h *Handler) Chat(c *websocket.Conn) {
 		}
 	}()
 
+	history, err := h.chatService.GetChat(ctx, &pb.GetChatRequest{ChatId: chatID})
+	if err != nil {
+		if status.Code(err) == codes.NotFound {
+			sendErr(c, errs.WrapErr(err), "chat not found")
+			return
+		}
+		sendErr(c, errs.WrapErr(err), "get chat error")
+		return
+	}
+
 	var (
-		msg        model.SocketMessage
-		processReq *pb.ProcessQueryRequest
-		chunk      *model.SocketMessage
-		errStream  error
+		msg          model.SocketMessage
+		titleResp    *domainpb.ProcessQueryResponse
+		processReq   *pb.ProcessQueryRequest
+		chunk        *model.SocketMessage
+		errStream    error
+		firstMessage bool
 	)
+
+	if len(history.GetContent()) == 0 {
+		firstMessage = true
+	}
 
 	for {
 		msg, err = getMsg(c)
@@ -178,6 +197,27 @@ func (h *Handler) Chat(c *websocket.Conn) {
 		if e != nil {
 			sendErr(c, errs.WrapErr(e), "start processing query")
 			continue
+		}
+
+		if firstMessage {
+			titleResp, err = h.mlService.ProcessFirstQuery(ctx, &domainpb.ProcessQueryRequest{
+				Query: &domainpb.Query{
+					Content: msg.Content,
+				},
+			})
+			if err != nil {
+				sendErr(c, errs.WrapErr(err), "summarize first message")
+			} else {
+				_, err = h.chatService.RenameChat(ctx, &pb.RenameChatRequest{
+					ChatId: chatID,
+					Title:  titleResp.GetChunk().GetContent(),
+				})
+				if err != nil {
+					sendErr(c, errs.WrapErr(err), "update chat title")
+				}
+			}
+
+			firstMessage = false
 		}
 
 		chunk, errStream = h.receiveChunk(stream)
