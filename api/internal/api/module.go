@@ -50,7 +50,7 @@ func SetupRoutes(
 	chatHandler := ch.New(
 		chatpb.NewChatServiceClient(chatConn),
 		authpb.NewAuthServiceClient(authConn),
-		domainpb.NewMLServiceClient(domainConn),
+		domainpb.NewMLServiceClient(mlConn),
 		tracer,
 	)
 	chat.SetupRoutes(chatRouter, chatHandler, wsConfig)
