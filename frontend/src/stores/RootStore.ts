@@ -25,6 +25,7 @@ export class RootStore {
     domainsOffset: number = 0;
     domainsLimit: number = 10;
     hasMoreDomains: boolean = true;
+    selectedDomainId: number | null = null;
 
     activeSessionId: string | null = null;
     activeSession: ChatSession | null = null;
@@ -42,6 +43,35 @@ export class RootStore {
 
         this.sessions = [];
         this.domains = [];
+
+        // Попытка восстановить выбранный domain из localStorage
+        try {
+            const savedDomainId = localStorage.getItem('selectedDomainId');
+            if (savedDomainId) {
+                this.selectedDomainId = parseInt(savedDomainId, 10);
+            }
+        } catch (e) {
+            console.error('Ошибка при чтении selectedDomainId из localStorage:', e);
+        }
+    }
+
+    setSelectedDomain(domainId: number) {
+        this.selectedDomainId = domainId;
+
+        // Сохраняем выбранный домен в localStorage
+        localStorage.setItem('selectedDomainId', domainId.toString());
+
+        // Если есть активное соединение - переподключаемся, чтобы использовать новый domainId
+        if (this.activeSessionId) {
+            this.connectWebSocket(this.activeSessionId);
+        }
+    }
+
+    getSelectedDomainTitle(): string {
+        if (!this.selectedDomainId) return 'Выберите домен';
+
+        const selectedDomain = this.domains.find((domain) => domain.id === this.selectedDomainId);
+        return selectedDomain ? selectedDomain.title : 'Домен не найден';
     }
 
     async getSessions() {
@@ -151,7 +181,7 @@ export class RootStore {
             isChunked: false,
             isLast: true,
             queryMetadata: {
-                domainID: 3,
+                domainID: this.selectedDomainId || undefined,
             },
         };
     }
@@ -244,6 +274,14 @@ export class RootStore {
 
         this.setIsModelAnswering(true);
         this.setChatDisabled(true);
+
+        // Добавляем domainID в метаданные запроса, если он выбран
+        if (this.selectedDomainId) {
+            message.queryMetadata = {
+                ...message.queryMetadata,
+                domainID: this.selectedDomainId,
+            };
+        }
 
         if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
             this.websocket.send(JSON.stringify(message));
