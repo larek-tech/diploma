@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -71,20 +72,18 @@ func ParseHTML(content io.ReadSeeker) (string, error) {
 }
 
 func cleanUTF8(input string) string {
-	if utf8.ValidString(input) {
-		return input
-	}
-	// Replace invalid bytes with the Unicode replacement character �
-	valid := make([]rune, 0, len(input))
-	for i, r := range input {
-		if r == utf8.RuneError {
-			_, size := utf8.DecodeRuneInString(input[i:])
-			if size == 1 {
-				valid = append(valid, '�') // replacement character
-				continue
-			}
+	b := []byte(input)
+	var buf bytes.Buffer
+
+	for len(b) > 0 {
+		r, size := utf8.DecodeRune(b)
+		if r == utf8.RuneError && size == 1 {
+			buf.WriteRune('�') // Replacement character
+			b = b[1:]
+		} else {
+			buf.WriteRune(r)
+			b = b[size:]
 		}
-		valid = append(valid, r)
 	}
-	return string(valid)
+	return buf.String()
 }
