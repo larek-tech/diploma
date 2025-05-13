@@ -6,7 +6,6 @@ import grpc
 from grpc import aio
 
 import ml.v1.model_pb2 as ml_pb2_model
-import ml.v1.service_pb2 as ml_pbd_service
 import ml.v1.service_pb2_grpc as ml_pb2_grpc
 from config import (
     DEFAULT_EMBEDER_MODEL,
@@ -14,8 +13,8 @@ from config import (
     DEFAULT_RERANKER_NAME,
     FIRST_MESSAE_PROMPT,
     ML_SERVICE_PORT,
+    OLLAMA_BASE_MODEL,
 )
-from data_client import AsyncDataServiceClient
 from optuna_pipline import OptunaPipeline
 from RAG_pipeline import RAGPipeline
 from sample_generate import generate_dataset
@@ -83,7 +82,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
         try:
             response = await self.rag.ollama_client.generate(
                 prompt=FIRST_MESSAE_PROMPT.format(message=request.query),
-                model="hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+                model=OLLAMA_BASE_MODEL,
             )
             return ml_pb2_model.ProcessFirstQueryResponse(message=response)
         except grpc.RpcError as e:
@@ -117,7 +116,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
                 searchByQuery=True,
             ),
             model=ml_pb2_model.LlmModel(
-                modelName="hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+                modelName=OLLAMA_BASE_MODEL,
                 temperature=0.7,
                 topK=5,
                 topP=0.9,

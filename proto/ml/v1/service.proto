@@ -10,5 +10,5 @@ service MLService {
   rpc ProcessQuery (ProcessQueryRequest) returns (stream ProcessQueryResponse) {};
   rpc GetDefaultParams (google.protobuf.Empty) returns (ModelParams) {};
   rpc GetOptimalParams (GetOptimalParamsRequest) returns (ModelParams) {};
-  rpc ProcessFirstQuery (ProcessQueryRequest) returns (ProcessQueryResponse) {};
+  rpc ProcessFirstQuery (ProcessFirstQueryRequest) returns (ProcessFirstQueryResponse) {};
 };
