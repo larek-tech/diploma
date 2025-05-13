@@ -62,8 +62,6 @@ services:
       - postgres
     env_file:
         - configs/data.parser.env
-    environment:
-
     ports:
       - "9999:8081"
 
