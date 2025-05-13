@@ -69,7 +69,9 @@ class AsyncOllamaClient:
                 if stream:
                     return self._handle_stream_response(response)
                 return self._handle_regular_response(response)
-
+            except httpx.HTTPStatusError as e:
+                msg = f"Got bad status: {e}"
+                raise RuntimeError(msg) from e
             except httpx.RequestError as e:
                 msg = f"API request failed: {e}"
                 raise RuntimeError(msg) from e
