@@ -100,7 +100,7 @@ proto-ml:
 		$(PROTOC) --proto_path=$(PROTO_SRC) --go_out=$$dir --go-grpc_out=$$dir \
 			$(ML_PROTO_SRC)/*.proto; \
 	done
-	@mkdir -p ml/ml/pb
+	@mkdir -p ml/src
 	@echo "Generating stubs in ./ml"
 	@python3 -m grpc_tools.protoc -I$(PROTO_SRC) --python_out=ml/src --pyi_out=ml/src --grpc_python_out=ml/src \
 		$(ML_PROTO_SRC)/*.proto;
@@ -109,7 +109,7 @@ proto-ml:
 .PHONY: proto-data
 proto-data: DATA_PROTO_SRC=$(PROTO_SRC)/data/v1
 proto-data:
-	@mkdir -p ml/data/pb
+	@mkdir -p ml/src
 	@echo "Generating stubs in ./ml"
 	@python3 -m grpc_tools.protoc -I$(PROTO_SRC) --python_out=ml/src --pyi_out=ml/src --grpc_python_out=ml/src \
 		$(DATA_PROTO_SRC)/*.proto;
