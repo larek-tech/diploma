@@ -722,6 +722,94 @@ func (x *GetOptimalParamsRequest) GetSourceIds() []string {
 	return nil
 }
 
+type ProcessFirstQueryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ProcessFirstQueryRequest) Reset() {
+	*x = ProcessFirstQueryRequest{}
+	mi := &file_ml_v1_model_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProcessFirstQueryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProcessFirstQueryRequest) ProtoMessage() {}
+
+func (x *ProcessFirstQueryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProcessFirstQueryRequest.ProtoReflect.Descriptor instead.
+func (*ProcessFirstQueryRequest) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ProcessFirstQueryRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+type ProcessFirstQueryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ProcessFirstQueryResponse) Reset() {
+	*x = ProcessFirstQueryResponse{}
+	mi := &file_ml_v1_model_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProcessFirstQueryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProcessFirstQueryResponse) ProtoMessage() {}
+
+func (x *ProcessFirstQueryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ml_v1_model_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProcessFirstQueryResponse.ProtoReflect.Descriptor instead.
+func (*ProcessFirstQueryResponse) Descriptor() ([]byte, []int) {
+	return file_ml_v1_model_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ProcessFirstQueryResponse) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
 var File_ml_v1_model_proto protoreflect.FileDescriptor
 
 const file_ml_v1_model_proto_rawDesc = "" +
@@ -788,7 +876,11 @@ const file_ml_v1_model_proto_rawDesc = "" +
 	"\t_rerankerB\x0f\n" +
 	"\r_vectorSearch\"7\n" +
 	"\x17GetOptimalParamsRequest\x12\x1c\n" +
-	"\tsourceIds\x18\x01 \x03(\tR\tsourceIdsB\x14Z\x12internal/domain/pbb\x06proto3"
+	"\tsourceIds\x18\x01 \x03(\tR\tsourceIds\"0\n" +
+	"\x18ProcessFirstQueryRequest\x12\x14\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\"1\n" +
+	"\x19ProcessFirstQueryResponse\x12\x14\n" +
+	"\x05query\x18\x01 \x01(\tR\x05queryB\x14Z\x12internal/domain/pbb\x06proto3"
 
 var (
 	file_ml_v1_model_proto_rawDescOnce sync.Once
@@ -802,28 +894,30 @@ func file_ml_v1_model_proto_rawDescGZIP() []byte {
 	return file_ml_v1_model_proto_rawDescData
 }
 
-var file_ml_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_ml_v1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_ml_v1_model_proto_goTypes = []any{
-	(*MultiQuery)(nil),              // 0: pb.ml.MultiQuery
-	(*Reranker)(nil),                // 1: pb.ml.Reranker
-	(*LlmModel)(nil),                // 2: pb.ml.LlmModel
-	(*VectorSearch)(nil),            // 3: pb.ml.VectorSearch
-	(*Scenario)(nil),                // 4: pb.ml.Scenario
-	(*Query)(nil),                   // 5: pb.ml.Query
-	(*ProcessQueryRequest)(nil),     // 6: pb.ml.ProcessQueryRequest
-	(*Chunk)(nil),                   // 7: pb.ml.Chunk
-	(*ProcessQueryResponse)(nil),    // 8: pb.ml.ProcessQueryResponse
-	(*ModelParams)(nil),             // 9: pb.ml.ModelParams
-	(*GetOptimalParamsRequest)(nil), // 10: pb.ml.GetOptimalParamsRequest
-	(*timestamppb.Timestamp)(nil),   // 11: google.protobuf.Timestamp
+	(*MultiQuery)(nil),                // 0: pb.ml.MultiQuery
+	(*Reranker)(nil),                  // 1: pb.ml.Reranker
+	(*LlmModel)(nil),                  // 2: pb.ml.LlmModel
+	(*VectorSearch)(nil),              // 3: pb.ml.VectorSearch
+	(*Scenario)(nil),                  // 4: pb.ml.Scenario
+	(*Query)(nil),                     // 5: pb.ml.Query
+	(*ProcessQueryRequest)(nil),       // 6: pb.ml.ProcessQueryRequest
+	(*Chunk)(nil),                     // 7: pb.ml.Chunk
+	(*ProcessQueryResponse)(nil),      // 8: pb.ml.ProcessQueryResponse
+	(*ModelParams)(nil),               // 9: pb.ml.ModelParams
+	(*GetOptimalParamsRequest)(nil),   // 10: pb.ml.GetOptimalParamsRequest
+	(*ProcessFirstQueryRequest)(nil),  // 11: pb.ml.ProcessFirstQueryRequest
+	(*ProcessFirstQueryResponse)(nil), // 12: pb.ml.ProcessFirstQueryResponse
+	(*timestamppb.Timestamp)(nil),     // 13: google.protobuf.Timestamp
 }
 var file_ml_v1_model_proto_depIdxs = []int32{
 	0,  // 0: pb.ml.Scenario.multiQuery:type_name -> pb.ml.MultiQuery
 	1,  // 1: pb.ml.Scenario.reranker:type_name -> pb.ml.Reranker
 	3,  // 2: pb.ml.Scenario.vectorSearch:type_name -> pb.ml.VectorSearch
 	2,  // 3: pb.ml.Scenario.model:type_name -> pb.ml.LlmModel
-	11, // 4: pb.ml.Scenario.createdAt:type_name -> google.protobuf.Timestamp
-	11, // 5: pb.ml.Scenario.updatedAt:type_name -> google.protobuf.Timestamp
+	13, // 4: pb.ml.Scenario.createdAt:type_name -> google.protobuf.Timestamp
+	13, // 5: pb.ml.Scenario.updatedAt:type_name -> google.protobuf.Timestamp
 	5,  // 6: pb.ml.ProcessQueryRequest.query:type_name -> pb.ml.Query
 	4,  // 7: pb.ml.ProcessQueryRequest.scenario:type_name -> pb.ml.Scenario
 	7,  // 8: pb.ml.ProcessQueryResponse.chunk:type_name -> pb.ml.Chunk
@@ -853,7 +947,7 @@ func file_ml_v1_model_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ml_v1_model_proto_rawDesc), len(file_ml_v1_model_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
