@@ -14,7 +14,7 @@ const (
 	ChunkSize = 8192
 	// ChunkOverlap is the number of overlapping characters between chunks.
 	ChunkOverlap  = 100
-	EmbeddingSize = 8192
+	EmbeddingSize = 1024
 )
 
 // embed embeds the document content into chunks and returns them.
@@ -39,12 +39,6 @@ func (s Service) embed(ctx context.Context, doc *document.Document) ([]*document
 	}
 	chunks := make([]*document.Chunk, 0, len(rawChunks))
 	for i, rawChunk := range rawChunks {
-		if len(embeddings[i]) > EmbeddingSize {
-			embeddings[i] = embeddings[i][:EmbeddingSize]
-		} else if len(embeddings[i]) < EmbeddingSize {
-			return nil, fmt.Errorf("embedding at index %d is smaller than %d", i, EmbeddingSize)
-		}
-
 		chunk := &document.Chunk{
 			ID:         uuid.NewString(),
 			DocumentID: doc.ID,
