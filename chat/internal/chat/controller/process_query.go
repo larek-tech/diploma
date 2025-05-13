@@ -189,7 +189,7 @@ func (ctrl *Controller) receiveChunk(
 		return errs.WrapErr(err, "streaming error")
 	}
 
-	content := r.GetChunk().Content
+	content := r.GetChunk().GetContent()
 
 	sourceIDs := r.GetSourceIds()
 	if sourceIDs != nil {
