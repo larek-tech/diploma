@@ -220,7 +220,7 @@ class OptunaPipeline:
                 ),
                 "topK": trial.suggest_int("model.topK", 1, 50),
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": OLLAMA_BASE_MODEL,
+                "modelName": "hf.co/t-tech/T-lite-it-1.0-Q8_0-GGUF:Q8_0",
             },
             "multiQuery": {
                 "useMultiquery": trial.suggest_categorical(
@@ -361,7 +361,7 @@ class OptunaPipeline:
             ]
 
         model_params.model.modelName = (
-            OLLAMA_BASE_MODEL
+            "hf.co/t-tech/T-lite-it-1.0-Q8_0-GGUF:Q8_0"
         )
         model_params.model.temperature = float(params["model.temperature"])
         model_params.model.topK = int(params["model.topK"])

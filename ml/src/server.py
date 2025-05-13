@@ -82,7 +82,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
         try:
             response = await self.rag.ollama_client.generate(
                 prompt=FIRST_MESSAE_PROMPT.format(message=request.query),
-                model=OLLAMA_BASE_MODEL,
+                model="hf.co/t-tech/T-lite-it-1.0-Q8_0-GGUF:Q8_0",
             )
             return ml_pb2_model.ProcessFirstQueryResponse(message=response)
         except grpc.RpcError as e:
@@ -116,7 +116,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
                 searchByQuery=True,
             ),
             model=ml_pb2_model.LlmModel(
-                modelName=OLLAMA_BASE_MODEL,
+                modelName="hf.co/t-tech/T-lite-it-1.0-Q8_0-GGUF:Q8_0",
                 temperature=0.7,
                 topK=5,
                 topP=0.9,

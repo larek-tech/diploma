@@ -94,7 +94,7 @@ async def main() -> None:
 
     stream = await client.generate(
         prompt="Привет, как дела?",
-        model=OLLAMA_BASE_MODEL,
+        model="hf.co/t-tech/T-lite-it-1.0-Q8_0-GGUF:Q8_0",
         stream=True,
     )
 

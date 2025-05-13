@@ -130,7 +130,7 @@ async def generate_dataset(
     source_ids: list[str], data_client: AsyncDataServiceClient
 ) -> None:
     generator = SyntheticDatasetGenerator(
-        model=OLLAMA_BASE_MODEL
+        model="hf.co/t-tech/T-lite-it-1.0-Q8_0-GGUF:Q8_0"
     )
     for source_id in source_ids:
         response = await data_client.get_documents(source_id, size=4, page=1)
