@@ -8,8 +8,8 @@ import (
 )
 
 const insertScenario = `
-	insert into domain.scenario(title, user_id, use_multiquery, n_queries, query_model_name, use_rerank, reranker_model_name, reranker_max_length, reranker_top_k, llm_model_name, temperature, top_k, top_p, system_prompt, top_n, threshold, search_by_query)
-	values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+	insert into domain.scenario(title, user_id, domain_id, use_multiquery, n_queries, query_model_name, use_rerank, reranker_model_name, reranker_max_length, reranker_top_k, llm_model_name, temperature, top_k, top_p, system_prompt, top_n, threshold, search_by_query)
+	values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
 	returning id;
 `
 
@@ -22,6 +22,7 @@ func (r *Repo) InsertScenario(ctx context.Context, s model.ScenarioDao) (int64, 
 		insertScenario,
 		s.Title,
 		s.UserID,
+		s.DomainID,
 		s.UseMultiquery,
 		s.NQueries,
 		s.QueryModelName,

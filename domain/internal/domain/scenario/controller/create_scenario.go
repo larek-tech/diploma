@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"time"
 
 	authpb "github.com/larek-tech/diploma/domain/internal/auth/pb"
 	"github.com/larek-tech/diploma/domain/internal/domain/pb"
@@ -29,6 +30,7 @@ func (ctrl *Controller) CreateScenario(ctx context.Context, req *pb.CreateScenar
 	vectorSearch := req.GetVectorSearch()
 
 	scenario := model.ScenarioDao{
+		Title:             req.GetTitle(),
 		UserID:            meta.GetUserId(),
 		UseMultiquery:     multiQuery.GetUseMultiquery(),
 		NQueries:          multiQuery.GetNQueries(),
@@ -45,6 +47,8 @@ func (ctrl *Controller) CreateScenario(ctx context.Context, req *pb.CreateScenar
 		TopN:              vectorSearch.GetTopN(),
 		Threshold:         vectorSearch.GetThreshold(),
 		SearchByQuery:     vectorSearch.GetSearchByQuery(),
+		CreatedAt:         time.Time{},
+		UpdatedAt:         time.Time{},
 	}
 
 	scenarioID, err := ctrl.sr.InsertScenario(ctx, scenario)
