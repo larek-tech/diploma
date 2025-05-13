@@ -20,6 +20,7 @@ class AsyncDataServiceClient:
 
     def __init__(self, host: str = "localhost", port: int = 9990) -> None:
         self.channel = aio.insecure_channel(f"{host}:{port}")
+        logger.info(f"{host}:{port}")
         self.stub = pb_grpc.DataServiceStub(self.channel)
 
     async def close(self) -> None:

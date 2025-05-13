@@ -50,6 +50,11 @@ class MLServiceStub(object):
                 request_serializer=ml_dot_v1_dot_model__pb2.GetOptimalParamsRequest.SerializeToString,
                 response_deserializer=ml_dot_v1_dot_model__pb2.ModelParams.FromString,
                 _registered_method=True)
+        self.ProcessFirstQuery = channel.unary_unary(
+                '/pb.ml.MLService/ProcessFirstQuery',
+                request_serializer=ml_dot_v1_dot_model__pb2.ProcessQueryRequest.SerializeToString,
+                response_deserializer=ml_dot_v1_dot_model__pb2.ProcessQueryResponse.FromString,
+                _registered_method=True)
 
 
 class MLServiceServicer(object):
@@ -73,6 +78,12 @@ class MLServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ProcessFirstQuery(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_MLServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -90,6 +101,11 @@ def add_MLServiceServicer_to_server(servicer, server):
                     servicer.GetOptimalParams,
                     request_deserializer=ml_dot_v1_dot_model__pb2.GetOptimalParamsRequest.FromString,
                     response_serializer=ml_dot_v1_dot_model__pb2.ModelParams.SerializeToString,
+            ),
+            'ProcessFirstQuery': grpc.unary_unary_rpc_method_handler(
+                    servicer.ProcessFirstQuery,
+                    request_deserializer=ml_dot_v1_dot_model__pb2.ProcessQueryRequest.FromString,
+                    response_serializer=ml_dot_v1_dot_model__pb2.ProcessQueryResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -173,6 +189,33 @@ class MLService(object):
             '/pb.ml.MLService/GetOptimalParams',
             ml_dot_v1_dot_model__pb2.GetOptimalParamsRequest.SerializeToString,
             ml_dot_v1_dot_model__pb2.ModelParams.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ProcessFirstQuery(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/pb.ml.MLService/ProcessFirstQuery',
+            ml_dot_v1_dot_model__pb2.ProcessQueryRequest.SerializeToString,
+            ml_dot_v1_dot_model__pb2.ProcessQueryResponse.FromString,
             options,
             channel_credentials,
             insecure,

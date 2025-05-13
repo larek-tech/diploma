@@ -125,3 +125,15 @@ class GetOptimalParamsRequest(_message.Message):
     SOURCEIDS_FIELD_NUMBER: _ClassVar[int]
     sourceIds: _containers.RepeatedScalarFieldContainer[str]
     def __init__(self, sourceIds: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class ProcessFirstQueryRequest(_message.Message):
+    __slots__ = ("query",)
+    QUERY_FIELD_NUMBER: _ClassVar[int]
+    query: str
+    def __init__(self, query: _Optional[str] = ...) -> None: ...
+
+class ProcessFirstQueryResponse(_message.Message):
+    __slots__ = ("query",)
+    QUERY_FIELD_NUMBER: _ClassVar[int]
+    query: str
+    def __init__(self, query: _Optional[str] = ...) -> None: ...

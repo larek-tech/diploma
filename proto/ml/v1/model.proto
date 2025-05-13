@@ -75,3 +75,10 @@ message ModelParams{
 message GetOptimalParamsRequest{
   repeated string sourceIds = 1;
 }
+message ProcessFirstQueryRequest {
+  string query = 1;
+}
+
+message ProcessFirstQueryResponse {
+  string query = 1;
+}

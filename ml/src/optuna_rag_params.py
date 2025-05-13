@@ -48,7 +48,7 @@ async def compute_metrics(dataset: list[dict[str]]) -> float:
             SingleTurnSample(**dataset[i])
         )
     logger.info("Context precision metrric %s", context_result / len(dataset))
-    logger.info("Semantic score: %s", context_result / len(dataset))
+    logger.info("Semantic score: %s", generate_result / len(dataset))
     return context_result / len(dataset), generate_result / len(dataset)
 
 
