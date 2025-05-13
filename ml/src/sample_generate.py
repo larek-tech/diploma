@@ -1,12 +1,10 @@
-import asyncio
 import json
 
 import anyio
 import redis.asyncio as redis
 
 from config import (
-    DATA_SERVICE_HOST,
-    DATA_SERVICE_PORT,
+    OLLAMA_BASE_MODEL,
     OLLAMA_BASE_URL,
     QA_PROMPT_TEMPLATE,
 )
@@ -48,7 +46,7 @@ def generate_structured_output_schema(n: int = 1) -> dict:
 class SyntheticDatasetGenerator:
     def __init__(self, model: str, base_url: str = OLLAMA_BASE_URL) -> None:
         self.client = AsyncOllamaClient(base_url=base_url)
-        self.model = model
+        self.model = OLLAMA_BASE_MODEL
 
     async def generate_qa_pair(
         self, chunks: list[str], n_questions: int
@@ -132,7 +130,7 @@ async def generate_dataset(
     source_ids: list[str], data_client: AsyncDataServiceClient
 ) -> None:
     generator = SyntheticDatasetGenerator(
-        model="hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M"
+        model=OLLAMA_BASE_MODEL
     )
     for source_id in source_ids:
         response = await data_client.get_documents(source_id, size=4, page=1)

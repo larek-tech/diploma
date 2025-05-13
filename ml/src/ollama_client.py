@@ -5,7 +5,7 @@ from typing import Any
 
 import httpx
 
-from config import OLLAMA_BASE_URL
+from config import OLLAMA_BASE_MODEL, OLLAMA_BASE_URL
 from utils.logger import logger
 
 
@@ -57,6 +57,7 @@ class AsyncOllamaClient:
             "model": model,
             "prompt": prompt,
             "stream": stream,
+            "num_ctx": NUM_CTX
             **kwargs,
         }
 
@@ -93,7 +94,7 @@ async def main() -> None:
 
     stream = await client.generate(
         prompt="Привет, как дела?",
-        model="hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+        model=OLLAMA_BASE_MODEL,
         stream=True,
     )
 
