@@ -5,7 +5,7 @@ from typing import Any
 
 import httpx
 
-from config import OLLAMA_BASE_MODEL, OLLAMA_BASE_URL
+from config import OLLAMA_BASE_MODEL, OLLAMA_BASE_URL, NUM_CTX
 from utils.logger import logger
 
 
@@ -57,7 +57,7 @@ class AsyncOllamaClient:
             "model": model,
             "prompt": prompt,
             "stream": stream,
-            "num_ctx": NUM_CTX
+            "num_ctx": NUM_CTX,
             **kwargs,
         }
 
