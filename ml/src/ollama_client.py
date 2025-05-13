@@ -63,13 +63,16 @@ class AsyncOllamaClient:
 
         async with httpx.AsyncClient(timeout=600) as client:
             try:
+                logger.info(f"sending payload {payload}")
                 response = await client.post(url, json=payload)
                 response.raise_for_status()
 
                 if stream:
                     return self._handle_stream_response(response)
                 return self._handle_regular_response(response)
-
+            except httpx.HTTPStatusError as e:
+                msg = f"Got bad status: {e}"
+                raise RuntimeError(msg) from e
             except httpx.RequestError as e:
                 msg = f"API request failed: {e}"
                 raise RuntimeError(msg) from e

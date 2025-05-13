@@ -233,7 +233,6 @@ func (h *Handler) Chat(c *websocket.Conn) {
 			Type:      model.TypeChunk,
 			IsChunked: true,
 			IsLast:    true,
-			SourceIDs: msg.SourceIDs,
 		}
 		sendMsg(c, chunk)
 	}

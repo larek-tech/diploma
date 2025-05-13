@@ -58,7 +58,7 @@ func (h *Handler) ProcessQuery(req *pb.ProcessQueryRequest, stream grpc.ServerSt
 		case e := <-errCh:
 			log.Err(errs.WrapErr(e)).Msg("process query")
 			return status.Errorf(codes.Internal, "failed processing query")
-		case <-time.After(time.Minute):
+		case <-time.After(time.Minute * 3):
 			log.Err(ErrProcessQueryTimeout).Msg("process query timeout")
 			return status.Error(codes.DeadlineExceeded, "processing query timeout")
 		}

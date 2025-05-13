@@ -152,6 +152,10 @@ func (ctrl *Controller) ProcessQuery(
 		case <-processCtx.Done():
 			return
 		case <-streamCtx.Done():
+			out <- &pb.ChunkedResponse{
+				QueryId:   resp.QueryID,
+				SourceIds: q.SourceIDs,
+			}
 			log.Debug().
 				Int64("queryID", resp.QueryID).
 				Any("sourceIDs", q.SourceIDs).
@@ -204,9 +208,8 @@ func (ctrl *Controller) receiveChunk(
 	log.Debug().Int64("queryID", resp.QueryID).Str("content", content).Msg("got chunk")
 
 	out <- &pb.ChunkedResponse{
-		QueryId:   resp.QueryID,
-		Content:   content,
-		SourceIds: sourceIDs,
+		QueryId: resp.QueryID,
+		Content: content,
 	}
 
 	resp.Content = buff.String()
