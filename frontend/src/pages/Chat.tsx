@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { useStores } from '@/hooks/useStores';
-import { ArrowUpIcon, FilePenIcon, Loader2, StopCircleIcon, MicIcon } from 'lucide-react';
+import { ArrowUpIcon, FilePenIcon, Loader2, StopCircleIcon, MicIcon, Database } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
@@ -65,6 +65,13 @@ const Chat = observer(() => {
         }
     }, [rootStore.chatError, toast]);
 
+    // Загружаем домены если они еще не загружены
+    useEffect(() => {
+        if (rootStore.domains.length === 0 && !rootStore.domainsLoading) {
+            rootStore.getDomains();
+        }
+    }, [rootStore]);
+
     const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
@@ -78,10 +85,16 @@ const Chat = observer(() => {
                 type: WSMessageType.Query,
                 content: message.trim(),
                 queryMetadata: {
-                    domainID: 3,
+                    domainID: rootStore.selectedDomainId || undefined,
                 },
             });
             setMessage('');
+        } else if (!rootStore.selectedDomainId) {
+            toast({
+                title: 'Внимание',
+                description: 'Выберите домен знаний для чата в боковой панели',
+                variant: 'destructive',
+            });
         }
     };
 
@@ -176,7 +189,7 @@ const Chat = observer(() => {
     return (
         <>
             <div className='chat'>
-                <div className='flex items-center'>
+                <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-2 group'>
                         <input
                             ref={titleInputRef}
@@ -195,6 +208,19 @@ const Chat = observer(() => {
                         >
                             <FilePenIcon className='w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' />
                         </Button>
+                    </div>
+
+                    <div className='flex items-center gap-2 text-sm'>
+                        <Database className='h-4 w-4 text-primary' />
+                        <span
+                            className={
+                                rootStore.selectedDomainId
+                                    ? 'text-primary-600 font-medium'
+                                    : 'text-gray-500'
+                            }
+                        >
+                            {rootStore.getSelectedDomainTitle()}
+                        </span>
                     </div>
                 </div>
 
@@ -234,6 +260,12 @@ const Chat = observer(() => {
                     </div>
 
                     <div className='max-w-5xl w-full sticky bottom-0 mx-auto py-4 flex flex-col gap-2 px-4 dark:bg-[#0f172a] bg-neutral-100'>
+                        {!rootStore.selectedDomainId && (
+                            <div className='text-amber-600 text-xs mb-1 flex items-center'>
+                                <span className='mr-1'>⚠️</span> Выберите домен знаний в боковой
+                                панели для начала общения
+                            </div>
+                        )}
                         <div className='relative'>
                             <Textarea
                                 onChange={(e) => setMessage(e.target.value)}
