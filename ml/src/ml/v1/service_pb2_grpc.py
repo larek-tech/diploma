@@ -52,8 +52,8 @@ class MLServiceStub(object):
                 _registered_method=True)
         self.ProcessFirstQuery = channel.unary_unary(
                 '/pb.ml.MLService/ProcessFirstQuery',
-                request_serializer=ml_dot_v1_dot_model__pb2.ProcessQueryRequest.SerializeToString,
-                response_deserializer=ml_dot_v1_dot_model__pb2.ProcessQueryResponse.FromString,
+                request_serializer=ml_dot_v1_dot_model__pb2.ProcessFirstQueryRequest.SerializeToString,
+                response_deserializer=ml_dot_v1_dot_model__pb2.ProcessFirstQueryResponse.FromString,
                 _registered_method=True)
 
 
@@ -104,8 +104,8 @@ def add_MLServiceServicer_to_server(servicer, server):
             ),
             'ProcessFirstQuery': grpc.unary_unary_rpc_method_handler(
                     servicer.ProcessFirstQuery,
-                    request_deserializer=ml_dot_v1_dot_model__pb2.ProcessQueryRequest.FromString,
-                    response_serializer=ml_dot_v1_dot_model__pb2.ProcessQueryResponse.SerializeToString,
+                    request_deserializer=ml_dot_v1_dot_model__pb2.ProcessFirstQueryRequest.FromString,
+                    response_serializer=ml_dot_v1_dot_model__pb2.ProcessFirstQueryResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -214,8 +214,8 @@ class MLService(object):
             request,
             target,
             '/pb.ml.MLService/ProcessFirstQuery',
-            ml_dot_v1_dot_model__pb2.ProcessQueryRequest.SerializeToString,
-            ml_dot_v1_dot_model__pb2.ProcessQueryResponse.FromString,
+            ml_dot_v1_dot_model__pb2.ProcessFirstQueryRequest.SerializeToString,
+            ml_dot_v1_dot_model__pb2.ProcessFirstQueryResponse.FromString,
             options,
             channel_credentials,
             insecure,

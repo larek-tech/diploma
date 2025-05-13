@@ -142,7 +142,7 @@ func (h *Handler) Chat(c *websocket.Conn) {
 
 	var (
 		msg          model.SocketMessage
-		titleResp    *domainpb.ProcessQueryResponse
+		titleResp    *domainpb.ProcessFirstQueryResponse
 		processReq   *pb.ProcessQueryRequest
 		chunk        *model.SocketMessage
 		errStream    error
@@ -200,17 +200,15 @@ func (h *Handler) Chat(c *websocket.Conn) {
 		}
 
 		if firstMessage {
-			titleResp, err = h.mlService.ProcessFirstQuery(ctx, &domainpb.ProcessQueryRequest{
-				Query: &domainpb.Query{
-					Content: msg.Content,
-				},
+			titleResp, err = h.mlService.ProcessFirstQuery(ctx, &domainpb.ProcessFirstQueryRequest{
+				Query: msg.Content,
 			})
 			if err != nil {
 				sendErr(c, errs.WrapErr(err), "summarize first message")
 			} else {
 				_, err = h.chatService.RenameChat(ctx, &pb.RenameChatRequest{
 					ChatId: chatID,
-					Title:  titleResp.GetChunk().GetContent(),
+					Title:  titleResp.GetQuery(),
 				})
 				if err != nil {
 					sendErr(c, errs.WrapErr(err), "update chat title")
