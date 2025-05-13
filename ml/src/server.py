@@ -111,7 +111,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
                 rerankerModel=DEFAULT_RERANKER_NAME,
             ),
             vectorSearch=ml_pb2_model.VectorSearch(
-                topN=5,
+                topN=10,
                 threshold=0.1,
                 searchByQuery=True,
             ),
