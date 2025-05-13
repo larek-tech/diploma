@@ -186,7 +186,7 @@ class OptunaPipeline:
     ) -> float:
         params = {
             "vectorSearch": {
-                "topN": trial.suggest_int("vectorSearch.topN", 3, 20),
+                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
                 "threshold": trial.suggest_float(
                     "vectorSearch.threshold", 0.1, 0.2
                 ),
@@ -198,9 +198,12 @@ class OptunaPipeline:
                 "useRerank": trial.suggest_categorical(
                     "reranker.useRerank", [True, False]
                 ),
-                "topK": trial.suggest_int("reranker.topK", 1, 10),
+                "topK": trial.suggest_int("reranker.topK", 4, 8),
                 "rerankerMaxLength": trial.suggest_int(
-                    "reranker.rerankerMaxLength", 128, 1024
+                    "reranker.rerankerMaxLength",
+                    512,
+                    1024,
+                    2048,
                 ),
                 "rerankerModel": "BAAI/bge-reranker-v2-m3",
             },
@@ -216,7 +219,7 @@ class OptunaPipeline:
                 "useMultiquery": trial.suggest_categorical(
                     "multiQuery.useMultiquery", [True, False]
                 ),
-                "nQueries": trial.suggest_int("multiQuery.nQueries", 1, 5),
+                "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
                 "queryModelName": None,
             },
             "sourceIds": source_ids,
@@ -279,6 +282,67 @@ class OptunaPipeline:
             study.tell(trial, [context_precision_score, similarity_score])
         best_trial = max(
             study.best_trials,
-            key=lambda t: (t.values[0], t.values[1])  # сортировка по двум метрикам
+            key=lambda t: (
+                t.values[0],
+                t.values[1],
+            ),  # сортировка по двум метрикам
         )
-        return study.best_trials
+        return self.trial_to_model_params(best_trial.params)
+
+    def trial_to_model_params(self, params):
+        model_params = ml_pb2_model.ModelParams()
+
+        # MultiQuery
+        if (
+            "multiQuery.useMultiquery" in params
+            and "multiQuery.nQueries" in params
+        ):
+            model_params.multiQuery.useMultiquery = params[
+                "multiQuery.useMultiquery"
+            ]
+            model_params.multiQuery.nQueries = int(
+                params["multiQuery.nQueries"]
+            )
+
+        # Reranker
+        if all(
+            k in params
+            for k in [
+                "reranker.useRerank",
+                "reranker.topK",
+                "reranker.rerankerMaxLength",
+            ]
+        ):
+            model_params.reranker.useRerank = params["reranker.useRerank"]
+            model_params.reranker.topK = int(params["reranker.topK"])
+            model_params.reranker.rerankerMaxLength = int(
+                params["reranker.rerankerMaxLength"]
+            )
+            model_params.reranker.rerankerModel = "BAAI/bge-reranker-v2-m3"
+
+        # VectorSearch
+        if all(
+            k in params
+            for k in [
+                "vectorSearch.topN",
+                "vectorSearch.threshold",
+                "vectorSearch.searchByQuery",
+            ]
+        ):
+            model_params.vectorSearch.topN = int(params["vectorSearch.topN"])
+            model_params.vectorSearch.threshold = float(
+                params["vectorSearch.threshold"]
+            )
+            model_params.vectorSearch.searchByQuery = params[
+                "vectorSearch.searchByQuery"
+            ]
+
+        model_params.model.modelName = (
+            "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M"
+        )
+        model_params.model.temperature = float(params["model.temperature"])
+        model_params.model.topK = int(params["model.topK"])
+        model_params.model.topP = float(params["model.topP"])
+        model_params.model.systemPrompt = ""
+
+        return model_params

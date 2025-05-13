@@ -4,7 +4,12 @@ import json
 import anyio
 import redis.asyncio as redis
 
-from config import DATA_SERVICE_HOST, OLLAMA_BASE_URL, QA_PROMPT_TEMPLATE
+from config import (
+    DATA_SERVICE_HOST,
+    DATA_SERVICE_PORT,
+    OLLAMA_BASE_URL,
+    QA_PROMPT_TEMPLATE,
+)
 from data_client import AsyncDataServiceClient
 from ollama_client import AsyncOllamaClient
 from utils.logger import logger
@@ -123,36 +128,21 @@ class SyntheticDatasetGenerator:
         await redis_client.close()
 
 
-async def generate_dataset(source_ids: list[str]) -> None:
-
-    # source_ids = ["0c03cad2-6af8-479d-bdad-58ae70c54eb5"]
-    # data_client = AsyncDataServiceClient(
-    #     host=DATA_SERVICE_HOST, port=DATA_SERVICE_HOST
-    # )
-    # chunks = []
-    # for source_id in source_ids:
-    #     response = await data_client.get_documents(source_id, size=10, page=10)
-    #     chunks += [doc.content for doc in response.documents]
-    # logger.info(chunks)
-    chunks = [
-        "Python — это язык программирования, широко используемый для веб-разработки, анализа данных, искусственного интеллекта и научных вычислений.",
-        "Гравитация — это сила, с которой тела притягиваются друг к другу. Она зависит от массы объектов и расстояния между ними.",
-    ]
-
+async def generate_dataset(
+    source_ids: list[str], data_client: AsyncDataServiceClient
+) -> None:
     generator = SyntheticDatasetGenerator(
         model="hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M"
     )
-    dataset = await generator.generate_qa_pair(chunks, n_questions=5)
+    for source_id in source_ids:
+        response = await data_client.get_documents(source_id, size=4, page=1)
+        chunks = [doc.content for doc in response.documents]
+        logger.info(chunks)
+        dataset = await generator.generate_qa_pair(chunks, n_questions=5)
 
-    output_path = "synthetic_dataset.jsonl"
-    await generator.save_to_jsonl(dataset, output_path)
+        output_path = "synthetic_dataset.jsonl"
+        await generator.save_to_jsonl(dataset, output_path)
 
-    await generator.save_to_redis(
-        dataset, key_prefix="a6bfe96f-45bd-4e4b-8e6f-2c2ef53ca280"
-    )
+        await generator.save_to_redis(dataset, key_prefix=source_id)
 
-    print(f"Сохранено {len(dataset)} QA-пар в {output_path}")
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+    logger.info(f"Сохранено {len(dataset)} QA-пар в {output_path}")
