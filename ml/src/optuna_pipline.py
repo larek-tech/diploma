@@ -1,7 +1,7 @@
 import json
 import traceback
 from typing import Any
-
+import asyncio
 import optuna
 import redis.asyncio as redis
 from datasets import Dataset
@@ -15,7 +15,6 @@ from ragas.metrics import (
 
 import ml.v1.model_pb2 as ml_pb2_model
 from config import DEFAULT_EMBEDER_MODEL, DEFAULT_REDIS_URL
-from optuna_rag_params import load_all_qa_samples_from_redis
 from RAG_pipeline import RAGPipeline
 from utils.logger import logger
 
@@ -46,32 +45,39 @@ class OptunaPipeline:
         )
         self.rag_pipeline = RAGPipeline()
 
-    async def compute_metrics(self, dataset: list[dict[str]]) -> float:
-        """Вычисляет метрики NonLLMContextPrecisionWithReference для
-        набора данных и SemanticSimilarity для оценки генерации.
+    async def calculate_ragas_metrics(
+        self, model_outputs: list[dict[str, Any]]
+    ) -> tuple[float, float]:
+        """Расчёт метрик RAGAS (ContextPrecision и SemanticSimilarity).
 
-        :param dataset: Dataset, который состоит из колонок:
-            - 'question'
-            - 'answer' (референсный ответ)
-            - 'contexts' (извлечённые контексты)
-            - 'generated_answer' (не используется в этой метрике, но можно оставить)
-            - 'retrivment_content' (можно использовать как синоним contexts)
-        :return: значение метрики (float)
+        :param model_outputs: Список словарей с полями:
+            - 'user_input' (вопрос пользователя)
+            - 'reference' (референсный ответ)
+            - 'retrieved_contexts' (список извлечённых контекстов)
+            - 'response' (сгенерированный ответ)
+        :return: Кортеж из двух float:
+            - context_precision_score
+            - semantic_similarity_score
         """
-        context_result = 0
-        generate_result = 0
-        for i in range(len(dataset)):
-            context_result += await self.context_metric.single_turn_ascore(
-                SingleTurnSample(**dataset[i])
-            )
-            generate_result += await self.generate_metric.single_turn_ascore(
-                SingleTurnSample(**dataset[i])
-            )
-        logger.info(
-            "Context precision metrric %s", context_result / len(dataset)
-        )
-        logger.info("Semantic score: %s", context_result / len(dataset))
-        return context_result / len(dataset), generate_result / len(dataset)
+        context_result = 0.0
+        generate_result = 0.0
+        total_samples = len(model_outputs)
+
+        for sample in model_outputs:
+            rag_sample = SingleTurnSample(**sample)
+            context_result += await self.context_metric.single_turn_ascore(rag_sample)
+            generate_result += await self.generate_metric.single_turn_ascore(rag_sample)
+
+        if total_samples == 0:
+            return 0.0, 0.0
+
+        context_score = context_result / total_samples
+        generate_score = generate_result / total_samples
+
+        logger.info("Context Precision: %s", context_score)
+        logger.info("Semantic Similarity: %s", generate_score)
+
+        return context_score, generate_score
 
     async def load_all_qa_samples_from_redis(
         self, key_prefix: str = "qa:"
@@ -96,34 +102,36 @@ class OptunaPipeline:
         self, entry: dict, params: dict
     ) -> ml_pb2_model.ProcessQueryRequest:
         return ml_pb2_model.ProcessQueryRequest(
-            query=ml_pb2_model.Query(content=entry["question"], userId=9),
+            query=ml_pb2_model.Query(
+                content=entry.get("question", ""),
+                userId=9
+            ),
             scenario=ml_pb2_model.Scenario(
                 model=ml_pb2_model.LlmModel(
-                    modelName=params["model"]["modelName"],
-                    temperature=params["model"]["temperature"],
-                    topK=params["model"]["topK"],
-                    topP=params["model"]["topP"],
+                    modelName=params.get("model", {}).get("modelName"),
+                    temperature=params.get("model", {}).get("temperature"),
+                    topK=params.get("model", {}).get("topK"),
+                    topP=params.get("model", {}).get("topP"),
                     systemPrompt="",
                 ),
                 multiQuery=ml_pb2_model.MultiQuery(
-                    useMultiquery=params["multiQuery"]["useMultiquery"],
-                    nQueries=params["multiQuery"]["nQueries"],
-                    queryModelName=params["multiQuery"]["queryModelName"]
-                    or "",
+                    useMultiquery=params.get("multiQuery", {}).get("useMultiquery"),
+                    nQueries=params.get("multiQuery", {}).get("nQueries"),
+                    queryModelName=params.get("multiQuery", {}).get("queryModelName") or "",
                 ),
                 vectorSearch=ml_pb2_model.VectorSearch(
-                    topN=params["vectorSearch"]["topN"],
-                    threshold=params["vectorSearch"]["threshold"],
-                    searchByQuery=params["vectorSearch"]["searchByQuery"],
+                    topN=params.get("vectorSearch", {}).get("topN"),
+                    threshold=params.get("vectorSearch", {}).get("threshold"),
+                    searchByQuery=params.get("vectorSearch", {}).get("searchByQuery"),
                 ),
                 reranker=ml_pb2_model.Reranker(
-                    useRerank=params["reranker"]["useRerank"],
-                    topK=params["reranker"]["topK"],
-                    rerankerMaxLength=params["reranker"]["rerankerMaxLength"],
-                    rerankerModel=params["reranker"]["rerankerModel"],
+                    useRerank=params.get("reranker", {}).get("useRerank"),
+                    topK=params.get("reranker", {}).get("topK"),
+                    rerankerMaxLength=params.get("reranker", {}).get("rerankerMaxLength"),
+                    rerankerModel=params.get("reranker", {}).get("rerankerModel"),
                 ),
             ),
-            sourceIds=params["sourceIds"],
+            sourceIds=params.get("sourceIds")
         )
 
     async def make_test_request(
@@ -174,50 +182,48 @@ class OptunaPipeline:
             (
                 context_precision_score,
                 semantic_score,
-            ) = await self.compute_metrics(model_answers)
+            ) = await self.calculate_ragas_metrics(model_answers)
             return context_precision_score, semantic_score
         except Exception as e:
             tb = traceback.format_exc()
             logger.error(f"Error during evaluation: {e}\n{tb}")
-            return 0.0
+            return 0.0, 0.0
 
     async def objective(
-        self, trial, test_dataset: list[dict[str]], source_ids: list[str]
+        self, trial: optuna.Trial, test_dataset: list[dict[str]], source_ids: list[str]
     ) -> float:
         params = {
             "vectorSearch": {
                 "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
                 "threshold": trial.suggest_float(
-                    "vectorSearch.threshold", 0.1, 0.2
+                    "vectorSearch.threshold", 0.1, 0.9
                 ),
                 "searchByQuery": trial.suggest_categorical(
-                    "vectorSearch.searchByQuery", [True, False]
+                    "vectorSearch.searchByQuery", [False]
                 ),
             },
-            "reranker": {
-                "useRerank": trial.suggest_categorical(
-                    "reranker.useRerank", [True, False]
-                ),
-                "topK": trial.suggest_int("reranker.topK", 4, 8),
-                "rerankerMaxLength": trial.suggest_int(
-                    "reranker.rerankerMaxLength",
-                    512,
-                    1024,
-                    2048,
-                ),
-                "rerankerModel": "BAAI/bge-reranker-v2-m3",
-            },
+            # "reranker": {
+            #     "useRerank": trial.suggest_categorical(
+            #         "reranker.useRerank", [True, False]
+            #     ),
+            #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+            #     "rerankerMaxLength": trial.suggest_int(
+            #         "reranker.rerankerMaxLength",
+            #         [4096, 8192]
+            #     ),
+            #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
+            # },
             "model": {
                 "temperature": trial.suggest_float(
                     "model.temperature", 0.0, 1.0
                 ),
-                "topK": trial.suggest_int("model.topK", 1, 100),
+                "topK": trial.suggest_int("model.topK", 1, 50),
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0),
                 "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
             },
             "multiQuery": {
                 "useMultiquery": trial.suggest_categorical(
-                    "multiQuery.useMultiquery", [True, False]
+                    "multiQuery.useMultiquery", [True]
                 ),
                 "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
                 "queryModelName": None,
@@ -226,7 +232,11 @@ class OptunaPipeline:
         }
         return await self.evaluate_rag_pipeline(params, test_dataset)
 
-    async def study(self, source_ids: list[str]) -> list[dict[str, Any]]:
+    async def study(
+        self,
+        source_ids: list[str],
+        params: dict | None = None,
+    ) -> list[dict[str, Any]]:
         """Создает и запускает Optuna-исследование для оптимизации
         параметров RAGPipeline.
         Параметры оптимизации включают:
@@ -258,17 +268,28 @@ class OptunaPipeline:
         list[dict[str, Any]]
             Список лучших испытаний, найденных Optuna.
         """
-        study = optuna.create_study(directions=["maximize", "maximize"])
         test_dataset = []
         logger.info("Loading test dataset from Redis")
         logger.info("Redis URL: %s", self.redis_url)
         logger.info("Source IDs: %s", source_ids)
         for source_id in source_ids:
             logger.info("Loading data for source ID: %s", source_id)
-            test_dataset += await load_all_qa_samples_from_redis(
-                redis_url=self.redis_url, key_prefix=source_id
+            test_dataset += await self.load_all_qa_samples_from_redis(
+                key_prefix=source_id
             )
-
+        if params:
+            logger.info("Evaluating with provided params (без Optuna)")
+            context_score, semantic_score = await self.evaluate_rag_pipeline(
+                params, test_dataset
+            )
+            return [
+                {
+                    "context_precision": context_score,
+                    "semantic_similarity": semantic_score,
+                    "params": params,
+                }
+            ]
+        study = optuna.create_study(directions=["maximize", "maximize"])
         for _ in range(5):
             trial = study.ask()
             try:
@@ -287,6 +308,7 @@ class OptunaPipeline:
                 t.values[1],
             ),  # сортировка по двум метрикам
         )
+        logger.info("Best run: %s", best_trial)
         return self.trial_to_model_params(best_trial.params)
 
     def trial_to_model_params(self, params):
@@ -346,3 +368,348 @@ class OptunaPipeline:
         model_params.model.systemPrompt = ""
 
         return model_params
+
+async def main():
+    pipline = OptunaPipeline(
+        redis_url="redis://localhost:6379",
+        embedings_model=DEFAULT_EMBEDER_MODEL,
+    )
+    source_ids = ["be5e140c-548b-4635-9cac-8aeba54414d0"]
+    defaul_rag_params={
+        "vectorSearch": {
+            "topN": 10,
+            "threshold": 0.4,
+            "searchByQuery": False,
+        },
+        "reranker": {
+            "useRerank": True,
+            "topK": 5,
+            "rerankerMaxLength": 1024,
+            "rerankerModel": "BAAI/bge-reranker-v2-m3",
+        },
+        "model": {
+            "temperature": 0.7,
+            "topK": 20,
+            "topP": 0.9,
+            "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+        },
+        "multiQuery": {
+            "useMultiquery": False,
+            "nQueries": 5,
+            "queryModelName": None,
+        },
+        "sourceIds": source_ids,
+    }
+    logger.info(await pipline.study(source_ids, defaul_rag_params))
+
+
+
+def foo():
+    default_rag_params = {
+            "vectorSearch": {
+                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+                "threshold": trial.suggest_float(
+                    "vectorSearch.threshold", 0.1, 0.9
+                ),
+                "searchByQuery": trial.suggest_categorical(
+                    "vectorSearch.searchByQuery", [False]
+                ),
+            },
+            # "reranker": {
+            #     "useRerank": trial.suggest_categorical(
+            #         "reranker.useRerank", [True, False]
+            #     ),
+            #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+            #     "rerankerMaxLength": trial.suggest_int(
+            #         "reranker.rerankerMaxLength",
+            #         [4096, 8192]
+            #     ),
+            #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
+            # },
+            "model": {
+                "temperature": trial.suggest_float(
+                    "model.temperature", 0.0, 1.0
+                ),
+                "topK": trial.suggest_int("model.topK", 1, 50),
+                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+            },
+            # "multiQuery": {
+            #     "useMultiquery": trial.suggest_categorical(
+            #         "multiQuery.useMultiquery", [True, False]
+            #     ),
+            #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+            #     "queryModelName": None,
+            # },
+            "sourceIds": source_ids,
+        }
+    multquery_rag_params = {
+            "vectorSearch": {
+                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+                "threshold": trial.suggest_float(
+                    "vectorSearch.threshold", 0.1, 0.9
+                ),
+                "searchByQuery": trial.suggest_categorical(
+                    "vectorSearch.searchByQuery", [False]
+                ),
+            },
+            # "reranker": {
+            #     "useRerank": trial.suggest_categorical(
+            #         "reranker.useRerank", [True, False]
+            #     ),
+            #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+            #     "rerankerMaxLength": trial.suggest_int(
+            #         "reranker.rerankerMaxLength",
+            #         [4096, 8192]
+            #     ),
+            #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
+            # },
+            "model": {
+                "temperature": trial.suggest_float(
+                    "model.temperature", 0.0, 1.0
+                ),
+                "topK": trial.suggest_int("model.topK", 1, 50),
+                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+            },
+            "multiQuery": {
+                "useMultiquery": trial.suggest_categorical(
+                    "multiQuery.useMultiquery", [True]
+                ),
+                "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+                "queryModelName": None,
+            },
+            "sourceIds": source_ids,
+        }
+    hypotetical_question_rag_params = {
+            "vectorSearch": {
+                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+                "threshold": trial.suggest_float(
+                    "vectorSearch.threshold", 0.1, 0.9
+                ),
+                "searchByQuery": trial.suggest_categorical(
+                    "vectorSearch.searchByQuery", [True]
+                ),
+            },
+            # "reranker": {
+            #     "useRerank": trial.suggest_categorical(
+            #         "reranker.useRerank", [True, False]
+            #     ),
+            #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+            #     "rerankerMaxLength": trial.suggest_int(
+            #         "reranker.rerankerMaxLength",
+            #         [4096, 8192]
+            #     ),
+            #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
+            # },
+            "model": {
+                "temperature": trial.suggest_float(
+                    "model.temperature", 0.0, 1.0
+                ),
+                "topK": trial.suggest_int("model.topK", 1, 50),
+                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+            },
+            # "multiQuery": {
+            #     "useMultiquery": trial.suggest_categorical(
+            #         "multiQuery.useMultiquery", [True]
+            #     ),
+            #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+            #     "queryModelName": None,
+            # },
+            "sourceIds": source_ids,
+        }
+    reranker_rag_params = {
+            "vectorSearch": {
+                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+                "threshold": trial.suggest_float(
+                    "vectorSearch.threshold", 0.1, 0.9
+                ),
+                "searchByQuery": trial.suggest_categorical(
+                    "vectorSearch.searchByQuery", [False]
+                ),
+            },
+            "reranker": {
+                "useRerank": trial.suggest_categorical(
+                    "reranker.useRerank", [True, False]
+                ),
+                "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+                "rerankerMaxLength": trial.suggest_int(
+                    "reranker.rerankerMaxLength",
+                    [4096, 8192]
+                ),
+                "rerankerModel": "BAAI/bge-reranker-v2-m3",
+            },
+            "model": {
+                "temperature": trial.suggest_float(
+                    "model.temperature", 0.0, 1.0
+                ),
+                "topK": trial.suggest_int("model.topK", 1, 50),
+                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+            },
+            # "multiQuery": {
+            #     "useMultiquery": trial.suggest_categorical(
+            #         "multiQuery.useMultiquery", [True]
+            #     ),
+            #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+            #     "queryModelName": None,
+            # },
+            "sourceIds": source_ids,
+        }
+    hypotetical_multiquery_rag_params = {
+            "vectorSearch": {
+                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+                "threshold": trial.suggest_float(
+                    "vectorSearch.threshold", 0.1, 0.9
+                ),
+                "searchByQuery": trial.suggest_categorical(
+                    "vectorSearch.searchByQuery", [True]
+                ),
+            },
+            # "reranker": {
+            #     "useRerank": trial.suggest_categorical(
+            #         "reranker.useRerank", [True, False]
+            #     ),
+            #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+            #     "rerankerMaxLength": trial.suggest_int(
+            #         "reranker.rerankerMaxLength",
+            #         [4096, 8192]
+            #     ),
+            #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
+            # },
+            "model": {
+                "temperature": trial.suggest_float(
+                    "model.temperature", 0.0, 1.0
+                ),
+                "topK": trial.suggest_int("model.topK", 1, 50),
+                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+            },
+            "multiQuery": {
+                "useMultiquery": trial.suggest_categorical(
+                    "multiQuery.useMultiquery", [True]
+                ),
+                "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+                "queryModelName": None,
+            },
+            "sourceIds": source_ids,
+        }
+    hypotetical_reranker_rag_params = {
+            "vectorSearch": {
+                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+                "threshold": trial.suggest_float(
+                    "vectorSearch.threshold", 0.1, 0.9
+                ),
+                "searchByQuery": trial.suggest_categorical(
+                    "vectorSearch.searchByQuery", [True]
+                ),
+            },
+            "reranker": {
+                "useRerank": trial.suggest_categorical(
+                    "reranker.useRerank", [True, False]
+                ),
+                "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+                "rerankerMaxLength": trial.suggest_int(
+                    "reranker.rerankerMaxLength",
+                    [4096, 8192]
+                ),
+                "rerankerModel": "BAAI/bge-reranker-v2-m3",
+            },
+            "model": {
+                "temperature": trial.suggest_float(
+                    "model.temperature", 0.0, 1.0
+                ),
+                "topK": trial.suggest_int("model.topK", 1, 50),
+                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+            },
+            # "multiQuery": {
+            #     "useMultiquery": trial.suggest_categorical(
+            #         "multiQuery.useMultiquery", [True]
+            #     ),
+            #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+            #     "queryModelName": None,
+            # },
+            "sourceIds": source_ids,
+        }
+    reranker_multiquery_rag_params = {
+            "vectorSearch": {
+                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+                "threshold": trial.suggest_float(
+                    "vectorSearch.threshold", 0.1, 0.9
+                ),
+                "searchByQuery": trial.suggest_categorical(
+                    "vectorSearch.searchByQuery", [False]
+                ),
+            },
+            "reranker": {
+                "useRerank": trial.suggest_categorical(
+                    "reranker.useRerank", [True, False]
+                ),
+                "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+                "rerankerMaxLength": trial.suggest_int(
+                    "reranker.rerankerMaxLength",
+                    [4096, 8192]
+                ),
+                "rerankerModel": "BAAI/bge-reranker-v2-m3",
+            },
+            "model": {
+                "temperature": trial.suggest_float(
+                    "model.temperature", 0.0, 1.0
+                ),
+                "topK": trial.suggest_int("model.topK", 1, 50),
+                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+            },
+            "multiQuery": {
+                "useMultiquery": trial.suggest_categorical(
+                    "multiQuery.useMultiquery", [True]
+                ),
+                "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+                "queryModelName": None,
+            },
+            "sourceIds": source_ids,
+        }
+
+    all_params = {
+            "vectorSearch": {
+                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+                "threshold": trial.suggest_float(
+                    "vectorSearch.threshold", 0.1, 0.7
+                ),
+                "searchByQuery": trial.suggest_categorical(
+                    "vectorSearch.searchByQuery", [True, False]
+                ),
+            },
+            "reranker": {
+                "useRerank": trial.suggest_categorical(
+                    "reranker.useRerank", [True, False]
+                ),
+                "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+                "rerankerMaxLength": trial.suggest_int(
+                    "reranker.rerankerMaxLength",
+                    [4096, 8192]
+                ),
+                "rerankerModel": "BAAI/bge-reranker-v2-m3",
+            },
+            "model": {
+                "temperature": trial.suggest_float(
+                    "model.temperature", 0.0, 1.0
+                ),
+                "topK": trial.suggest_int("model.topK", 1, 100),
+                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+                "modelName": "hf.co/yandex/YandexGPT-5-Lite-8B-instruct-GGUF:Q4_K_M",
+            },
+            "multiQuery": {
+                "useMultiquery": trial.suggest_categorical(
+                    "multiQuery.useMultiquery", [True, False]
+                ),
+                "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+                "queryModelName": None,
+            },
+            "sourceIds": source_ids,
+        }
+
+if __name__ == "__main__":
+    asyncio.run(main())
