@@ -9,7 +9,7 @@ type SocketMessageType string
 
 const (
 	// TypeAuth content is auth token (without Bearer).
-	TypeAuth  SocketMessageType = "auth"
+	TypeAuth SocketMessageType = "auth"
 	// TypeQuery content is general message.
 	TypeQuery SocketMessageType = "query"
 	// TypeChunk content is chunked response.
