@@ -20,6 +20,7 @@ func New() *SitemapParser {
 // GetAndParseSitemap fetches a sitemap from a URL and parses it
 func (sp *SitemapParser) GetAndParseSitemap(siteURL url.URL) ([]sitemap.URLResult, error) {
 	siteURL.Path = "/sitemap.xml"
+	siteURL.RawQuery = "" // Remove all query parameters
 
 	resp, err := http.Get(siteURL.String())
 	if err != nil {
