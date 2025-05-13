@@ -1,9 +1,5 @@
 package model
 
-import (
-	"github.com/larek-tech/diploma/api/internal/domain/pb"
-)
-
 // SocketMessageType enum defining type of socket message.
 type SocketMessageType string
 
@@ -20,17 +16,11 @@ const (
 
 // SocketMessage is a model for incoming and outgoing messages for websocket.
 type SocketMessage struct {
-	Type          SocketMessageType `json:"type"`
-	Content       string            `json:"content,omitempty"`
-	IsChunked     bool              `json:"isChunked"`
-	IsLast        bool              `json:"isLast"`
-	SourceIDs     []string          `json:"sourceIDs,omitempty"`
-	QueryMetadata QueryMetadata     `json:"queryMetadata,omitempty"`
-	Err           string            `json:"error,omitempty"`
-}
-
-// QueryMetadata stores information about chosen domain, sources and scenario for query.
-type QueryMetadata struct {
-	DomainID *int64       `json:"domainID,omitempty"`
-	Scenario *pb.Scenario `json:"scenario,omitempty"`
+	Type       SocketMessageType `json:"type"`
+	Content    string            `json:"content,omitempty"`
+	IsChunked  bool              `json:"isChunked"`
+	IsLast     bool              `json:"isLast"`
+	DomainID   int64             `json:"domainID"`
+	ScenarioID int64             `json:"scenarioID"`
+	Err        string            `json:"error,omitempty"`
 }

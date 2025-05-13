@@ -86,11 +86,9 @@ type Query struct {
 	UserId        int64                  `protobuf:"varint,2,opt,name=userId,proto3" json:"userId,omitempty"`
 	ChatId        string                 `protobuf:"bytes,3,opt,name=chatId,proto3" json:"chatId,omitempty"`
 	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`
-	DomainId      *int64                 `protobuf:"varint,5,opt,name=domainId,proto3,oneof" json:"domainId,omitempty"`
-	SourceIds     []string               `protobuf:"bytes,6,rep,name=sourceIds,proto3" json:"sourceIds,omitempty"`
-	ScenarioId    *int64                 `protobuf:"varint,7,opt,name=scenarioId,proto3,oneof" json:"scenarioId,omitempty"`
-	Metadata      []byte                 `protobuf:"bytes,8,opt,name=metadata,proto3,oneof" json:"metadata,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	DomainId      int64                  `protobuf:"varint,5,opt,name=domainId,proto3" json:"domainId,omitempty"`
+	ScenarioId    int64                  `protobuf:"varint,6,opt,name=scenarioId,proto3" json:"scenarioId,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -154,31 +152,17 @@ func (x *Query) GetContent() string {
 }
 
 func (x *Query) GetDomainId() int64 {
-	if x != nil && x.DomainId != nil {
-		return *x.DomainId
+	if x != nil {
+		return x.DomainId
 	}
 	return 0
-}
-
-func (x *Query) GetSourceIds() []string {
-	if x != nil {
-		return x.SourceIds
-	}
-	return nil
 }
 
 func (x *Query) GetScenarioId() int64 {
-	if x != nil && x.ScenarioId != nil {
-		return *x.ScenarioId
+	if x != nil {
+		return x.ScenarioId
 	}
 	return 0
-}
-
-func (x *Query) GetMetadata() []byte {
-	if x != nil {
-		return x.Metadata
-	}
-	return nil
 }
 
 func (x *Query) GetCreatedAt() *timestamppb.Timestamp {
@@ -761,10 +745,9 @@ type ProcessQueryRequest struct {
 	UserId        int64                  `protobuf:"varint,1,opt,name=userId,proto3" json:"userId,omitempty"`
 	ChatId        string                 `protobuf:"bytes,2,opt,name=chatId,proto3" json:"chatId,omitempty"`
 	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
-	DomainId      *int64                 `protobuf:"varint,4,opt,name=domainId,proto3,oneof" json:"domainId,omitempty"`
-	SourceIds     []string               `protobuf:"bytes,5,rep,name=sourceIds,proto3" json:"sourceIds,omitempty"`
-	ScenarioId    *int64                 `protobuf:"varint,6,opt,name=scenarioId,proto3,oneof" json:"scenarioId,omitempty"`
-	Metadata      []byte                 `protobuf:"bytes,7,opt,name=metadata,proto3,oneof" json:"metadata,omitempty"`
+	DomainId      int64                  `protobuf:"varint,4,opt,name=domainId,proto3" json:"domainId,omitempty"`
+	Scenario      []byte                 `protobuf:"bytes,5,opt,name=scenario,proto3" json:"scenario,omitempty"`
+	SourceIds     []string               `protobuf:"bytes,6,rep,name=sourceIds,proto3" json:"sourceIds,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -821,29 +804,22 @@ func (x *ProcessQueryRequest) GetContent() string {
 }
 
 func (x *ProcessQueryRequest) GetDomainId() int64 {
-	if x != nil && x.DomainId != nil {
-		return *x.DomainId
+	if x != nil {
+		return x.DomainId
 	}
 	return 0
+}
+
+func (x *ProcessQueryRequest) GetScenario() []byte {
+	if x != nil {
+		return x.Scenario
+	}
+	return nil
 }
 
 func (x *ProcessQueryRequest) GetSourceIds() []string {
 	if x != nil {
 		return x.SourceIds
-	}
-	return nil
-}
-
-func (x *ProcessQueryRequest) GetScenarioId() int64 {
-	if x != nil && x.ScenarioId != nil {
-		return *x.ScenarioId
-	}
-	return 0
-}
-
-func (x *ProcessQueryRequest) GetMetadata() []byte {
-	if x != nil {
-		return x.Metadata
 	}
 	return nil
 }
@@ -896,22 +872,17 @@ var File_chat_v1_model_proto protoreflect.FileDescriptor
 
 const file_chat_v1_model_proto_rawDesc = "" +
 	"\n" +
-	"\x13chat/v1/model.proto\x12\achat.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc9\x02\n" +
+	"\x13chat/v1/model.proto\x12\achat.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd7\x01\n" +
 	"\x05Query\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
 	"\x06userId\x18\x02 \x01(\x03R\x06userId\x12\x16\n" +
 	"\x06chatId\x18\x03 \x01(\tR\x06chatId\x12\x18\n" +
-	"\acontent\x18\x04 \x01(\tR\acontent\x12\x1f\n" +
-	"\bdomainId\x18\x05 \x01(\x03H\x00R\bdomainId\x88\x01\x01\x12\x1c\n" +
-	"\tsourceIds\x18\x06 \x03(\tR\tsourceIds\x12#\n" +
+	"\acontent\x18\x04 \x01(\tR\acontent\x12\x1a\n" +
+	"\bdomainId\x18\x05 \x01(\x03R\bdomainId\x12\x1e\n" +
 	"\n" +
-	"scenarioId\x18\a \x01(\x03H\x01R\n" +
-	"scenarioId\x88\x01\x01\x12\x1f\n" +
-	"\bmetadata\x18\b \x01(\fH\x02R\bmetadata\x88\x01\x01\x128\n" +
-	"\tcreatedAt\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAtB\v\n" +
-	"\t_domainIdB\r\n" +
-	"\v_scenarioIdB\v\n" +
-	"\t_metadata\"\x8b\x02\n" +
+	"scenarioId\x18\x06 \x01(\x03R\n" +
+	"scenarioId\x128\n" +
+	"\tcreatedAt\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\x8b\x02\n" +
 	"\bResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x18\n" +
 	"\aqueryId\x18\x02 \x01(\x03R\aqueryId\x12\x16\n" +
@@ -947,20 +918,14 @@ const file_chat_v1_model_proto_rawDesc = "" +
 	"\x06offset\x18\x01 \x01(\x04R\x06offset\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x04R\x05limit\"8\n" +
 	"\x11ListChatsResponse\x12#\n" +
-	"\x05chats\x18\x01 \x03(\v2\r.chat.v1.ChatR\x05chats\"\x8d\x02\n" +
+	"\x05chats\x18\x01 \x03(\v2\r.chat.v1.ChatR\x05chats\"\xb5\x01\n" +
 	"\x13ProcessQueryRequest\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\x03R\x06userId\x12\x16\n" +
 	"\x06chatId\x18\x02 \x01(\tR\x06chatId\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\tR\acontent\x12\x1f\n" +
-	"\bdomainId\x18\x04 \x01(\x03H\x00R\bdomainId\x88\x01\x01\x12\x1c\n" +
-	"\tsourceIds\x18\x05 \x03(\tR\tsourceIds\x12#\n" +
-	"\n" +
-	"scenarioId\x18\x06 \x01(\x03H\x01R\n" +
-	"scenarioId\x88\x01\x01\x12\x1f\n" +
-	"\bmetadata\x18\a \x01(\fH\x02R\bmetadata\x88\x01\x01B\v\n" +
-	"\t_domainIdB\r\n" +
-	"\v_scenarioIdB\v\n" +
-	"\t_metadata\"3\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\x12\x1a\n" +
+	"\bdomainId\x18\x04 \x01(\x03R\bdomainId\x12\x1a\n" +
+	"\bscenario\x18\x05 \x01(\fR\bscenario\x12\x1c\n" +
+	"\tsourceIds\x18\x06 \x03(\tR\tsourceIds\"3\n" +
 	"\x17CancelProcessingRequest\x12\x18\n" +
 	"\aqueryId\x18\x01 \x01(\x03R\aqueryId*\x98\x01\n" +
 	"\x0eResponseStatus\x12\x16\n" +
@@ -1025,8 +990,6 @@ func file_chat_v1_model_proto_init() {
 	if File_chat_v1_model_proto != nil {
 		return
 	}
-	file_chat_v1_model_proto_msgTypes[0].OneofWrappers = []any{}
-	file_chat_v1_model_proto_msgTypes[11].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

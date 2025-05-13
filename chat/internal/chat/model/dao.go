@@ -55,35 +55,19 @@ type QueryDao struct {
 	ChatID     uuid.UUID `db:"chat_id"`
 	Content    string    `db:"content"`
 	DomainID   int64     `db:"domain_id"`
-	SourceIDs  []string  `db:"source_ids"`
 	ScenarioID int64     `db:"scenario_id"`
-	Metadata   []byte    `db:"metadata"`
 	CreatedAt  time.Time `db:"created_at"`
 }
 
 // ToProto converts data model into protobuf format.
 func (q *QueryDao) ToProto() *pb.Query {
-	var (
-		domainID   *int64 = nil
-		scenarioID *int64 = nil
-	)
-
-	if q.DomainID >= 1 {
-		domainID = &q.DomainID
-	}
-	if q.ScenarioID >= 1 {
-		scenarioID = &q.ScenarioID
-	}
-
 	return &pb.Query{
 		Id:         q.ID,
 		UserId:     q.UserID,
 		ChatId:     q.ChatID.String(),
 		Content:    q.Content,
-		DomainId:   domainID,
-		SourceIds:  q.SourceIDs,
-		ScenarioId: scenarioID,
-		Metadata:   q.Metadata,
+		DomainId:   q.DomainID,
+		ScenarioId: q.ScenarioID,
 		CreatedAt:  timestamppb.New(q.CreatedAt),
 	}
 }

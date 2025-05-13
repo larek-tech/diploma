@@ -51,6 +51,9 @@ func SetupRoutes(
 		chatpb.NewChatServiceClient(chatConn),
 		authpb.NewAuthServiceClient(authConn),
 		domainpb.NewMLServiceClient(mlConn),
+		domainpb.NewScenarioServiceClient(domainConn),
+		domainpb.NewDomainServiceClient(domainConn),
+		domainpb.NewSourceServiceClient(domainConn),
 		tracer,
 	)
 	chat.SetupRoutes(chatRouter, chatHandler, wsConfig)
