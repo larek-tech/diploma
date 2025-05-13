@@ -25,29 +25,31 @@ var File_ml_v1_service_proto protoreflect.FileDescriptor
 
 const file_ml_v1_service_proto_rawDesc = "" +
 	"\n" +
-	"\x13ml/v1/service.proto\x12\x05pb.ml\x1a\x11ml/v1/model.proto\x1a\x1bgoogle/protobuf/empty.proto2\xb4\x02\n" +
+	"\x13ml/v1/service.proto\x12\x05pb.ml\x1a\x11ml/v1/model.proto\x1a\x1bgoogle/protobuf/empty.proto2\xbe\x02\n" +
 	"\tMLService\x12K\n" +
 	"\fProcessQuery\x12\x1a.pb.ml.ProcessQueryRequest\x1a\x1b.pb.ml.ProcessQueryResponse\"\x000\x01\x12@\n" +
 	"\x10GetDefaultParams\x12\x16.google.protobuf.Empty\x1a\x12.pb.ml.ModelParams\"\x00\x12H\n" +
-	"\x10GetOptimalParams\x12\x1e.pb.ml.GetOptimalParamsRequest\x1a\x12.pb.ml.ModelParams\"\x00\x12N\n" +
-	"\x11ProcessFirstQuery\x12\x1a.pb.ml.ProcessQueryRequest\x1a\x1b.pb.ml.ProcessQueryResponse\"\x00B\x14Z\x12internal/domain/pbb\x06proto3"
+	"\x10GetOptimalParams\x12\x1e.pb.ml.GetOptimalParamsRequest\x1a\x12.pb.ml.ModelParams\"\x00\x12X\n" +
+	"\x11ProcessFirstQuery\x12\x1f.pb.ml.ProcessFirstQueryRequest\x1a .pb.ml.ProcessFirstQueryResponse\"\x00B\x14Z\x12internal/domain/pbb\x06proto3"
 
 var file_ml_v1_service_proto_goTypes = []any{
-	(*ProcessQueryRequest)(nil),     // 0: pb.ml.ProcessQueryRequest
-	(*emptypb.Empty)(nil),           // 1: google.protobuf.Empty
-	(*GetOptimalParamsRequest)(nil), // 2: pb.ml.GetOptimalParamsRequest
-	(*ProcessQueryResponse)(nil),    // 3: pb.ml.ProcessQueryResponse
-	(*ModelParams)(nil),             // 4: pb.ml.ModelParams
+	(*ProcessQueryRequest)(nil),       // 0: pb.ml.ProcessQueryRequest
+	(*emptypb.Empty)(nil),             // 1: google.protobuf.Empty
+	(*GetOptimalParamsRequest)(nil),   // 2: pb.ml.GetOptimalParamsRequest
+	(*ProcessFirstQueryRequest)(nil),  // 3: pb.ml.ProcessFirstQueryRequest
+	(*ProcessQueryResponse)(nil),      // 4: pb.ml.ProcessQueryResponse
+	(*ModelParams)(nil),               // 5: pb.ml.ModelParams
+	(*ProcessFirstQueryResponse)(nil), // 6: pb.ml.ProcessFirstQueryResponse
 }
 var file_ml_v1_service_proto_depIdxs = []int32{
 	0, // 0: pb.ml.MLService.ProcessQuery:input_type -> pb.ml.ProcessQueryRequest
 	1, // 1: pb.ml.MLService.GetDefaultParams:input_type -> google.protobuf.Empty
 	2, // 2: pb.ml.MLService.GetOptimalParams:input_type -> pb.ml.GetOptimalParamsRequest
-	0, // 3: pb.ml.MLService.ProcessFirstQuery:input_type -> pb.ml.ProcessQueryRequest
-	3, // 4: pb.ml.MLService.ProcessQuery:output_type -> pb.ml.ProcessQueryResponse
-	4, // 5: pb.ml.MLService.GetDefaultParams:output_type -> pb.ml.ModelParams
-	4, // 6: pb.ml.MLService.GetOptimalParams:output_type -> pb.ml.ModelParams
-	3, // 7: pb.ml.MLService.ProcessFirstQuery:output_type -> pb.ml.ProcessQueryResponse
+	3, // 3: pb.ml.MLService.ProcessFirstQuery:input_type -> pb.ml.ProcessFirstQueryRequest
+	4, // 4: pb.ml.MLService.ProcessQuery:output_type -> pb.ml.ProcessQueryResponse
+	5, // 5: pb.ml.MLService.GetDefaultParams:output_type -> pb.ml.ModelParams
+	5, // 6: pb.ml.MLService.GetOptimalParams:output_type -> pb.ml.ModelParams
+	6, // 7: pb.ml.MLService.ProcessFirstQuery:output_type -> pb.ml.ProcessFirstQueryResponse
 	4, // [4:8] is the sub-list for method output_type
 	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

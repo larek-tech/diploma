@@ -33,7 +33,7 @@ type MLServiceClient interface {
 	ProcessQuery(ctx context.Context, in *ProcessQueryRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ProcessQueryResponse], error)
 	GetDefaultParams(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ModelParams, error)
 	GetOptimalParams(ctx context.Context, in *GetOptimalParamsRequest, opts ...grpc.CallOption) (*ModelParams, error)
-	ProcessFirstQuery(ctx context.Context, in *ProcessQueryRequest, opts ...grpc.CallOption) (*ProcessQueryResponse, error)
+	ProcessFirstQuery(ctx context.Context, in *ProcessFirstQueryRequest, opts ...grpc.CallOption) (*ProcessFirstQueryResponse, error)
 }
 
 type mLServiceClient struct {
@@ -83,9 +83,9 @@ func (c *mLServiceClient) GetOptimalParams(ctx context.Context, in *GetOptimalPa
 	return out, nil
 }
 
-func (c *mLServiceClient) ProcessFirstQuery(ctx context.Context, in *ProcessQueryRequest, opts ...grpc.CallOption) (*ProcessQueryResponse, error) {
+func (c *mLServiceClient) ProcessFirstQuery(ctx context.Context, in *ProcessFirstQueryRequest, opts ...grpc.CallOption) (*ProcessFirstQueryResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ProcessQueryResponse)
+	out := new(ProcessFirstQueryResponse)
 	err := c.cc.Invoke(ctx, MLService_ProcessFirstQuery_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -100,7 +100,7 @@ type MLServiceServer interface {
 	ProcessQuery(*ProcessQueryRequest, grpc.ServerStreamingServer[ProcessQueryResponse]) error
 	GetDefaultParams(context.Context, *emptypb.Empty) (*ModelParams, error)
 	GetOptimalParams(context.Context, *GetOptimalParamsRequest) (*ModelParams, error)
-	ProcessFirstQuery(context.Context, *ProcessQueryRequest) (*ProcessQueryResponse, error)
+	ProcessFirstQuery(context.Context, *ProcessFirstQueryRequest) (*ProcessFirstQueryResponse, error)
 	mustEmbedUnimplementedMLServiceServer()
 }
 
@@ -120,7 +120,7 @@ func (UnimplementedMLServiceServer) GetDefaultParams(context.Context, *emptypb.E
 func (UnimplementedMLServiceServer) GetOptimalParams(context.Context, *GetOptimalParamsRequest) (*ModelParams, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOptimalParams not implemented")
 }
-func (UnimplementedMLServiceServer) ProcessFirstQuery(context.Context, *ProcessQueryRequest) (*ProcessQueryResponse, error) {
+func (UnimplementedMLServiceServer) ProcessFirstQuery(context.Context, *ProcessFirstQueryRequest) (*ProcessFirstQueryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ProcessFirstQuery not implemented")
 }
 func (UnimplementedMLServiceServer) mustEmbedUnimplementedMLServiceServer() {}
@@ -192,7 +192,7 @@ func _MLService_GetOptimalParams_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _MLService_ProcessFirstQuery_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProcessQueryRequest)
+	in := new(ProcessFirstQueryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -204,7 +204,7 @@ func _MLService_ProcessFirstQuery_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: MLService_ProcessFirstQuery_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MLServiceServer).ProcessFirstQuery(ctx, req.(*ProcessQueryRequest))
+		return srv.(MLServiceServer).ProcessFirstQuery(ctx, req.(*ProcessFirstQueryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

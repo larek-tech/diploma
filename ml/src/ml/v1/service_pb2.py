@@ -26,7 +26,7 @@ from ml.v1 import model_pb2 as ml_dot_v1_dot_model__pb2
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13ml/v1/service.proto\x12\x05pb.ml\x1a\x11ml/v1/model.proto\x1a\x1bgoogle/protobuf/empty.proto2\xb4\x02\n\tMLService\x12K\n\x0cProcessQuery\x12\x1a.pb.ml.ProcessQueryRequest\x1a\x1b.pb.ml.ProcessQueryResponse\"\x00\x30\x01\x12@\n\x10GetDefaultParams\x12\x16.google.protobuf.Empty\x1a\x12.pb.ml.ModelParams\"\x00\x12H\n\x10GetOptimalParams\x12\x1e.pb.ml.GetOptimalParamsRequest\x1a\x12.pb.ml.ModelParams\"\x00\x12N\n\x11ProcessFirstQuery\x12\x1a.pb.ml.ProcessQueryRequest\x1a\x1b.pb.ml.ProcessQueryResponse\"\x00\x42\x14Z\x12internal/domain/pbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13ml/v1/service.proto\x12\x05pb.ml\x1a\x11ml/v1/model.proto\x1a\x1bgoogle/protobuf/empty.proto2\xbe\x02\n\tMLService\x12K\n\x0cProcessQuery\x12\x1a.pb.ml.ProcessQueryRequest\x1a\x1b.pb.ml.ProcessQueryResponse\"\x00\x30\x01\x12@\n\x10GetDefaultParams\x12\x16.google.protobuf.Empty\x1a\x12.pb.ml.ModelParams\"\x00\x12H\n\x10GetOptimalParams\x12\x1e.pb.ml.GetOptimalParamsRequest\x1a\x12.pb.ml.ModelParams\"\x00\x12X\n\x11ProcessFirstQuery\x12\x1f.pb.ml.ProcessFirstQueryRequest\x1a .pb.ml.ProcessFirstQueryResponse\"\x00\x42\x14Z\x12internal/domain/pbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,5 +35,5 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z\022internal/domain/pb'
   _globals['_MLSERVICE']._serialized_start=79
-  _globals['_MLSERVICE']._serialized_end=387
+  _globals['_MLSERVICE']._serialized_end=397
 # @@protoc_insertion_point(module_scope)
