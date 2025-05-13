@@ -11,6 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Pages } from '@/router/constants';
 import Conversation from '@/components/Conversation';
 import EmptyChat from '@/components/EmptyChat';
+import { WSMessageType } from '@/api/models';
 
 const Chat = observer(() => {
     const { rootStore } = useStores();
@@ -74,7 +75,11 @@ const Chat = observer(() => {
     const sendMessage = () => {
         if (message.trim() && !rootStore.isChatDisabled && rootStore.websocket?.readyState === 1) {
             rootStore.sendMessage({
-                prompt: message.trim(),
+                type: WSMessageType.Query,
+                content: message.trim(),
+                queryMetadata: {
+                    domainID: 3,
+                },
             });
             setMessage('');
         }

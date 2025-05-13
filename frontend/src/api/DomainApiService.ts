@@ -1,7 +1,7 @@
 import axiosInstance from './axiosInstance';
 import {
     CreateDomainRequest,
-    CreateScenarioRequest,
+    Scenario,
     CreateSourceRequest,
     Domain,
     DomainsResponse,
@@ -25,7 +25,7 @@ export class DomainApiService {
         return response.data;
     }
 
-    static async createScenario(data: CreateScenarioRequest): Promise<unknown> {
+    static async createScenario(data: Scenario): Promise<unknown> {
         const response = await axiosInstance.post<unknown>('/api/v1/scenario', data);
         return response.data;
     }

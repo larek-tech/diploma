@@ -18,7 +18,6 @@ import { useEffect } from 'react';
 import { useStores } from '@/hooks/useStores';
 import { toast } from './ui/use-toast';
 import { Pages } from '@/router/constants';
-import OrganizationSwitcher from './OrganizationSwitcher';
 
 type DashboardProps = {
     children: React.ReactNode;
@@ -59,8 +58,8 @@ export function Dashboard({ children }: DashboardProps) {
                             </nav>
 
                             <div className='p-6 space-y-6'>
-                                <SessionsHistory />
                                 <DomainsHistory />
+                                <SessionsHistory />
                             </div>
                         </div>
                     </div>
@@ -99,14 +98,6 @@ export function Dashboard({ children }: DashboardProps) {
                             </SheetContent>
                         </Sheet>
 
-                        <div className='w-full flex-1'>
-                            {(location.pathname.match(new RegExp(`chat`)) ||
-                                location.pathname === '/') && (
-                                <div className='max-w-60'>
-                                    <OrganizationSwitcher />
-                                </div>
-                            )}
-                        </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant='secondary' size='icon' className='rounded-full'>
