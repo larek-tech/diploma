@@ -51,20 +51,18 @@ func (ctrl *Controller) ProcessQuery(
 	processCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	var queryMeta []byte
-	if m := req.GetMetadata(); m == nil {
-		queryMeta = []byte("{}")
-	} else {
-		queryMeta = m
+	var scenario mlpb.Scenario
+	if err = json.Unmarshal(req.GetScenario(), &scenario); err != nil {
+		errCh <- errs.WrapErr(err, "get query scenario from metadata")
+		return
 	}
+
 	q := model.QueryDao{
 		UserID:     req.GetUserId(),
 		ChatID:     chatID,
 		Content:    req.GetContent(),
 		DomainID:   req.GetDomainId(),
-		SourceIDs:  req.GetSourceIds(),
-		ScenarioID: req.GetScenarioId(),
-		Metadata:   queryMeta,
+		ScenarioID: scenario.GetId(),
 	}
 	queryID, err := ctrl.cr.InsertQuery(ctx, q)
 	if err != nil {
@@ -75,15 +73,6 @@ func (ctrl *Controller) ProcessQuery(
 	ctrl.mu.Lock()
 	ctrl.processing[queryID] = cancel
 	ctrl.mu.Unlock()
-
-	var scenario *mlpb.Scenario = nil
-	if q.Metadata != nil {
-		scenario = &mlpb.Scenario{}
-		if err = json.Unmarshal(q.Metadata, &scenario); err != nil {
-			errCh <- errs.WrapErr(err, "get query scenario from metadata")
-			return
-		}
-	}
 
 	respCreate := model.ResponseDao{
 		QueryID: queryID,
@@ -132,8 +121,8 @@ func (ctrl *Controller) ProcessQuery(
 			UserId:  q.UserID,
 			Content: q.Content,
 		},
-		Scenario:  scenario,
-		SourceIds: q.SourceIDs,
+		Scenario:  &scenario,
+		SourceIds: req.GetSourceIds(),
 	}
 	stream, err := ctrl.mlService.ProcessQuery(ctx, mlReq)
 	if err != nil {
@@ -152,13 +141,17 @@ func (ctrl *Controller) ProcessQuery(
 		case <-processCtx.Done():
 			return
 		case <-streamCtx.Done():
+			ctrl.mu.Lock()
+			delete(ctrl.processing, queryID)
+			ctrl.mu.Unlock()
+
 			out <- &pb.ChunkedResponse{
 				QueryId:   resp.QueryID,
-				SourceIds: q.SourceIDs,
+				SourceIds: req.GetSourceIds(),
 			}
 			log.Debug().
 				Int64("queryID", resp.QueryID).
-				Any("sourceIDs", q.SourceIDs).
+				Any("sourceIDs", req.GetSourceIds()).
 				Msg("got chunk")
 			log.Info().Int64("queryID", queryID).Msg("stream successfully finished")
 			return

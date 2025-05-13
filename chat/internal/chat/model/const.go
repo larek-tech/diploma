@@ -9,8 +9,7 @@ const (
 type ResponseStatus uint8
 
 const (
-	// StatusUndefined undefined status.
-	StatusUndefined ResponseStatus = iota
+	_ ResponseStatus = iota
 	// StatusCreated empty response created.
 	StatusCreated
 	// StatusProcessing response is being generated.

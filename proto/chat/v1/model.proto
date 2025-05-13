@@ -19,11 +19,9 @@ message Query {
   int64 userId = 2;
   string chatId = 3;
   string content = 4;
-  optional int64 domainId = 5;
-  repeated string sourceIds = 6;
-  optional int64 scenarioId = 7;
-  optional bytes metadata = 8;
-  google.protobuf.Timestamp createdAt = 9;
+  int64 domainId = 5;
+  int64 scenarioId = 6;
+  google.protobuf.Timestamp createdAt = 7;
 };
 
 message Response {
@@ -86,10 +84,9 @@ message ProcessQueryRequest {
   int64 userId = 1;
   string chatId = 2;
   string content = 3;
-  optional int64 domainId = 4;
-  repeated string sourceIds = 5;
-  optional int64 scenarioId = 6;
-  optional bytes metadata = 7;
+  int64 domainId = 4;
+  bytes scenario = 5;
+  repeated string sourceIds = 6;
 };
 
 message CancelProcessingRequest {

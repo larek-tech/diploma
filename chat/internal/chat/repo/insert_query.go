@@ -8,8 +8,8 @@ import (
 )
 
 const insertQuery = `
-	insert into chat.query(user_id, chat_id, content, domain_id, source_ids, scenario_id, metadata)
-	values ($1, $2, $3, $4, $5, $6, $7)
+	insert into chat.query(user_id, chat_id, content, domain_id, scenario_id)
+	values ($1, $2, $3, $4, $5)
 	returning id;
 `
 
@@ -24,9 +24,7 @@ func (r *Repo) InsertQuery(ctx context.Context, q model.QueryDao) (int64, error)
 		q.ChatID,
 		q.Content,
 		q.DomainID,
-		q.SourceIDs,
 		q.ScenarioID,
-		q.Metadata,
 	); err != nil {
 		return 0, errs.WrapErr(err, "insert query")
 	}

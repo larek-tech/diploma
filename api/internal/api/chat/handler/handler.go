@@ -16,18 +16,32 @@ const (
 
 // Handler implements chat methods on transport level.
 type Handler struct {
-	chatService pb.ChatServiceClient
-	authService authpb.AuthServiceClient
-	mlService   domainpb.MLServiceClient
-	tracer      trace.Tracer
+	chatService     pb.ChatServiceClient
+	authService     authpb.AuthServiceClient
+	mlService       domainpb.MLServiceClient
+	scenarioService domainpb.ScenarioServiceClient
+	domainService   domainpb.DomainServiceClient
+	sourceService   domainpb.SourceServiceClient
+	tracer          trace.Tracer
 }
 
 // New creates new Handler.
-func New(chatService pb.ChatServiceClient, authService authpb.AuthServiceClient, mlService domainpb.MLServiceClient, tracer trace.Tracer) *Handler {
+func New(
+	chatService pb.ChatServiceClient,
+	authService authpb.AuthServiceClient,
+	mlService domainpb.MLServiceClient,
+	scenarioService domainpb.ScenarioServiceClient,
+	domainService domainpb.DomainServiceClient,
+	sourceService domainpb.SourceServiceClient,
+	tracer trace.Tracer,
+) *Handler {
 	return &Handler{
-		chatService: chatService,
-		authService: authService,
-		mlService:   mlService,
-		tracer:      tracer,
+		chatService:     chatService,
+		authService:     authService,
+		mlService:       mlService,
+		scenarioService: scenarioService,
+		domainService:   domainService,
+		sourceService:   sourceService,
+		tracer:          tracer,
 	}
 }

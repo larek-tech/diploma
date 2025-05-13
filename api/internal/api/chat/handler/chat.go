@@ -141,12 +141,16 @@ func (h *Handler) Chat(c *websocket.Conn) {
 	}
 
 	var (
-		msg          model.SocketMessage
-		titleResp    *domainpb.ProcessFirstQueryResponse
-		processReq   *pb.ProcessQueryRequest
-		chunk        *model.SocketMessage
-		errStream    error
-		firstMessage bool
+		msg              model.SocketMessage
+		titleResp        *domainpb.ProcessFirstQueryResponse
+		processReq       *pb.ProcessQueryRequest
+		chunk            *model.SocketMessage
+		scenario         *domainpb.Scenario
+		domain           *domainpb.Domain
+		sourceIDs        *domainpb.GetSourceIDsResponse
+		scenarioMetadata []byte
+		errStream        error
+		firstMessage     bool
 	)
 
 	if len(history.GetContent()) == 0 {
@@ -169,29 +173,39 @@ func (h *Handler) Chat(c *websocket.Conn) {
 			continue
 		}
 
-		var (
-			scenarioID   *int64 = nil
-			scenarioMeta []byte = nil
-		)
-		if msg.QueryMetadata.Scenario != nil {
-			scenarioID = &msg.QueryMetadata.Scenario.Id
-			scenarioMeta, err = json.Marshal(msg.QueryMetadata.Scenario)
-			if err != nil {
-				sendErr(c, errs.WrapErr(shared.ErrInvalidBody), "invalid scenario")
-				continue
-			}
-		}
-
 		ctx = context.WithValue(ctx, "chat-id", chatID)
 
+		scenario, err = h.scenarioService.GetScenario(ctx, &domainpb.GetScenarioRequest{ScenarioId: msg.ScenarioID})
+		if err != nil {
+			sendErr(c, errs.WrapErr(err), "get scenario by id")
+			continue
+		}
+
+		scenarioMetadata, err = json.Marshal(scenario)
+		if err != nil {
+			sendErr(c, errs.WrapErr(err), "process scenario")
+			continue
+		}
+
+		domain, err = h.domainService.GetDomain(ctx, &domainpb.GetDomainRequest{DomainId: msg.DomainID})
+		if err != nil {
+			sendErr(c, errs.WrapErr(err), "get domain by id")
+			continue
+		}
+
+		sourceIDs, err = h.sourceService.GetSourceIDs(ctx, &domainpb.GetSourceIDsRequest{SourceIds: domain.GetSourceIds()})
+		if err != nil {
+			sendErr(c, errs.WrapErr(err), "get source ids")
+			continue
+		}
+
 		processReq = &pb.ProcessQueryRequest{
-			UserId:     userMeta.GetUserId(),
-			ChatId:     chatID,
-			Content:    msg.Content,
-			DomainId:   msg.QueryMetadata.DomainID,
-			SourceIds:  msg.SourceIDs,
-			ScenarioId: scenarioID,
-			Metadata:   scenarioMeta,
+			UserId:    userMeta.GetUserId(),
+			ChatId:    chatID,
+			Content:   msg.Content,
+			DomainId:  msg.DomainID,
+			Scenario:  scenarioMetadata,
+			SourceIds: sourceIDs.GetSourceIds(),
 		}
 		stream, e := h.chatService.ProcessQuery(ctx, processReq)
 		if e != nil {
