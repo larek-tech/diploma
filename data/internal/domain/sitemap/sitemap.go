@@ -22,3 +22,13 @@ type URLResult struct {
 	ChangeFreq string `json:"changefreq,omitempty"`
 	LastMod    string `json:"lastmod,omitempty"`
 }
+
+type SitemapIndex struct {
+	XMLName  xml.Name      `xml:"sitemapindex"`
+	Sitemaps []SitemapInfo `xml:"sitemap"`
+}
+
+type SitemapInfo struct {
+	Loc     string `xml:"loc"`
+	LastMod string `xml:"lastmod"`
+}

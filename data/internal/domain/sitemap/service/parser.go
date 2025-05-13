@@ -6,79 +6,78 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/larek-tech/diploma/data/internal/domain/sitemap"
 )
 
-// SitemapParser handles sitemap parsing operations
 type SitemapParser struct{}
 
 func New() *SitemapParser {
 	return &SitemapParser{}
 }
 
-// GetAndParseSitemap fetches a sitemap from a URL and parses it
-func (sp *SitemapParser) GetAndParseSitemap(siteURL url.URL) ([]sitemap.URLResult, error) {
-	siteURL.Path = "/sitemap.xml"
-	siteURL.RawQuery = "" // Remove all query parameters
-
-	resp, err := http.Get(siteURL.String())
+func fetchSitemapContent(sitemapURL string) (string, error) {
+	resp, err := http.Get(sitemapURL)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch sitemap: %w", err)
+		return "", fmt.Errorf("failed to fetch sitemap: %w", err)
 	}
 	defer resp.Body.Close()
-
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
+		return "", fmt.Errorf("failed to read response body: %w", err)
 	}
-
-	return sp.ParseSitemapContent(string(body))
+	return string(body), nil
 }
 
-// ParseSitemapContent parses a sitemap XML string and returns URLs with changefreq
-// ParseSitemapContent parses the XML content of a sitemap and converts it into a slice of URLResult objects.
-// It unmarshals the provided XML string into a sitemap.URLSet structure and extracts relevant information
-// from each URL entry such as the location, change frequency, and last modification time.
-//
-// Parameters:
-//   - content: A string containing the XML sitemap content to be parsed
-//
-// Returns:
-//   - []sitemap.URLResult: A slice of URLResult objects containing the extracted information
-//   - error: An error if the XML parsing fails, nil otherwise
-//
-// Example usage:
-//
-//	content := `<?xml version="1.0" encoding="UTF-8"?>
-//	<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-//	  <url>
-//	    <loc>https://example.com/</loc>
-//	    <lastmod>2023-01-01</lastmod>
-//	    <changefreq>daily</changefreq>
-//	  </url>
-//	</urlset>`
-//	results, err := sitemapParser.ParseSitemapContent(content)
-//	if err != nil {
-//	    log.Fatalf("Failed to parse sitemap: %v", err)
-//	}
-//	for _, result := range results {
-//	    fmt.Printf("URL: %s, LastMod: %s, ChangeFreq: %s\n", result.URL, result.LastMod, result.ChangeFreq)
-//	}
-func (sp *SitemapParser) ParseSitemapContent(content string) ([]sitemap.URLResult, error) {
+func (sp *SitemapParser) ParseSitemapContentRecursive(content string, visited map[string]struct{}) ([]sitemap.URLResult, error) {
+
 	var urlset sitemap.URLSet
-	if err := xml.Unmarshal([]byte(content), &urlset); err != nil {
-		return nil, fmt.Errorf("failed to parse sitemap XML: %w", err)
+	if err := xml.Unmarshal([]byte(content), &urlset); err == nil && len(urlset.URLs) > 0 {
+		var results []sitemap.URLResult
+		for _, url := range urlset.URLs {
+			results = append(results, sitemap.URLResult{
+				URL:        url.Loc,
+				ChangeFreq: url.ChangeFreq,
+				LastMod:    url.LastMod,
+			})
+		}
+		return results, nil
 	}
 
-	var results []sitemap.URLResult
-	for _, url := range urlset.URLs {
-		results = append(results, sitemap.URLResult{
-			URL:        url.Loc,
-			ChangeFreq: url.ChangeFreq,
-			LastMod:    url.LastMod,
-		})
+	var sitemapIndex sitemap.SitemapIndex
+	if err := xml.Unmarshal([]byte(content), &sitemapIndex); err == nil && len(sitemapIndex.Sitemaps) > 0 {
+		var allResults []sitemap.URLResult
+		for _, sm := range sitemapIndex.Sitemaps {
+			loc := strings.TrimSpace(sm.Loc)
+			if loc == "" {
+				continue
+			}
+			if _, seen := visited[loc]; seen {
+				continue // avoid cycles
+			}
+			visited[loc] = struct{}{}
+			subContent, err := fetchSitemapContent(loc)
+			if err != nil {
+				continue // skip broken links
+			}
+			subResults, err := sp.ParseSitemapContentRecursive(subContent, visited)
+			if err == nil {
+				allResults = append(allResults, subResults...)
+			}
+		}
+		return allResults, nil
 	}
 
-	return results, nil
+	return nil, fmt.Errorf("failed to parse sitemap as urlset or sitemapindex")
+}
+
+func (sp *SitemapParser) GetAndParseSitemap(siteURL url.URL) ([]sitemap.URLResult, error) {
+	siteURL.Path = "/sitemap.xml"
+	siteURL.RawQuery = ""
+	content, err := fetchSitemapContent(siteURL.String())
+	if err != nil {
+		return nil, err
+	}
+	return sp.ParseSitemapContentRecursive(content, map[string]struct{}{siteURL.String(): {}})
 }
