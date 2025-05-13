@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"unicode/utf8"
 
 	"github.com/larek-tech/diploma/data/internal/domain/document"
 )
@@ -28,6 +29,23 @@ func prepareVector(embeddings []float32) string {
 
 	return string(embeddingsBytes)
 }
+func sanitizeUTF8(s string) string {
+	if utf8.ValidString(s) {
+		return s
+	}
+	v := make([]rune, 0, len(s))
+	for i, r := range s {
+		if r == utf8.RuneError {
+			_, size := utf8.DecodeRuneInString(s[i:])
+			if size == 1 {
+				v = append(v, '�')
+				continue
+			}
+		}
+		v = append(v, r)
+	}
+	return string(v)
+}
 
 func (s Storage) Update(ctx context.Context, documentID string, chunks []*document.Chunk) error {
 	return s.trManager.Do(ctx, func(txCtx context.Context) error {
@@ -41,7 +59,7 @@ func (s Storage) Update(ctx context.Context, documentID string, chunks []*docume
 				txCtx,
 				`INSERT INTO chunks (id, index, source_id, document_id, content, embeddings)
      VALUES ($1, $2, $3, $4, $5, $6)`,
-				chunk.ID, chunk.Index, chunk.SourceID, documentID, chunk.Content, prepareVector(chunk.Embeddings),
+				chunk.ID, chunk.Index, chunk.SourceID, documentID, sanitizeUTF8(chunk.Content), prepareVector(chunk.Embeddings),
 			); err != nil {
 				return fmt.Errorf("failed to insert chunk: %w", err)
 			}
