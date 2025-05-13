@@ -42,6 +42,7 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
+    "react-hook-form": "^7.56.3",
     "react-papaparse": "^4.4.0",
     "react-router-dom": "^6.23.1",
     "recharts": "^2.12.7",
