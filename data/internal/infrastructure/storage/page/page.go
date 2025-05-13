@@ -3,6 +3,7 @@ package page
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/larek-tech/diploma/data/internal/domain/site"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/s3"
@@ -108,11 +109,13 @@ WHERE url = $1;
 		}
 	}
 	if page.RawObjectID != "" {
-		obj, err := s.objectStore.Download(ctx, PageBucketName, page.RawObjectID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to download page raw content: %w", err)
+		obj, err := s.objectStore.Download(ctx, PageBucketName, getObjectStoreKey(&page))
+		if err == nil {
+			page.Raw = string(obj.GetData())
+		} else {
+			slog.Error("failed to download page raw content", "err", err)
 		}
-		page.Raw = string(obj.GetData())
+
 	}
 	return &page, err
 }
@@ -138,11 +141,13 @@ WHERE id = $1;
 		}
 	}
 	if page.RawObjectID != "" {
-		obj, err := s.objectStore.Download(ctx, PageBucketName, page.RawObjectID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to download page raw content: %w", err)
+		obj, err := s.objectStore.Download(ctx, PageBucketName, getObjectStoreKey(&page))
+		if err == nil {
+			page.Raw = string(obj.GetData())
+		} else {
+			slog.Error("failed to download page raw content", "err", err)
 		}
-		page.Raw = string(obj.GetData())
+
 	}
 	return &page, err
 }
