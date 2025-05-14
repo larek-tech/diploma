@@ -57,6 +57,7 @@ export interface Domain {
     createdAt: TimeStamp;
     id: number;
     sourceIds: number[];
+    scenarioIds: number[];
     title: string;
     updatedAt: TimeStamp;
 }

@@ -26,6 +26,7 @@ export class RootStore {
     domainsLimit: number = 10;
     hasMoreDomains: boolean = true;
     selectedDomainId: number | null = null;
+    selectedScenarioId: number | null = null;
 
     activeSessionId: string | null = null;
     activeSession: ChatSession | null = null;
@@ -44,14 +45,19 @@ export class RootStore {
         this.sessions = [];
         this.domains = [];
 
-        // Попытка восстановить выбранный domain из localStorage
+        // Попытка восстановить выбранный domain и scenario из localStorage
         try {
             const savedDomainId = localStorage.getItem('selectedDomainId');
             if (savedDomainId) {
                 this.selectedDomainId = parseInt(savedDomainId, 10);
             }
+
+            const savedScenarioId = localStorage.getItem('selectedScenarioId');
+            if (savedScenarioId) {
+                this.selectedScenarioId = parseInt(savedScenarioId, 10);
+            }
         } catch (e) {
-            console.error('Ошибка при чтении selectedDomainId из localStorage:', e);
+            console.error('Ошибка при чтении данных из localStorage:', e);
         }
     }
 
@@ -61,7 +67,23 @@ export class RootStore {
         // Сохраняем выбранный домен в localStorage
         localStorage.setItem('selectedDomainId', domainId.toString());
 
+        // Сбрасываем выбранный сценарий
+        this.selectedScenarioId = null;
+        localStorage.removeItem('selectedScenarioId');
+
         // Если есть активное соединение - переподключаемся, чтобы использовать новый domainId
+        if (this.activeSessionId) {
+            this.connectWebSocket(this.activeSessionId);
+        }
+    }
+
+    setSelectedScenario(scenarioId: number) {
+        this.selectedScenarioId = scenarioId;
+
+        // Сохраняем выбранный сценарий в localStorage
+        localStorage.setItem('selectedScenarioId', scenarioId.toString());
+
+        // Если есть активное соединение - переподключаемся, чтобы использовать новый scenarioId
         if (this.activeSessionId) {
             this.connectWebSocket(this.activeSessionId);
         }
@@ -72,6 +94,24 @@ export class RootStore {
 
         const selectedDomain = this.domains.find((domain) => domain.id === this.selectedDomainId);
         return selectedDomain ? selectedDomain.title : 'Домен не найден';
+    }
+
+    getSelectedScenarioId(): number | null {
+        return this.selectedScenarioId;
+    }
+
+    hasScenarios(): boolean {
+        if (!this.selectedDomainId) return false;
+
+        const selectedDomain = this.domains.find((domain) => domain.id === this.selectedDomainId);
+        return selectedDomain ? selectedDomain.scenarioIds.length > 0 : false;
+    }
+
+    getAvailableScenarios(): number[] {
+        if (!this.selectedDomainId) return [];
+
+        const selectedDomain = this.domains.find((domain) => domain.id === this.selectedDomainId);
+        return selectedDomain ? selectedDomain.scenarioIds : [];
     }
 
     async getSessions() {
@@ -180,9 +220,8 @@ export class RootStore {
             content: token,
             isChunked: false,
             isLast: true,
-            queryMetadata: {
-                domainID: this.selectedDomainId || undefined,
-            },
+            domainID: this.selectedDomainId || undefined,
+            scenarioID: this.selectedScenarioId || undefined,
         };
     }
 
@@ -275,13 +314,15 @@ export class RootStore {
         this.setIsModelAnswering(true);
         this.setChatDisabled(true);
 
-        // Добавляем domainID в метаданные запроса, если он выбран
-        if (this.selectedDomainId) {
-            message.queryMetadata = {
-                ...message.queryMetadata,
-                domainID: this.selectedDomainId,
-            };
-        }
+        // Добавляем domainID и scenarioID в метаданные запроса, если они выбраны
+        // message.queryMetadata = {
+        //     ...message.queryMetadata,
+        //     domainID: this.selectedDomainId || undefined,
+        //     scenarioID: this.selectedScenarioId || undefined,
+        // };
+
+        message.domainID = this.selectedDomainId || undefined;
+        message.scenarioID = this.selectedScenarioId || undefined;
 
         if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
             this.websocket.send(JSON.stringify(message));

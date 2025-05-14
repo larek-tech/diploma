@@ -82,6 +82,8 @@ export interface WSMessage {
     isChunked?: boolean;
     isLast?: boolean;
     sourceIDs?: string[];
+    domainID?: number;
+    scenarioID?: number;
     queryMetadata?: QueryMetadata;
     error?: string;
 }
@@ -95,6 +97,7 @@ export enum WSMessageType {
 
 export interface QueryMetadata {
     domainID?: number;
+    scenarioID?: number;
     scenario?: Scenario;
 }
 
