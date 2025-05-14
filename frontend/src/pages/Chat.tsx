@@ -3,7 +3,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { useStores } from '@/hooks/useStores';
-import { ArrowUpIcon, FilePenIcon, Loader2, StopCircleIcon, MicIcon, Database } from 'lucide-react';
+import {
+    ArrowUpIcon,
+    FilePenIcon,
+    Loader2,
+    StopCircleIcon,
+    MicIcon,
+    Database,
+    BookOpen,
+} from 'lucide-react';
 import { observer } from 'mobx-react-lite';
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
@@ -84,15 +92,18 @@ const Chat = observer(() => {
             rootStore.sendMessage({
                 type: WSMessageType.Query,
                 content: message.trim(),
-                queryMetadata: {
-                    domainID: rootStore.selectedDomainId || undefined,
-                },
             });
             setMessage('');
         } else if (!rootStore.selectedDomainId) {
             toast({
                 title: 'Внимание',
                 description: 'Выберите домен знаний для чата в боковой панели',
+                variant: 'destructive',
+            });
+        } else if (rootStore.hasScenarios() && !rootStore.selectedScenarioId) {
+            toast({
+                title: 'Внимание',
+                description: 'Выберите сценарий для выбранного домена знаний',
                 variant: 'destructive',
             });
         }
@@ -210,17 +221,36 @@ const Chat = observer(() => {
                         </Button>
                     </div>
 
-                    <div className='flex items-center gap-2 text-sm'>
-                        <Database className='h-4 w-4 text-primary' />
-                        <span
-                            className={
-                                rootStore.selectedDomainId
-                                    ? 'text-primary-600 font-medium'
-                                    : 'text-gray-500'
-                            }
-                        >
-                            {rootStore.getSelectedDomainTitle()}
-                        </span>
+                    <div className='flex items-center gap-4 text-sm'>
+                        <div className='flex items-center gap-1'>
+                            <Database className='h-4 w-4 text-primary' />
+                            <span
+                                className={
+                                    rootStore.selectedDomainId
+                                        ? 'text-primary-600 font-medium'
+                                        : 'text-gray-500'
+                                }
+                            >
+                                {rootStore.getSelectedDomainTitle()}
+                            </span>
+                        </div>
+
+                        {rootStore.selectedDomainId && rootStore.hasScenarios() && (
+                            <div className='flex items-center gap-1'>
+                                <BookOpen className='h-4 w-4 text-primary' />
+                                <span
+                                    className={
+                                        rootStore.selectedScenarioId
+                                            ? 'text-primary-600 font-medium'
+                                            : 'text-gray-500'
+                                    }
+                                >
+                                    {rootStore.selectedScenarioId
+                                        ? `Сценарий #${rootStore.selectedScenarioId}`
+                                        : 'Выберите сценарий'}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -266,6 +296,16 @@ const Chat = observer(() => {
                                 панели для начала общения
                             </div>
                         )}
+
+                        {rootStore.selectedDomainId &&
+                            rootStore.hasScenarios() &&
+                            !rootStore.selectedScenarioId && (
+                                <div className='text-amber-600 text-xs mb-1 flex items-center'>
+                                    <span className='mr-1'>⚠️</span> Выберите сценарий для
+                                    выбранного домена
+                                </div>
+                            )}
+
                         <div className='relative'>
                             <Textarea
                                 onChange={(e) => setMessage(e.target.value)}
