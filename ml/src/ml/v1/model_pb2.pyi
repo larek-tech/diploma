@@ -2,7 +2,13 @@ from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import (
+    ClassVar as _ClassVar,
+    Iterable as _Iterable,
+    Mapping as _Mapping,
+    Optional as _Optional,
+    Union as _Union,
+)
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -14,7 +20,12 @@ class MultiQuery(_message.Message):
     useMultiquery: bool
     nQueries: int
     queryModelName: str
-    def __init__(self, useMultiquery: bool = ..., nQueries: _Optional[int] = ..., queryModelName: _Optional[str] = ...) -> None: ...
+    def __init__(
+        self,
+        useMultiquery: bool = ...,
+        nQueries: _Optional[int] = ...,
+        queryModelName: _Optional[str] = ...,
+    ) -> None: ...
 
 class Reranker(_message.Message):
     __slots__ = ("useRerank", "rerankerModel", "rerankerMaxLength", "topK")
@@ -26,7 +37,13 @@ class Reranker(_message.Message):
     rerankerModel: str
     rerankerMaxLength: int
     topK: int
-    def __init__(self, useRerank: bool = ..., rerankerModel: _Optional[str] = ..., rerankerMaxLength: _Optional[int] = ..., topK: _Optional[int] = ...) -> None: ...
+    def __init__(
+        self,
+        useRerank: bool = ...,
+        rerankerModel: _Optional[str] = ...,
+        rerankerMaxLength: _Optional[int] = ...,
+        topK: _Optional[int] = ...,
+    ) -> None: ...
 
 class LlmModel(_message.Message):
     __slots__ = ("modelName", "temperature", "topK", "topP", "systemPrompt")
@@ -40,7 +57,14 @@ class LlmModel(_message.Message):
     topK: int
     topP: float
     systemPrompt: str
-    def __init__(self, modelName: _Optional[str] = ..., temperature: _Optional[float] = ..., topK: _Optional[int] = ..., topP: _Optional[float] = ..., systemPrompt: _Optional[str] = ...) -> None: ...
+    def __init__(
+        self,
+        modelName: _Optional[str] = ...,
+        temperature: _Optional[float] = ...,
+        topK: _Optional[int] = ...,
+        topP: _Optional[float] = ...,
+        systemPrompt: _Optional[str] = ...,
+    ) -> None: ...
 
 class VectorSearch(_message.Message):
     __slots__ = ("topN", "threshold", "searchByQuery")
@@ -50,10 +74,25 @@ class VectorSearch(_message.Message):
     topN: int
     threshold: float
     searchByQuery: bool
-    def __init__(self, topN: _Optional[int] = ..., threshold: _Optional[float] = ..., searchByQuery: bool = ...) -> None: ...
+    def __init__(
+        self,
+        topN: _Optional[int] = ...,
+        threshold: _Optional[float] = ...,
+        searchByQuery: bool = ...,
+    ) -> None: ...
 
 class Scenario(_message.Message):
-    __slots__ = ("id", "multiQuery", "reranker", "vectorSearch", "model", "createdAt", "updatedAt", "title", "domainId")
+    __slots__ = (
+        "id",
+        "multiQuery",
+        "reranker",
+        "vectorSearch",
+        "model",
+        "createdAt",
+        "updatedAt",
+        "title",
+        "domainId",
+    )
     ID_FIELD_NUMBER: _ClassVar[int]
     MULTIQUERY_FIELD_NUMBER: _ClassVar[int]
     RERANKER_FIELD_NUMBER: _ClassVar[int]
@@ -72,7 +111,18 @@ class Scenario(_message.Message):
     updatedAt: _timestamp_pb2.Timestamp
     title: str
     domainId: int
-    def __init__(self, id: _Optional[int] = ..., multiQuery: _Optional[_Union[MultiQuery, _Mapping]] = ..., reranker: _Optional[_Union[Reranker, _Mapping]] = ..., vectorSearch: _Optional[_Union[VectorSearch, _Mapping]] = ..., model: _Optional[_Union[LlmModel, _Mapping]] = ..., createdAt: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updatedAt: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., title: _Optional[str] = ..., domainId: _Optional[int] = ...) -> None: ...
+    def __init__(
+        self,
+        id: _Optional[int] = ...,
+        multiQuery: _Optional[_Union[MultiQuery, _Mapping]] = ...,
+        reranker: _Optional[_Union[Reranker, _Mapping]] = ...,
+        vectorSearch: _Optional[_Union[VectorSearch, _Mapping]] = ...,
+        model: _Optional[_Union[LlmModel, _Mapping]] = ...,
+        createdAt: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...,
+        updatedAt: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...,
+        title: _Optional[str] = ...,
+        domainId: _Optional[int] = ...,
+    ) -> None: ...
 
 class Query(_message.Message):
     __slots__ = ("id", "userId", "content")
@@ -82,7 +132,12 @@ class Query(_message.Message):
     id: int
     userId: int
     content: str
-    def __init__(self, id: _Optional[int] = ..., userId: _Optional[int] = ..., content: _Optional[str] = ...) -> None: ...
+    def __init__(
+        self,
+        id: _Optional[int] = ...,
+        userId: _Optional[int] = ...,
+        content: _Optional[str] = ...,
+    ) -> None: ...
 
 class ProcessQueryRequest(_message.Message):
     __slots__ = ("query", "scenario", "sourceIds")
@@ -92,7 +147,12 @@ class ProcessQueryRequest(_message.Message):
     query: Query
     scenario: Scenario
     sourceIds: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, query: _Optional[_Union[Query, _Mapping]] = ..., scenario: _Optional[_Union[Scenario, _Mapping]] = ..., sourceIds: _Optional[_Iterable[str]] = ...) -> None: ...
+    def __init__(
+        self,
+        query: _Optional[_Union[Query, _Mapping]] = ...,
+        scenario: _Optional[_Union[Scenario, _Mapping]] = ...,
+        sourceIds: _Optional[_Iterable[str]] = ...,
+    ) -> None: ...
 
 class Chunk(_message.Message):
     __slots__ = ("content",)
@@ -106,7 +166,11 @@ class ProcessQueryResponse(_message.Message):
     SOURCEIDS_FIELD_NUMBER: _ClassVar[int]
     chunk: Chunk
     sourceIds: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, chunk: _Optional[_Union[Chunk, _Mapping]] = ..., sourceIds: _Optional[_Iterable[str]] = ...) -> None: ...
+    def __init__(
+        self,
+        chunk: _Optional[_Union[Chunk, _Mapping]] = ...,
+        sourceIds: _Optional[_Iterable[str]] = ...,
+    ) -> None: ...
 
 class ModelParams(_message.Message):
     __slots__ = ("multiQuery", "reranker", "vectorSearch", "model")
@@ -118,7 +182,13 @@ class ModelParams(_message.Message):
     reranker: Reranker
     vectorSearch: VectorSearch
     model: LlmModel
-    def __init__(self, multiQuery: _Optional[_Union[MultiQuery, _Mapping]] = ..., reranker: _Optional[_Union[Reranker, _Mapping]] = ..., vectorSearch: _Optional[_Union[VectorSearch, _Mapping]] = ..., model: _Optional[_Union[LlmModel, _Mapping]] = ...) -> None: ...
+    def __init__(
+        self,
+        multiQuery: _Optional[_Union[MultiQuery, _Mapping]] = ...,
+        reranker: _Optional[_Union[Reranker, _Mapping]] = ...,
+        vectorSearch: _Optional[_Union[VectorSearch, _Mapping]] = ...,
+        model: _Optional[_Union[LlmModel, _Mapping]] = ...,
+    ) -> None: ...
 
 class GetOptimalParamsRequest(_message.Message):
     __slots__ = ("sourceIds",)
