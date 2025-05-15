@@ -56,9 +56,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
                 logger.debug(f"Sending chunk for request {request_id}")
                 yield response
             logger.info(chunks)
-            yield ml_pb2_model.ProcessQueryResponse(
-                sourceIds=chunks
-            )
+            yield ml_pb2_model.ProcessQueryResponse(sourceIds=chunks)
         except grpc.RpcError as e:
             logger.error(
                 f"gRPC error processing request {request_id}:"
@@ -76,9 +74,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
     ) -> ml_pb2_model.ProcessFirstQueryResponse:
         client_ip = context.peer().split(":")[-1]
 
-        logger.info(
-            f"New request [From {client_ip}\nQuery: {request.query}\n"
-        )
+        logger.info(f"New request [From {client_ip}\nQuery: {request.query}\n")
         try:
             response = await self.rag.ollama_client.generate(
                 prompt=FIRST_MESSAE_PROMPT.format(message=request.query),
@@ -107,7 +103,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
             reranker=ml_pb2_model.Reranker(
                 useRerank=True,
                 topK=5,
-                rerankerMaxLength=2048,
+                rerankerMaxLength=8192,
                 rerankerModel=DEFAULT_RERANKER_NAME,
             ),
             vectorSearch=ml_pb2_model.VectorSearch(

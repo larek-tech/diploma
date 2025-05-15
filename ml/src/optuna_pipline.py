@@ -1,7 +1,8 @@
+import asyncio
 import json
 import traceback
 from typing import Any
-import asyncio
+
 import optuna
 import redis.asyncio as redis
 from datasets import Dataset
@@ -14,9 +15,16 @@ from ragas.metrics import (
 )
 
 import ml.v1.model_pb2 as ml_pb2_model
-from config import DATA_SERVICE_HOST, DEFAULT_EMBEDER_MODEL, DEFAULT_REDIS_URL, OLLAMA_BASE_MODEL
+from config import (
+    DATA_SERVICE_HOST,
+    DEFAULT_EMBEDER_MODEL,
+    DEFAULT_REDIS_URL,
+    OLLAMA_BASE_MODEL,
+)
 from RAG_pipeline import RAGPipeline
 from utils.logger import logger
+
+optuna.logging.enable_propagation()
 
 
 class OptunaPipeline:
@@ -45,6 +53,7 @@ class OptunaPipeline:
             embeddings=LangchainEmbeddingsWrapper(self.embeder)
         )
         self.rag_pipeline = RAGPipeline()
+        
 
     async def calculate_ragas_metrics(
         self, model_outputs: list[dict[str, Any]]
@@ -66,8 +75,12 @@ class OptunaPipeline:
 
         for sample in model_outputs:
             rag_sample = SingleTurnSample(**sample)
-            context_result += await self.context_metric.single_turn_ascore(rag_sample)
-            generate_result += await self.generate_metric.single_turn_ascore(rag_sample)
+            context_result += await self.context_metric.single_turn_ascore(
+                rag_sample
+            )
+            generate_result += await self.generate_metric.single_turn_ascore(
+                rag_sample
+            )
 
         if total_samples == 0:
             return 0.0, 0.0
@@ -104,8 +117,7 @@ class OptunaPipeline:
     ) -> ml_pb2_model.ProcessQueryRequest:
         return ml_pb2_model.ProcessQueryRequest(
             query=ml_pb2_model.Query(
-                content=entry.get("question", ""),
-                userId=9
+                content=entry.get("question", ""), userId=9
             ),
             scenario=ml_pb2_model.Scenario(
                 model=ml_pb2_model.LlmModel(
@@ -116,23 +128,34 @@ class OptunaPipeline:
                     systemPrompt="",
                 ),
                 multiQuery=ml_pb2_model.MultiQuery(
-                    useMultiquery=params.get("multiQuery", {}).get("useMultiquery"),
+                    useMultiquery=params.get("multiQuery", {}).get(
+                        "useMultiquery"
+                    ),
                     nQueries=params.get("multiQuery", {}).get("nQueries"),
-                    queryModelName=params.get("multiQuery", {}).get("queryModelName") or "",
+                    queryModelName=params.get("multiQuery", {}).get(
+                        "queryModelName"
+                    )
+                    or "",
                 ),
                 vectorSearch=ml_pb2_model.VectorSearch(
                     topN=params.get("vectorSearch", {}).get("topN"),
                     threshold=params.get("vectorSearch", {}).get("threshold"),
-                    searchByQuery=params.get("vectorSearch", {}).get("searchByQuery"),
+                    searchByQuery=params.get("vectorSearch", {}).get(
+                        "searchByQuery"
+                    ),
                 ),
                 reranker=ml_pb2_model.Reranker(
                     useRerank=params.get("reranker", {}).get("useRerank"),
                     topK=params.get("reranker", {}).get("topK"),
-                    rerankerMaxLength=params.get("reranker", {}).get("rerankerMaxLength"),
-                    rerankerModel=params.get("reranker", {}).get("rerankerModel"),
+                    rerankerMaxLength=params.get("reranker", {}).get(
+                        "rerankerMaxLength"
+                    ),
+                    rerankerModel=params.get("reranker", {}).get(
+                        "rerankerModel"
+                    ),
                 ),
             ),
-            sourceIds=params.get("sourceIds")
+            sourceIds=params.get("sourceIds"),
         )
 
     async def make_test_request(
@@ -191,40 +214,42 @@ class OptunaPipeline:
             return 0.0, 0.0
 
     async def objective(
-        self, trial: optuna.Trial, test_dataset: list[dict[str]], source_ids: list[str]
+        self,
+        trial: optuna.Trial,
+        test_dataset: list[dict[str]],
+        source_ids: list[str],
     ) -> float:
         params = {
             "vectorSearch": {
                 "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
                 "threshold": trial.suggest_float(
-                    "vectorSearch.threshold", 0.1, 0.9
+                    "vectorSearch.threshold", 0.1, 0.7
                 ),
                 "searchByQuery": trial.suggest_categorical(
-                    "vectorSearch.searchByQuery", [False]
+                    "vectorSearch.searchByQuery", [True, False]
                 ),
             },
-            # "reranker": {
-            #     "useRerank": trial.suggest_categorical(
-            #         "reranker.useRerank", [True, False]
-            #     ),
-            #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
-            #     "rerankerMaxLength": trial.suggest_int(
-            #         "reranker.rerankerMaxLength",
-            #         [4096, 8192]
-            #     ),
-            #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
-            # },
+            "reranker": {
+                "useRerank": trial.suggest_categorical(
+                    "reranker.useRerank", [True, False]
+                ),
+                "topK": trial.suggest_int("reranker.topK", 4, 8),
+                "rerankerMaxLength": trial.suggest_categorical(
+                    "reranker.rerankerMaxLength", [8192]
+                ),
+                "rerankerModel": "BAAI/bge-reranker-v2-m3",
+            },
             "model": {
                 "temperature": trial.suggest_float(
                     "model.temperature", 0.0, 1.0
                 ),
-                "topK": trial.suggest_int("model.topK", 1, 50),
+                "topK": trial.suggest_int("model.topK", 1, 100),
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0),
                 "modelName": OLLAMA_BASE_MODEL,
             },
             "multiQuery": {
                 "useMultiquery": trial.suggest_categorical(
-                    "multiQuery.useMultiquery", [True]
+                    "multiQuery.useMultiquery", [True, False]
                 ),
                 "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
                 "queryModelName": None,
@@ -290,8 +315,15 @@ class OptunaPipeline:
                     "params": params,
                 }
             ]
-        study = optuna.create_study(directions=["maximize", "maximize"])
-        for _ in range(5):
+        storage_path = f"sqlite:///optuna_study_{'_'.join(source_ids)}.db"
+        study = optuna.create_study(
+            directions=["maximize", "maximize"],
+            study_name=f"Full RAG params in sources: {source_ids}",
+            storage=storage_path,
+            load_if_exists=True,
+        )
+        logger.info("Study name: %s", study.study_name)
+        for trial_num in range(5):
             trial = study.ask()
             try:
                 (
@@ -301,6 +333,12 @@ class OptunaPipeline:
             except Exception as e:
                 logger.error(f"Trial failed: {e}")
                 context_precision_score, similarity_score = 0.0, 0.0
+            logger.info(
+                "Trial #%d params: %s metric: %s",
+                trial_num,
+                trial.params,
+                (context_precision_score, similarity_score),
+            )
             study.tell(trial, [context_precision_score, similarity_score])
         best_trial = max(
             study.best_trials,
@@ -309,7 +347,13 @@ class OptunaPipeline:
                 t.values[1],
             ),  # сортировка по двум метрикам
         )
-        logger.info("Best run: %s", best_trial)
+        logger.info("Best trial found:")
+        logger.info(
+            " - Values: context=%.4f, semantic=%.4f",
+            best_trial.values[0],
+            best_trial.values[1],
+        )
+        logger.info(" - Params: %s", best_trial.params)
         return self.trial_to_model_params(best_trial.params)
 
     def trial_to_model_params(self, params):
@@ -360,9 +404,7 @@ class OptunaPipeline:
                 "vectorSearch.searchByQuery"
             ]
 
-        model_params.model.modelName = (
-            OLLAMA_BASE_MODEL
-        )
+        model_params.model.modelName = OLLAMA_BASE_MODEL
         model_params.model.temperature = float(params["model.temperature"])
         model_params.model.topK = int(params["model.topK"])
         model_params.model.topP = float(params["model.topP"])
@@ -370,13 +412,14 @@ class OptunaPipeline:
 
         return model_params
 
+
 async def main():
     pipline = OptunaPipeline(
         redis_url="redis://localhost:6379",
         embedings_model=DEFAULT_EMBEDER_MODEL,
     )
     source_ids = ["be5e140c-548b-4635-9cac-8aeba54414d0"]
-    defaul_rag_params={
+    defaul_rag_params = {
         "vectorSearch": {
             "topN": 10,
             "threshold": 0.4,
@@ -404,313 +447,293 @@ async def main():
     logger.info(await pipline.study(source_ids, defaul_rag_params))
 
 
-
 def foo():
     default_rag_params = {
-            "vectorSearch": {
-                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
-                "threshold": trial.suggest_float(
-                    "vectorSearch.threshold", 0.1, 0.9
-                ),
-                "searchByQuery": trial.suggest_categorical(
-                    "vectorSearch.searchByQuery", [False]
-                ),
-            },
-            # "reranker": {
-            #     "useRerank": trial.suggest_categorical(
-            #         "reranker.useRerank", [True, False]
-            #     ),
-            #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
-            #     "rerankerMaxLength": trial.suggest_int(
-            #         "reranker.rerankerMaxLength",
-            #         [4096, 8192]
-            #     ),
-            #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
-            # },
-            "model": {
-                "temperature": trial.suggest_float(
-                    "model.temperature", 0.0, 1.0
-                ),
-                "topK": trial.suggest_int("model.topK", 1, 50),
-                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": OLLAMA_BASE_MODEL,
-            },
-            # "multiQuery": {
-            #     "useMultiquery": trial.suggest_categorical(
-            #         "multiQuery.useMultiquery", [True, False]
-            #     ),
-            #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
-            #     "queryModelName": None,
-            # },
-            "sourceIds": source_ids,
-        }
+        "vectorSearch": {
+            "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+            "threshold": trial.suggest_float(
+                "vectorSearch.threshold", 0.1, 0.9
+            ),
+            "searchByQuery": trial.suggest_categorical(
+                "vectorSearch.searchByQuery", [False]
+            ),
+        },
+        # "reranker": {
+        #     "useRerank": trial.suggest_categorical(
+        #         "reranker.useRerank", [True, False]
+        #     ),
+        #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+        #     "rerankerMaxLength": trial.suggest_int(
+        #         "reranker.rerankerMaxLength",
+        #         [4096, 8192]
+        #     ),
+        #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
+        # },
+        "model": {
+            "temperature": trial.suggest_float("model.temperature", 0.0, 1.0),
+            "topK": trial.suggest_int("model.topK", 1, 50),
+            "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+            "modelName": OLLAMA_BASE_MODEL,
+        },
+        # "multiQuery": {
+        #     "useMultiquery": trial.suggest_categorical(
+        #         "multiQuery.useMultiquery", [True, False]
+        #     ),
+        #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+        #     "queryModelName": None,
+        # },
+        "sourceIds": source_ids,
+    }
     multquery_rag_params = {
-            "vectorSearch": {
-                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
-                "threshold": trial.suggest_float(
-                    "vectorSearch.threshold", 0.1, 0.9
-                ),
-                "searchByQuery": trial.suggest_categorical(
-                    "vectorSearch.searchByQuery", [False]
-                ),
-            },
-            # "reranker": {
-            #     "useRerank": trial.suggest_categorical(
-            #         "reranker.useRerank", [True, False]
-            #     ),
-            #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
-            #     "rerankerMaxLength": trial.suggest_int(
-            #         "reranker.rerankerMaxLength",
-            #         [4096, 8192]
-            #     ),
-            #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
-            # },
-            "model": {
-                "temperature": trial.suggest_float(
-                    "model.temperature", 0.0, 1.0
-                ),
-                "topK": trial.suggest_int("model.topK", 1, 50),
-                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": OLLAMA_BASE_MODEL,
-            },
-            "multiQuery": {
-                "useMultiquery": trial.suggest_categorical(
-                    "multiQuery.useMultiquery", [True]
-                ),
-                "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
-                "queryModelName": None,
-            },
-            "sourceIds": source_ids,
-        }
+        "vectorSearch": {
+            "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+            "threshold": trial.suggest_float(
+                "vectorSearch.threshold", 0.1, 0.9
+            ),
+            "searchByQuery": trial.suggest_categorical(
+                "vectorSearch.searchByQuery", [False]
+            ),
+        },
+        # "reranker": {
+        #     "useRerank": trial.suggest_categorical(
+        #         "reranker.useRerank", [True, False]
+        #     ),
+        #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+        #     "rerankerMaxLength": trial.suggest_int(
+        #         "reranker.rerankerMaxLength",
+        #         [4096, 8192]
+        #     ),
+        #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
+        # },
+        "model": {
+            "temperature": trial.suggest_float("model.temperature", 0.0, 1.0),
+            "topK": trial.suggest_int("model.topK", 1, 50),
+            "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+            "modelName": OLLAMA_BASE_MODEL,
+        },
+        "multiQuery": {
+            "useMultiquery": trial.suggest_categorical(
+                "multiQuery.useMultiquery", [True]
+            ),
+            "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+            "queryModelName": None,
+        },
+        "sourceIds": source_ids,
+    }
     hypotetical_question_rag_params = {
-            "vectorSearch": {
-                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
-                "threshold": trial.suggest_float(
-                    "vectorSearch.threshold", 0.1, 0.9
-                ),
-                "searchByQuery": trial.suggest_categorical(
-                    "vectorSearch.searchByQuery", [True]
-                ),
-            },
-            # "reranker": {
-            #     "useRerank": trial.suggest_categorical(
-            #         "reranker.useRerank", [True, False]
-            #     ),
-            #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
-            #     "rerankerMaxLength": trial.suggest_int(
-            #         "reranker.rerankerMaxLength",
-            #         [4096, 8192]
-            #     ),
-            #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
-            # },
-            "model": {
-                "temperature": trial.suggest_float(
-                    "model.temperature", 0.0, 1.0
-                ),
-                "topK": trial.suggest_int("model.topK", 1, 50),
-                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": OLLAMA_BASE_MODEL,
-            },
-            # "multiQuery": {
-            #     "useMultiquery": trial.suggest_categorical(
-            #         "multiQuery.useMultiquery", [True]
-            #     ),
-            #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
-            #     "queryModelName": None,
-            # },
-            "sourceIds": source_ids,
-        }
+        "vectorSearch": {
+            "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+            "threshold": trial.suggest_float(
+                "vectorSearch.threshold", 0.1, 0.9
+            ),
+            "searchByQuery": trial.suggest_categorical(
+                "vectorSearch.searchByQuery", [True]
+            ),
+        },
+        # "reranker": {
+        #     "useRerank": trial.suggest_categorical(
+        #         "reranker.useRerank", [True, False]
+        #     ),
+        #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+        #     "rerankerMaxLength": trial.suggest_int(
+        #         "reranker.rerankerMaxLength",
+        #         [4096, 8192]
+        #     ),
+        #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
+        # },
+        "model": {
+            "temperature": trial.suggest_float("model.temperature", 0.0, 1.0),
+            "topK": trial.suggest_int("model.topK", 1, 50),
+            "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+            "modelName": OLLAMA_BASE_MODEL,
+        },
+        # "multiQuery": {
+        #     "useMultiquery": trial.suggest_categorical(
+        #         "multiQuery.useMultiquery", [True]
+        #     ),
+        #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+        #     "queryModelName": None,
+        # },
+        "sourceIds": source_ids,
+    }
     reranker_rag_params = {
-            "vectorSearch": {
-                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
-                "threshold": trial.suggest_float(
-                    "vectorSearch.threshold", 0.1, 0.9
-                ),
-                "searchByQuery": trial.suggest_categorical(
-                    "vectorSearch.searchByQuery", [False]
-                ),
-            },
-            "reranker": {
-                "useRerank": trial.suggest_categorical(
-                    "reranker.useRerank", [True, False]
-                ),
-                "topK": trial.suggest_categorical("reranker.topK", 4, 8),
-                "rerankerMaxLength": trial.suggest_int(
-                    "reranker.rerankerMaxLength",
-                    [4096, 8192]
-                ),
-                "rerankerModel": "BAAI/bge-reranker-v2-m3",
-            },
-            "model": {
-                "temperature": trial.suggest_float(
-                    "model.temperature", 0.0, 1.0
-                ),
-                "topK": trial.suggest_int("model.topK", 1, 50),
-                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": OLLAMA_BASE_MODEL,
-            },
-            # "multiQuery": {
-            #     "useMultiquery": trial.suggest_categorical(
-            #         "multiQuery.useMultiquery", [True]
-            #     ),
-            #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
-            #     "queryModelName": None,
-            # },
-            "sourceIds": source_ids,
-        }
+        "vectorSearch": {
+            "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+            "threshold": trial.suggest_float(
+                "vectorSearch.threshold", 0.1, 0.9
+            ),
+            "searchByQuery": trial.suggest_categorical(
+                "vectorSearch.searchByQuery", [False]
+            ),
+        },
+        "reranker": {
+            "useRerank": trial.suggest_categorical(
+                "reranker.useRerank", [True, False]
+            ),
+            "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+            "rerankerMaxLength": trial.suggest_int(
+                "reranker.rerankerMaxLength", [4096, 8192]
+            ),
+            "rerankerModel": "BAAI/bge-reranker-v2-m3",
+        },
+        "model": {
+            "temperature": trial.suggest_float("model.temperature", 0.0, 1.0),
+            "topK": trial.suggest_int("model.topK", 1, 50),
+            "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+            "modelName": OLLAMA_BASE_MODEL,
+        },
+        # "multiQuery": {
+        #     "useMultiquery": trial.suggest_categorical(
+        #         "multiQuery.useMultiquery", [True]
+        #     ),
+        #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+        #     "queryModelName": None,
+        # },
+        "sourceIds": source_ids,
+    }
     hypotetical_multiquery_rag_params = {
-            "vectorSearch": {
-                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
-                "threshold": trial.suggest_float(
-                    "vectorSearch.threshold", 0.1, 0.9
-                ),
-                "searchByQuery": trial.suggest_categorical(
-                    "vectorSearch.searchByQuery", [True]
-                ),
-            },
-            # "reranker": {
-            #     "useRerank": trial.suggest_categorical(
-            #         "reranker.useRerank", [True, False]
-            #     ),
-            #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
-            #     "rerankerMaxLength": trial.suggest_int(
-            #         "reranker.rerankerMaxLength",
-            #         [4096, 8192]
-            #     ),
-            #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
-            # },
-            "model": {
-                "temperature": trial.suggest_float(
-                    "model.temperature", 0.0, 1.0
-                ),
-                "topK": trial.suggest_int("model.topK", 1, 50),
-                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": OLLAMA_BASE_MODEL,
-            },
-            "multiQuery": {
-                "useMultiquery": trial.suggest_categorical(
-                    "multiQuery.useMultiquery", [True]
-                ),
-                "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
-                "queryModelName": None,
-            },
-            "sourceIds": source_ids,
-        }
+        "vectorSearch": {
+            "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+            "threshold": trial.suggest_float(
+                "vectorSearch.threshold", 0.1, 0.9
+            ),
+            "searchByQuery": trial.suggest_categorical(
+                "vectorSearch.searchByQuery", [True]
+            ),
+        },
+        # "reranker": {
+        #     "useRerank": trial.suggest_categorical(
+        #         "reranker.useRerank", [True, False]
+        #     ),
+        #     "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+        #     "rerankerMaxLength": trial.suggest_int(
+        #         "reranker.rerankerMaxLength",
+        #         [4096, 8192]
+        #     ),
+        #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
+        # },
+        "model": {
+            "temperature": trial.suggest_float("model.temperature", 0.0, 1.0),
+            "topK": trial.suggest_int("model.topK", 1, 50),
+            "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+            "modelName": OLLAMA_BASE_MODEL,
+        },
+        "multiQuery": {
+            "useMultiquery": trial.suggest_categorical(
+                "multiQuery.useMultiquery", [True]
+            ),
+            "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+            "queryModelName": None,
+        },
+        "sourceIds": source_ids,
+    }
     hypotetical_reranker_rag_params = {
-            "vectorSearch": {
-                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
-                "threshold": trial.suggest_float(
-                    "vectorSearch.threshold", 0.1, 0.9
-                ),
-                "searchByQuery": trial.suggest_categorical(
-                    "vectorSearch.searchByQuery", [True]
-                ),
-            },
-            "reranker": {
-                "useRerank": trial.suggest_categorical(
-                    "reranker.useRerank", [True, False]
-                ),
-                "topK": trial.suggest_categorical("reranker.topK", 4, 8),
-                "rerankerMaxLength": trial.suggest_int(
-                    "reranker.rerankerMaxLength",
-                    [4096, 8192]
-                ),
-                "rerankerModel": "BAAI/bge-reranker-v2-m3",
-            },
-            "model": {
-                "temperature": trial.suggest_float(
-                    "model.temperature", 0.0, 1.0
-                ),
-                "topK": trial.suggest_int("model.topK", 1, 50),
-                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": OLLAMA_BASE_MODEL,
-            },
-            # "multiQuery": {
-            #     "useMultiquery": trial.suggest_categorical(
-            #         "multiQuery.useMultiquery", [True]
-            #     ),
-            #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
-            #     "queryModelName": None,
-            # },
-            "sourceIds": source_ids,
-        }
+        "vectorSearch": {
+            "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+            "threshold": trial.suggest_float(
+                "vectorSearch.threshold", 0.1, 0.9
+            ),
+            "searchByQuery": trial.suggest_categorical(
+                "vectorSearch.searchByQuery", [True]
+            ),
+        },
+        "reranker": {
+            "useRerank": trial.suggest_categorical(
+                "reranker.useRerank", [True, False]
+            ),
+            "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+            "rerankerMaxLength": trial.suggest_int(
+                "reranker.rerankerMaxLength", [4096, 8192]
+            ),
+            "rerankerModel": "BAAI/bge-reranker-v2-m3",
+        },
+        "model": {
+            "temperature": trial.suggest_float("model.temperature", 0.0, 1.0),
+            "topK": trial.suggest_int("model.topK", 1, 50),
+            "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+            "modelName": OLLAMA_BASE_MODEL,
+        },
+        # "multiQuery": {
+        #     "useMultiquery": trial.suggest_categorical(
+        #         "multiQuery.useMultiquery", [True]
+        #     ),
+        #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+        #     "queryModelName": None,
+        # },
+        "sourceIds": source_ids,
+    }
     reranker_multiquery_rag_params = {
-            "vectorSearch": {
-                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
-                "threshold": trial.suggest_float(
-                    "vectorSearch.threshold", 0.1, 0.9
-                ),
-                "searchByQuery": trial.suggest_categorical(
-                    "vectorSearch.searchByQuery", [False]
-                ),
-            },
-            "reranker": {
-                "useRerank": trial.suggest_categorical(
-                    "reranker.useRerank", [True, False]
-                ),
-                "topK": trial.suggest_categorical("reranker.topK", 4, 8),
-                "rerankerMaxLength": trial.suggest_int(
-                    "reranker.rerankerMaxLength",
-                    [4096, 8192]
-                ),
-                "rerankerModel": "BAAI/bge-reranker-v2-m3",
-            },
-            "model": {
-                "temperature": trial.suggest_float(
-                    "model.temperature", 0.0, 1.0
-                ),
-                "topK": trial.suggest_int("model.topK", 1, 50),
-                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": OLLAMA_BASE_MODEL,
-            },
-            "multiQuery": {
-                "useMultiquery": trial.suggest_categorical(
-                    "multiQuery.useMultiquery", [True]
-                ),
-                "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
-                "queryModelName": None,
-            },
-            "sourceIds": source_ids,
-        }
+        "vectorSearch": {
+            "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+            "threshold": trial.suggest_float(
+                "vectorSearch.threshold", 0.1, 0.9
+            ),
+            "searchByQuery": trial.suggest_categorical(
+                "vectorSearch.searchByQuery", [False]
+            ),
+        },
+        "reranker": {
+            "useRerank": trial.suggest_categorical(
+                "reranker.useRerank", [True, False]
+            ),
+            "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+            "rerankerMaxLength": trial.suggest_int(
+                "reranker.rerankerMaxLength", [4096, 8192]
+            ),
+            "rerankerModel": "BAAI/bge-reranker-v2-m3",
+        },
+        "model": {
+            "temperature": trial.suggest_float("model.temperature", 0.0, 1.0),
+            "topK": trial.suggest_int("model.topK", 1, 50),
+            "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+            "modelName": OLLAMA_BASE_MODEL,
+        },
+        "multiQuery": {
+            "useMultiquery": trial.suggest_categorical(
+                "multiQuery.useMultiquery", [True]
+            ),
+            "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+            "queryModelName": None,
+        },
+        "sourceIds": source_ids,
+    }
 
     all_params = {
-            "vectorSearch": {
-                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
-                "threshold": trial.suggest_float(
-                    "vectorSearch.threshold", 0.1, 0.7
-                ),
-                "searchByQuery": trial.suggest_categorical(
-                    "vectorSearch.searchByQuery", [True, False]
-                ),
-            },
-            "reranker": {
-                "useRerank": trial.suggest_categorical(
-                    "reranker.useRerank", [True, False]
-                ),
-                "topK": trial.suggest_categorical("reranker.topK", 4, 8),
-                "rerankerMaxLength": trial.suggest_int(
-                    "reranker.rerankerMaxLength",
-                    [4096, 8192]
-                ),
-                "rerankerModel": "BAAI/bge-reranker-v2-m3",
-            },
-            "model": {
-                "temperature": trial.suggest_float(
-                    "model.temperature", 0.0, 1.0
-                ),
-                "topK": trial.suggest_int("model.topK", 1, 100),
-                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
-                "modelName": OLLAMA_BASE_MODEL,
-            },
-            "multiQuery": {
-                "useMultiquery": trial.suggest_categorical(
-                    "multiQuery.useMultiquery", [True, False]
-                ),
-                "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
-                "queryModelName": None,
-            },
-            "sourceIds": source_ids,
-        }
+        "vectorSearch": {
+            "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+            "threshold": trial.suggest_float(
+                "vectorSearch.threshold", 0.1, 0.7
+            ),
+            "searchByQuery": trial.suggest_categorical(
+                "vectorSearch.searchByQuery", [True, False]
+            ),
+        },
+        "reranker": {
+            "useRerank": trial.suggest_categorical(
+                "reranker.useRerank", [True, False]
+            ),
+            "topK": trial.suggest_categorical("reranker.topK", 4, 8),
+            "rerankerMaxLength": trial.suggest_int(
+                "reranker.rerankerMaxLength", [4096, 8192]
+            ),
+            "rerankerModel": "BAAI/bge-reranker-v2-m3",
+        },
+        "model": {
+            "temperature": trial.suggest_float("model.temperature", 0.0, 1.0),
+            "topK": trial.suggest_int("model.topK", 1, 100),
+            "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+            "modelName": OLLAMA_BASE_MODEL,
+        },
+        "multiQuery": {
+            "useMultiquery": trial.suggest_categorical(
+                "multiQuery.useMultiquery", [True, False]
+            ),
+            "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
+            "queryModelName": None,
+        },
+        "sourceIds": source_ids,
+    }
+
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -63,7 +63,7 @@ class AsyncOllamaClient:
 
         async with httpx.AsyncClient(timeout=600) as client:
             try:
-                logger.info(f"sending payload {payload}")
+                logger.debug(f"sending payload {payload}")
                 response = await client.post(url, json=payload)
                 response.raise_for_status()
 

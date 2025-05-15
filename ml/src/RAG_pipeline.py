@@ -65,6 +65,8 @@ class RAGPipeline:
                 reverse=True,
             )
         ]
+        if not chunks:
+            return ["Контент не найден"]
         if request.scenario.reranker.useRerank:
             if (
                 request.scenario.reranker.rerankerModel
