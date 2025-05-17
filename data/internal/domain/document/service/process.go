@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/larek-tech/diploma/data/internal/domain/document"
+	"github.com/larek-tech/diploma/data/internal/domain/file"
 	"github.com/larek-tech/diploma/data/internal/domain/site"
 	"github.com/samber/lo"
 )
@@ -60,6 +61,9 @@ func setDocData(doc *document.Document, source any) {
 	case *site.Page:
 		doc.ObjectID = v.ID
 		doc.ObjectType = document.TypePage
+	case *file.File:
+		doc.ObjectID = v.ID
+		doc.ObjectType = document.TypeFile
 	default:
 		doc.ObjectID = ""
 		doc.ObjectType = document.TypeFile

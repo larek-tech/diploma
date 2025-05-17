@@ -4,12 +4,13 @@ import (
 	"time"
 
 	"github.com/larek-tech/diploma/data/internal/domain/document"
+	"github.com/larek-tech/diploma/data/internal/domain/file"
 	"github.com/larek-tech/diploma/data/internal/domain/object_store"
 	"github.com/larek-tech/diploma/data/internal/domain/site"
 )
 
 type Entity interface {
-	site.Site | site.Page | document.Document | object_store.ObjectStore | object_store.Object
+	site.Site | site.Page | document.Document | object_store.ObjectStore | object_store.Object | file.File
 }
 
 type DelayedJob[T Entity] struct {
@@ -21,6 +22,9 @@ type DelayedJob[T Entity] struct {
 type SiteJob = DelayedJob[site.Site]
 type PageJob = DelayedJob[site.Page]
 type PageResultJob = DelayedJob[site.Page]
+
+type FileJob = DelayedJob[file.File]
+type FileResultJob = DelayedJob[file.File]
 
 type ParseS3Job = DelayedJob[object_store.ObjectStore]
 type ObjectJob = DelayedJob[object_store.Object]

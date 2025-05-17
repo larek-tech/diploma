@@ -3,6 +3,7 @@ package document
 import (
 	"errors"
 	"time"
+	"unicode/utf8"
 )
 
 var (
@@ -49,4 +50,23 @@ type Questions struct {
 type SearchResult struct {
 	Chunk
 	CosineSimilarity float32 `db:"cosine_similarity"` // оценка релевантности чанка к запросу
+}
+
+func CleanUTF8(input string) string {
+	if utf8.ValidString(input) {
+		return input
+	}
+
+	valid := make([]rune, 0, len(input))
+	for i, r := range input {
+		if r == utf8.RuneError {
+			_, size := utf8.DecodeRuneInString(input[i:])
+			if size == 1 {
+				valid = append(valid, '�')
+				continue
+			}
+		}
+		valid = append(valid, r)
+	}
+	return string(valid)
 }

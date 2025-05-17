@@ -1,4 +1,4 @@
-package service
+package html
 
 import (
 	"os"
@@ -31,7 +31,8 @@ func saveResult(content string) {
 func TestParsing(t *testing.T) {
 	content := loadFile()
 	reader := strings.NewReader(content)
-	processed, err := ParseHTML(reader)
+	s := New()
+	processed, err := s.Parse(reader)
 	assert.Greater(t, len(content), len(processed))
 	assert.Greater(t, len(processed), 0)
 	assert.NoError(t, err)

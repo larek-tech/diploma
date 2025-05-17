@@ -3,7 +3,7 @@ FROM golang:1.24-alpine AS builder
 
 RUN apk update && \
     apk upgrade --update-cache --available && \
-    apk add --no-cache make git curl gcc musl-dev openssl librdkafka-dev
+    apk add --no-cache make git curl gcc musl-dev openssl
 
 ARG MODULE_NAME=github.com/larek-tech/diploma/data
 
@@ -16,7 +16,7 @@ COPY . .
 
 ENV CGO_ENABLED=1
 
-RUN go build -tags musl -o ./bin/main ./cmd/crawler/main.go
+RUN go build -o ./bin/main ./cmd/crawler/main.go
 
 # Runner
 FROM alpine:latest AS runner

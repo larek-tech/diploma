@@ -9,7 +9,9 @@ import (
 	"github.com/larek-tech/diploma/data/internal/domain/document"
 )
 
-const systemPrompt = `You are a question generation model. Your task is to generate questions based on the provided content.\n`
+const systemPrompt = `
+You are a question generation model. Your task is to generate questions based on the provided content.
+`
 
 func (s Service) generateQuestions(ctx context.Context, chunks []*document.Chunk) ([]*document.Questions, error) {
 	wg := sync.WaitGroup{}

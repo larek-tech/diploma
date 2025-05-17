@@ -9,6 +9,9 @@ const (
 	ParsePageQueue       Queue = "web_parse_page"
 	ParsePageResultQueue Queue = "web_parse_page_result" // replacement for WebResult
 
+	ParseFileQueue  Queue = "file_parse"
+	ParseFileResult Queue = "file_parse_result"
+
 	ParseS3Queue       Queue = "web_parse_s3"        // job for parsing s3 bucket
 	ParseS3ResultQueue Queue = "web_parse_s3_result" // job for parsing s3 bucket result
 

@@ -1,9 +1,9 @@
-# Builder
-FROM golang:1.24-alpine AS builder
+# FIXME: use this docker image as base https://github.com/otiai10/gosseract/blob/main/Dockerfile
+FROM golang:1.24 AS builder
 
-RUN apk update && \
-    apk upgrade --update-cache --available && \
-    apk add --no-cache make git curl gcc musl-dev openssl librdkafka-dev
+RUN apt-get update && \
+    apt-get install -y make git curl gcc g++ libtesseract-dev libleptonica-dev tesseract-ocr pkg-config \
+    tesseract-ocr-eng tesseract-ocr-deu tesseract-ocr-rus
 
 ARG MODULE_NAME=github.com/larek-tech/diploma/data
 
@@ -15,14 +15,20 @@ RUN go mod download
 COPY . .
 
 ENV CGO_ENABLED=1
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
 
-RUN go build -tags musl -o ./bin/main ./cmd/parser/main.go
+RUN go build -o ./bin/main ./cmd/parser/main.go
 
-# Runner
-FROM alpine:latest AS runner
+FROM debian:stable-slim AS runner
 ARG MODULE_NAME=github.com/larek-tech/diploma/data
 
 WORKDIR /root/
+RUN apt-get update && \
+    apt-get install -y tesseract-ocr libtesseract-dev libleptonica-dev \
+    tesseract-ocr-eng tesseract-ocr-deu tesseract-ocr-jpn && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
 
 COPY --from=builder /home/${MODULE_NAME}/bin/main .
 

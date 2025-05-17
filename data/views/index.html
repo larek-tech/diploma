@@ -1,0 +1,78 @@
+<!-- Sample HTML page to send a file in JSON body via HTTP POST -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Send File in JSON</title>
+</head>
+
+<body>
+    <h2>Send File as JSON</h2>
+    <input type="file" id="fileInput" />
+    <button onclick="sendFile()">Send</button>
+    <pre id="result"></pre>
+    <script>
+        function uint8ToBase64(u8Arr) {
+            let CHUNK_SIZE = 0x8000; // 32KB
+            let index = 0;
+            let length = u8Arr.length;
+            let result = '';
+            let slice;
+            while (index < length) {
+                slice = u8Arr.subarray(index, Math.min(index + CHUNK_SIZE, length));
+                result += String.fromCharCode.apply(null, slice);
+                index += CHUNK_SIZE;
+            }
+            return btoa(result);
+        }
+
+        function getFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (ext === 'zip') return 3; // ArchivedFiles
+            if (['pdf', 'png', 'jpeg', 'jpg', 'txt', 'md', 'markdown'].includes(ext)) return 2; // SingleFile
+            return 0; // Undefined
+        }
+
+        async function sendFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file.');
+                return;
+            }
+
+            // Read file as ArrayBuffer, then convert to Base64
+            const arrayBuffer = await file.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
+            const base64String = uint8ToBase64(uint8Array);
+
+            // Determine type from extension
+            const type = getFileType(file.name);
+
+            // Prepare JSON body (adjust fields as needed)
+            const data = {
+                title: file.name,
+                content: base64String,
+                type: type,
+                credentials: "",
+                update_params: {
+                    every_period: 0,
+                    on_time: new Date().toISOString()
+                }
+            };
+
+            // Send JSON via POST
+            const response = await fetch('http://localhost:8080/test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.text();
+            document.getElementById('result').textContent = result;
+        }
+    </script>
+</body>
+
+</html>

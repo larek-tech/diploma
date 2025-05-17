@@ -23,7 +23,7 @@ func (s Service) embed(ctx context.Context, doc *document.Document) ([]*document
 	if err != nil {
 		return nil, fmt.Errorf("failed to validate document: %w", err)
 	}
-	content := cleanUTF8(doc.Content)
+	content := document.CleanUTF8(doc.Content)
 	rawChunks := characterTextSplitter(content, ChunkSize, ChunkOverlap)
 	if len(rawChunks) == 0 {
 		return nil, nil

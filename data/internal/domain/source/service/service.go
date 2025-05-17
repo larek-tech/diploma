@@ -4,37 +4,37 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"net/url"
 
 	"github.com/google/uuid"
+	"github.com/larek-tech/diploma/data/internal/domain/file"
 	"github.com/larek-tech/diploma/data/internal/domain/site"
-	"github.com/larek-tech/diploma/data/internal/domain/sitemap"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
-	"github.com/samber/lo"
 )
 
 type Service struct {
 	sitemapParser sitemapParser
 	sourceStorage sourceStorage
+	fileStorage   fileStorage
 	pub           publisher
 	trManager     transactionalManager
 }
 
-func New(sourceStorage sourceStorage, sitemapParser sitemapParser, pub publisher, trManager transactionalManager) *Service {
+func New(sourceStorage sourceStorage, fileStorage fileStorage, sitemapParser sitemapParser, pub publisher, trManager transactionalManager) *Service {
 	return &Service{
 		sitemapParser: sitemapParser,
 		sourceStorage: sourceStorage,
+		fileStorage:   fileStorage,
 		pub:           pub,
 		trManager:     trManager,
 	}
 }
 
-func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (*source.Source, error) {
+func (s Service) CreateSource(ctx context.Context, msg source.DataMessage) (*source.Source, error) {
 	src := &source.Source{
 		ID:    uuid.NewString(),
-		Title: message.Title,
-		Type:  message.Type,
+		Title: msg.Title,
+		Type:  msg.Type,
 	}
 	err := s.trManager.Do(ctx, func(ctx context.Context) error {
 		err := s.sourceStorage.Save(ctx, src)
@@ -44,7 +44,7 @@ func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (
 		switch src.Type {
 		case source.Web:
 			var webSource *site.Site
-			webSource, err = s.createSite(src, message)
+			webSource, err = s.createSite(src, msg)
 			if err != nil {
 				return fmt.Errorf("failed to create site: %w", err)
 			}
@@ -57,7 +57,7 @@ func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (
 				Delay:   0,
 				Metadata: map[string]any{
 					"siteJobID":   uuid.NewString(),
-					"externalKey": string(message.ExternalKey),
+					"externalKey": string(msg.ExternalKey),
 				},
 			}}, publishOptions...)
 			if err != nil {
@@ -65,6 +65,58 @@ func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (
 			}
 		case source.S3WithCredentials:
 			slog.Info("creating s3 source", "source", src)
+		case source.SingleFile:
+			var file *file.File
+			file, err := s.createFile(src, msg)
+			if err != nil {
+				return fmt.Errorf("failed to create file: %w", err)
+			}
+			err = s.fileStorage.Save(ctx, file)
+			if err != nil {
+				return fmt.Errorf("failed to save file: %w", err)
+			}
+			publishOptions := []qaas.PublishOption{
+				qaas.WithQueue(qaas.ParseFileQueue),
+				qaas.WithSourceQueue(qaas.ParseFileQueue),
+			}
+			_, err = s.pub.Publish(ctx, []any{qaas.FileJob{
+				Payload: file,
+				Delay:   0,
+				Metadata: map[string]any{
+					"externalKey": string(msg.ExternalKey),
+				},
+			}}, publishOptions...)
+			if err != nil {
+				return fmt.Errorf("failed to publish file job: %w", err)
+			}
+		case source.ArchivedFiles:
+			files, err := s.createArchive(src, msg)
+			if err != nil {
+				return fmt.Errorf("failed to create archive: %w", err)
+			}
+			var jobs []any
+			for _, f := range files {
+				err = s.fileStorage.Save(ctx, f)
+				if err != nil {
+					return fmt.Errorf("failed to save file: %w", err)
+				}
+				jobs = append(jobs, qaas.FileJob{
+					Payload: f,
+					Delay:   0,
+					Metadata: map[string]any{
+						"externalKey": string(msg.ExternalKey),
+					},
+				})
+
+			}
+			publishOptions := []qaas.PublishOption{
+				qaas.WithQueue(qaas.ParseFileQueue),
+				qaas.WithSourceQueue(qaas.ParseFileQueue),
+			}
+			_, err = s.pub.Publish(ctx, jobs, publishOptions...)
+			if err != nil {
+				return fmt.Errorf("failed to publish file job: %w", err)
+			}
 		default:
 			return fmt.Errorf("unsupported source type: %v", src.Type)
 		}
@@ -76,27 +128,4 @@ func (s Service) CreateSource(ctx context.Context, message source.DataMessage) (
 	}
 
 	return src, nil
-}
-
-func (s Service) createSite(src *source.Source, message source.DataMessage) (*site.Site, error) {
-	rawUrl := string(message.Content)
-	if rawUrl == "" {
-		return nil, fmt.Errorf("url is empty")
-	}
-
-	siteURL, err := url.Parse(string(message.Content))
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse url for web source: %w", err)
-	}
-	site, err := site.NewSite(src.ID, siteURL.String())
-	if err != nil {
-		return nil, fmt.Errorf("failed to create site: %w", err)
-	}
-	availableURLs, err := s.sitemapParser.GetAndParseSitemap(*siteURL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse sitemap: %w", err)
-	}
-	site.AvailablePages = lo.Map(availableURLs, func(v sitemap.URLResult, _ int) string { return v.URL })
-
-	return site, nil
 }

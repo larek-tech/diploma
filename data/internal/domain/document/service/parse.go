@@ -19,29 +19,18 @@ var ErrFileTypeNotSupported = errors.New("file extension not supported")
 
 // parse parses the document based on its file extension and returns a Document object.
 func (s Service) parse(_ context.Context, obj io.ReadSeeker, fileExt document.FileExtension) (*document.Document, error) {
-	var (
-		parsedContent string
-		err           error
-	)
-	switch fileExt {
-	case document.TXT:
-		parsedContent, err = ParseTXT(obj)
-	case document.HTML:
-		parsedContent, err = ParseHTML(obj)
-	case document.MD:
-		parsedContent, err = ParseMarkdown(obj)
-	case document.PDF:
-		parsedContent, err = ParsePDF(obj)
-	default:
+	parser, found := s.parsers[fileExt]
+	if !found {
 		return nil, fmt.Errorf("failed to parse file unsupported filetype %v: %w", fileExt, ErrFileTypeNotSupported)
 	}
+	content, err := parser.Parse(obj)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse file %w", err)
 	}
 
 	return &document.Document{
 		ID:        uuid.NewString(),
-		Content:   parsedContent,
+		Content:   content,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}, nil

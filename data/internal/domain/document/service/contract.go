@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"io"
 
 	"github.com/larek-tech/diploma/data/internal/domain/document"
 )
@@ -25,5 +26,11 @@ type (
 	}
 	trManager interface {
 		Do(context.Context, func(ctx context.Context) error) error
+	}
+	parser interface {
+		Parse(io.ReadSeeker) (string, error)
+	}
+	ocr interface {
+		Process(string) (string, error)
 	}
 )

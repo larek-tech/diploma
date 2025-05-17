@@ -5,13 +5,15 @@ go 1.24.2
 require (
 	github.com/IBM/sarama v1.45.1
 	github.com/PuerkitoBio/goquery v1.10.3
-	github.com/confluentinc/confluent-kafka-go/v2 v2.10.0
+	github.com/gen2brain/go-fitz v1.24.14
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/larek-tech/storage/postgres v0.0.0-20250415095913-fc60c523b115
 	github.com/minio/minio-go/v7 v7.0.91
 	github.com/ollama/ollama v0.6.7
+	github.com/otiai10/gosseract v2.2.1+incompatible
+	github.com/otiai10/gosseract/v2 v2.4.1
 	github.com/pressly/goose/v3 v3.24.2
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/samber/lo v1.50.0
@@ -32,6 +34,7 @@ require (
 	github.com/eapache/go-resiliency v1.7.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
+	github.com/ebitengine/purego v0.8.0 // indirect
 	github.com/georgysavva/scany/v2 v2.1.4 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
@@ -53,6 +56,7 @@ require (
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/jmoiron/sqlx v1.4.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/jupiterrider/ffi v0.2.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
