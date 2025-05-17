@@ -1,7 +1,6 @@
 package html
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"strings"

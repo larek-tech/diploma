@@ -34,6 +34,7 @@ RUN go mod download
 COPY . .
 
 ENV CGO_ENABLED=1
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
 
 
 RUN  export CGO_LDFLAGS="-lmupdf -lm -lmupdf-third -lfreetype -ljbig2dec -lharfbuzz -ljpeg -lopenjp2 -lz" \
