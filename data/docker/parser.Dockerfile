@@ -46,7 +46,7 @@ WORKDIR /root/
 RUN apt-get update -qq 
 
 RUN apt-get install -y -qq \
-    libtesseract-dev libleptonica-dev \
+    libtesseract-dev libleptonica-dev tesseract-ocr tesseract-ocr-eng tesseract-ocr-rus \
     libmupdf-dev mupdf mupdf-tools \
     libfreetype6-dev \
     libharfbuzz-dev
