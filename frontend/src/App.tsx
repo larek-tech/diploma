@@ -9,6 +9,7 @@ import { Toaster } from './components/ui/toaster';
 import { Pages } from './router/constants';
 import { useEffect } from 'react';
 import CreateDomain from './pages/CreateDomain';
+import HomeBanner from './components/HomeBanner';
 
 function App() {
     useEffect(() => {
@@ -54,7 +55,7 @@ function App() {
                         element={
                             <RequireAuth>
                                 <Dashboard>
-                                    <Chat />
+                                    <HomeBanner />
                                 </Dashboard>
                             </RequireAuth>
                         }
