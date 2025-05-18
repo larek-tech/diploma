@@ -1,12 +1,12 @@
 import axiosInstance from './axiosInstance';
 import {
-    CreateDomainRequest,
-    Scenario,
-    CreateSourceRequest,
-    Domain,
-    DomainsResponse,
-    Source,
-    SourcesResponse,
+  CreateDomainRequest,
+  CreateSourceRequest,
+  Domain,
+  DomainsResponse,
+  Scenario,
+  Source,
+  SourcesResponse,
 } from './models';
 
 export class DomainApiService {
@@ -25,15 +25,27 @@ export class DomainApiService {
         return response.data;
     }
 
+    static async getDomains(offset: number = 0, limit: number = 10): Promise<DomainsResponse> {
+        const response = await axiosInstance.get<DomainsResponse>('/api/v1/domain/list', {
+            params: { offset, limit },
+        });
+        return response.data;
+    }
+
+    static async getDomainById(domainId: number): Promise<Domain> {
+        const response = await axiosInstance.get<Domain>(`/api/v1/domain/${domainId}`);
+
+        return response.data;
+    }
+
     static async createScenario(data: Scenario): Promise<unknown> {
         const response = await axiosInstance.post<unknown>('/api/v1/scenario', data);
         return response.data;
     }
 
-    static async getDomains(offset: number = 0, limit: number = 10): Promise<DomainsResponse> {
-        const response = await axiosInstance.get<DomainsResponse>('/api/v1/domain/list', {
-            params: { offset, limit },
-        });
+    static async getScenarioById(scenarioId: number): Promise<Scenario> {
+        const response = await axiosInstance.get<Scenario>(`/api/v1/scenario/${scenarioId}`);
+
         return response.data;
     }
 }

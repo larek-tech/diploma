@@ -11,8 +11,7 @@ import {
 import {Sheet, SheetContent, SheetTrigger} from '@/components/ui/sheet';
 import {useStores} from '@/hooks/useStores';
 import {Pages} from '@/router/constants';
-// filepath: /Users/e.shmat/Documents/GitHub/diploma/frontend/src/components/Dashboard.tsx
-import {CircleUser, Menu, Package2, SquarePen} from 'lucide-react';
+import {CircleUser, Menu, Package2} from 'lucide-react';
 import {useEffect} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import DomainsHistory from './DomainsHistory';
@@ -131,19 +130,8 @@ export function Dashboard({ children }: DashboardProps) {
 }
 
 const Navigation = () => {
-    const location = useLocation();
-
     return (
         <>
-            <Link
-                to={location.pathname === `/${Pages.Chat}` ? '/chat-new' : `/${Pages.Chat}`}
-                className='flex items-center gap-2'
-            >
-                <LoaderButton className='flex w-full items-center gap-3 rounded-lg px-3 py-2 my-2 text-muted-foreground transition-all hover:text-secondary hover:bg-slate-200 bg-slate-200'>
-                    <SquarePen className='h-4 w-4' />
-                    Новый чат
-                </LoaderButton>
-            </Link>
             <Link to={`/${Pages.CreateDomain}`} className='flex items-center gap-2'>
                 <LoaderButton className='flex w-full items-center gap-3 rounded-lg px-3 py-2 my-2 text-muted-foreground transition-all hover:text-secondary hover:bg-slate-200 bg-slate-200'>
                     Создание домена
