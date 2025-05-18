@@ -23,6 +23,7 @@ import (
 	questionStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/question"
 	siteStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/site"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/storage/sitejob"
+	"github.com/larek-tech/diploma/data/pkg/metric"
 	"github.com/otiai10/gosseract"
 
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
@@ -126,6 +127,12 @@ func run() int {
 
 	slog.Info("Starting consumer")
 	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		metric.RunPrometheusServer("9090")
+	}()
+
 	wg.Add(1)
 	// site parser
 	go func() {

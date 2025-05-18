@@ -29,6 +29,7 @@ import (
 	pageStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/page"
 	sourceStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/source"
 	"github.com/larek-tech/diploma/data/internal/worker/kafka/create_source"
+	"github.com/larek-tech/diploma/data/pkg/metric"
 	"github.com/larek-tech/storage/postgres"
 	"google.golang.org/grpc/reflection"
 )
@@ -219,6 +220,12 @@ func run() int {
 		),
 	)
 	reflection.Register(srv.GetSrv())
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		metric.RunPrometheusServer("9090")
+	}()
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()

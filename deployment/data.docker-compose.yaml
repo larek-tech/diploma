@@ -39,6 +39,7 @@ services:
     env_file:
         - configs/data.crawler.env
     ports:
+      - "9091:9090"
       - "9998:8080"
       - "50051:50051"
   parser:
@@ -53,6 +54,7 @@ services:
         - configs/data.parser.env
     ports:
       - "9999:8081"
+      - "9095:9090"
 
 
 
