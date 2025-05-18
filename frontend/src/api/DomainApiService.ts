@@ -38,8 +38,21 @@ export class DomainApiService {
         return response.data;
     }
 
-    static async createScenario(data: Scenario): Promise<unknown> {
-        const response = await axiosInstance.post<unknown>('/api/v1/scenario', data);
+    static async createScenario(data: Scenario): Promise<Scenario> {
+        const response = await axiosInstance.post<Scenario>('/api/v1/scenario', data);
+        return response.data;
+    }
+
+    static async getScenarios(
+        offset: number = 0,
+        limit: number = 1000
+    ): Promise<{ scenarios: Scenario[] }> {
+        const response = await axiosInstance.get<{ scenarios: Scenario[] }>(
+            '/api/v1/scenario/list',
+            {
+                params: { offset, limit },
+            }
+        );
         return response.data;
     }
 

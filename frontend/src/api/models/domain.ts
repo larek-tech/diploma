@@ -94,6 +94,7 @@ export interface ScenarioVectorSearchConfig {
 }
 
 export interface Scenario {
+    id: number;
     domainId: number;
     model: ScenarioModelConfig;
     multiQuery: ScenarioMultiQueryConfig;
