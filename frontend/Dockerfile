@@ -6,7 +6,7 @@ COPY . /app
 
 RUN npm install -g pnpm --global-dir=/usr/local/lib/pnpm
 
-RUN pnpm install
+RUN pnpm install --force
 
 RUN pnpm run build
 

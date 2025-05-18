@@ -1,0 +1,15 @@
+services:
+
+  frontend:
+    build:
+        context: ../frontend
+        dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    environment:
+      - VITE_API_URL=https://api.larek.tech
+      - VITE_WS_URL=wss://api.larek.tech/api/v1/chat/ws
+    env_file:
+      - ../frontend/.env
+    ports:
+        - "3000:3000"
