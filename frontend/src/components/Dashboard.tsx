@@ -66,7 +66,7 @@ export function Dashboard({ children }: DashboardProps) {
                 </div>
 
                 <div className='flex flex-col h-full overflow-hidden'>
-                    <header className='flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 shrink-0'>
+                    <header className='flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 shrink-0 justify-end'>
                         <Sheet>
                             <SheetTrigger asChild>
                                 <Button
