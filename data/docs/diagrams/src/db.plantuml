@@ -1,0 +1,168 @@
+@startuml Database Schema
+
+!theme plain
+hide circle
+hide stereotype
+
+skinparam backgroundColor white
+skinparam linetype ortho
+skinparam ArrowColor #2C3E50
+skinparam ArrowThickness 1.5
+skinparam classFontSize 14
+skinparam classFontName Times New Roman
+skinparam padding 5
+skinparam roundCorner 10
+skinparam classAttributeFontSize 12
+skinparam nodesep 100
+skinparam ranksep 180
+skinparam defaultTextAlignment center
+skinparam messageAlignment center
+
+' Color scheme
+skinparam class {
+  BackgroundColor #EBF5FB
+  BorderColor #2980B9
+  ArrowColor #2C3E50
+  HeaderBackgroundColor #3498DB
+  HeaderFontColor white
+}
+
+' Source Management at the top (outside packages)
+package "User Sources" #F0F8FF {
+    class sources {
+    **id: uuid [PK]**
+    --
+    title: text
+    type: smallint
+    credentials: bytea
+    }
+}
+
+
+' Document Processing package - horizontal layout
+package "Document Processing" #F0F8FF {
+  ' Document Processing entities side by side
+  together {
+    ' Document Processing start
+    class documents {
+      **id: uuid [PK]**
+      --
+      source_id: uuid [FK]
+      object_id: uuid
+      object_type: text
+      name: text
+      raw_object_id: text
+      content: text
+      metadata: jsonb
+      created_at: timestamp
+      updated_at: timestamp
+    }
+
+    ' Chunks
+    class chunks {
+      **id: uuid [PK]**
+      --
+      index: integer
+      document_id: uuid [FK]
+      source_id: uuid [FK]
+      content: text
+      metadata: jsonb
+      embeddings: vector(1024)
+    }
+
+    ' Chunk Questions
+    class chunk_questions {
+      **id: uuid [PK]**
+      --
+      chunk_id: uuid [FK]
+      question: text
+      embeddings: vector(1024)
+    }
+  }
+}
+
+' Web Crawling package - horizontal layout
+package "Web Crawling" #F0F8FF {
+  ' Web Crawling entities side by side
+  together {
+    ' Web sites
+    class sites {
+      **id: uuid [PK]**
+      --
+      source_id: uuid [FK]
+      url: text
+      available_pages: text[]
+      created_at: timestamp
+      updated_at: timestamp
+    }
+
+    ' Pages
+    class pages {
+      **id: uuid [PK]**
+      --
+      site_id: uuid [FK]
+      url: text
+      metadata: jsonb
+      raw_object_id: text
+      content: text
+      outgoing: text[]
+      created_at: timestamp
+      updated_at: timestamp
+    }
+  }
+}
+
+' File processing package
+package "File Processing" #F0F8FF {
+  ' Files
+  class files {
+    **id: uuid [PK]**
+    --
+    source_id: uuid [FK]
+    filename: text
+    extension: text
+    object_key: text
+    created_at: timestamp
+    updated_at: timestamp
+  }
+}
+package "Migrations" {
+    class goose_db_version {
+  **id: integer [PK]**
+  --
+  version_id: bigint
+  is_applied: boolean
+  tstamp: timestamp
+}
+}
+
+
+' Define layout using invisible connections
+sources -[hidden]down-> documents
+sources -[hidden]down-> sites
+sources -[hidden]down-> files
+
+' Horizontal layout for Document Processing entities
+documents -[hidden]left-> chunks
+chunks -[hidden]left-> chunk_questions
+
+' Horizontal layout for Web Crawling entities
+sites -[hidden]right-> pages
+
+
+
+' Define relationships with adjusted routing
+sources "1" <--[#2980B9]-- "n" documents : "source_id"
+sources "1" <--[#2980B9]-- "n" sites : "source_id"
+sources "1" <--[#2980B9]-- "n" files : "source_id"
+sources "1" <--[#2980B9]-- "n" chunks : "source_id" 
+
+documents "1" <--[#2980B9]-- "n" chunks : "document_id"
+chunks "1" <--[#2980B9]-- "n" chunk_questions : "chunk_id"
+sites "1" <--[#2980B9]-- "n" pages : "site_id"
+
+' Special complex relationships (polymorphic)
+documents "1" --[#2980B9]-> "0..1" pages : "object_id = id\n(when object_type = 'page')"
+documents "1" --[#2980B9]-> "0..1" files : "object_id = id\n(when object_type = 'file')"
+
+@enduml
