@@ -1,7 +1,7 @@
-import { useStores } from '@/hooks/useStores';
-import { observer } from 'mobx-react-lite';
-import { Skeleton } from './ui/skeleton';
+import {useStores} from '@/hooks/useStores';
+import {observer} from 'mobx-react-lite';
 import SessionHistoryItem from './SessionHistoryItem';
+import {Skeleton} from './ui/skeleton';
 
 const SessionsHistory = observer(() => {
     const { rootStore } = useStores();

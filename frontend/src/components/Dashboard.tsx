@@ -1,23 +1,23 @@
-import { CircleUser, Menu, Package2, SquarePen } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import {useAuth} from '@/auth';
+import {Button} from '@/components/ui/button';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/auth';
-import SessionsHistory from './SessionsHistory';
+import {Sheet, SheetContent, SheetTrigger} from '@/components/ui/sheet';
+import {useStores} from '@/hooks/useStores';
+import {Pages} from '@/router/constants';
+import {CircleUser, Menu, Package2} from 'lucide-react';
+import {useEffect} from 'react';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import DomainsHistory from './DomainsHistory';
-import { LoaderButton } from './ui/loader-button';
-import { useEffect } from 'react';
-import { useStores } from '@/hooks/useStores';
-import { toast } from './ui/use-toast';
-import { Pages } from '@/router/constants';
+import SessionsHistory from './SessionsHistory';
+import {LoaderButton} from './ui/loader-button';
+import {toast} from './ui/use-toast';
 
 type DashboardProps = {
     children: React.ReactNode;
@@ -43,7 +43,7 @@ export function Dashboard({ children }: DashboardProps) {
 
     return (
         <>
-            <div className='dashboard grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'>
+            <div className='dashboard grid h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr] overflow-hidden'>
                 <div className='hidden border-r bg-muted/40 md:block'>
                     <div className='flex h-full max-h-screen flex-col gap-2'>
                         <div className='flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6'>
@@ -52,7 +52,7 @@ export function Dashboard({ children }: DashboardProps) {
                                 <span className=''>misis.tech</span>
                             </Link>
                         </div>
-                        <div className='flex-1 overflow-y-scroll'>
+                        <div className='flex-1 overflow-y-auto'>
                             <nav className='grid items-start px-2 text-sm font-medium lg:px-4'>
                                 <Navigation />
                             </nav>
@@ -65,8 +65,8 @@ export function Dashboard({ children }: DashboardProps) {
                     </div>
                 </div>
 
-                <div className='flex flex-col'>
-                    <header className='flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6'>
+                <div className='flex flex-col h-full overflow-hidden'>
+                    <header className='flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 shrink-0 justify-end'>
                         <Sheet>
                             <SheetTrigger asChild>
                                 <Button
@@ -78,7 +78,7 @@ export function Dashboard({ children }: DashboardProps) {
                                     <span className='sr-only'>Открыть меню</span>
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side='left' className='flex flex-col overflow-y-scroll'>
+                            <SheetContent side='left' className='flex flex-col overflow-y-auto'>
                                 <nav className='grid gap-2 text-lg font-medium'>
                                     <Link
                                         to='/'
@@ -120,7 +120,7 @@ export function Dashboard({ children }: DashboardProps) {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </header>
-                    <main className='flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6'>
+                    <main className='flex flex-col gap-4 p-4 lg:gap-6 lg:p-6 overflow-y-auto flex-1'>
                         {children}
                     </main>
                 </div>
@@ -130,19 +130,8 @@ export function Dashboard({ children }: DashboardProps) {
 }
 
 const Navigation = () => {
-    const location = useLocation();
-
     return (
         <>
-            <Link
-                to={location.pathname === `/${Pages.Chat}` ? '/chat-new' : `/${Pages.Chat}`}
-                className='flex items-center gap-2'
-            >
-                <LoaderButton className='flex w-full items-center gap-3 rounded-lg px-3 py-2 my-2 text-muted-foreground transition-all hover:text-secondary hover:bg-slate-200 bg-slate-200'>
-                    <SquarePen className='h-4 w-4' />
-                    Новый чат
-                </LoaderButton>
-            </Link>
             <Link to={`/${Pages.CreateDomain}`} className='flex items-center gap-2'>
                 <LoaderButton className='flex w-full items-center gap-3 rounded-lg px-3 py-2 my-2 text-muted-foreground transition-all hover:text-secondary hover:bg-slate-200 bg-slate-200'>
                     Создание домена

@@ -1,27 +1,20 @@
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/components/ui/use-toast';
-import { useStores } from '@/hooks/useStores';
-import {
-    ArrowUpIcon,
-    FilePenIcon,
-    Loader2,
-    StopCircleIcon,
-    MicIcon,
-    Database,
-    BookOpen,
-} from 'lucide-react';
-import { observer } from 'mobx-react-lite';
-import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
-import debounce from 'lodash/debounce';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Pages } from '@/router/constants';
+import {WSMessageType} from '@/api/models';
 import Conversation from '@/components/Conversation';
 import EmptyChat from '@/components/EmptyChat';
-import { WSMessageType } from '@/api/models';
+import {Button} from '@/components/ui/button';
+import {Skeleton} from '@/components/ui/skeleton';
+import {Textarea} from '@/components/ui/textarea';
+import {useToast} from '@/components/ui/use-toast';
+import {useStores} from '@/hooks/useStores';
+import {Pages} from '@/router/constants';
+import debounce from 'lodash/debounce';
+import {ArrowUpIcon, BookOpen, Database, FilePenIcon, Loader2, MicIcon, Settings, StopCircleIcon} from 'lucide-react';
+import {observer} from 'mobx-react-lite';
+import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import ScenarioSettingsModal from './ScenarioSettingsModal';
 
-const Chat = observer(() => {
+const ChatWrapper = observer(() => {
     const { rootStore } = useStores();
     const { toast } = useToast();
     const { sessionId } = useParams();
@@ -29,6 +22,7 @@ const Chat = observer(() => {
     const [message, setMessage] = useState('');
     const [titleValue, setTitleValue] = useState('');
     const [recognizing, setRecognizing] = useState(false);
+    const [isScenarioSettingsOpen, setIsScenarioSettingsOpen] = useState(false);
 
     const titleInputRef = useRef<HTMLInputElement>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,13 +67,6 @@ const Chat = observer(() => {
         }
     }, [rootStore.chatError, toast]);
 
-    // Загружаем домены если они еще не загружены
-    useEffect(() => {
-        if (rootStore.domains.length === 0 && !rootStore.domainsLoading) {
-            rootStore.getDomains();
-        }
-    }, [rootStore]);
-
     const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
@@ -92,6 +79,8 @@ const Chat = observer(() => {
             rootStore.sendMessage({
                 type: WSMessageType.Query,
                 content: message.trim(),
+                domainID: rootStore.selectedDomainId ?? undefined,
+                scenarioID: rootStore.selectedScenarioId ?? undefined,
             });
             setMessage('');
         } else if (!rootStore.selectedDomainId) {
@@ -237,7 +226,6 @@ const Chat = observer(() => {
 
                         {rootStore.selectedDomainId && rootStore.hasScenarios() && (
                             <div className='flex items-center gap-1'>
-                                <BookOpen className='h-4 w-4 text-primary' />
                                 <span
                                     className={
                                         rootStore.selectedScenarioId
@@ -245,9 +233,28 @@ const Chat = observer(() => {
                                             : 'text-gray-500'
                                     }
                                 >
-                                    {rootStore.selectedScenarioId
-                                        ? `Сценарий #${rootStore.selectedScenarioId}`
-                                        : 'Выберите сценарий'}
+                                    <div className='flex items-center gap-1'>
+                                        <BookOpen className='h-4 w-4 text-primary' />
+                                        <span
+                                            className={
+                                                rootStore.selectedScenarioId
+                                                    ? 'text-primary-600 font-medium'
+                                                    : 'text-gray-500'
+                                            }
+                                        >
+                                            {rootStore.selectedScenarioId
+                                                ? `Сценарий #${rootStore.getSelectedScenarioId()}`
+                                                : 'Выберите сценарий'}
+                                        </span>
+                                        <Button
+                                            variant='ghost'
+                                            size='icon'
+                                            className='rounded-full hover:bg-gray-100 dark:hover:bg-[#1e293b] transition-colors p-1'
+                                            onClick={() => setIsScenarioSettingsOpen(true)}
+                                        >
+                                            <Settings className='w-4 h-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300' />
+                                        </Button>
+                                    </div>
                                 </span>
                             </div>
                         )}
@@ -363,8 +370,13 @@ const Chat = observer(() => {
                     </div>
                 </div>
             </div>
+
+            <ScenarioSettingsModal
+                open={isScenarioSettingsOpen}
+                onOpenChange={setIsScenarioSettingsOpen}
+            />
         </>
     );
 });
 
-export default Chat;
+export default ChatWrapper;

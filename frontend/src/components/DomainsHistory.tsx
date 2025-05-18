@@ -1,10 +1,12 @@
-import { useEffect } from 'react';
-import { observer } from 'mobx-react-lite';
-import { useStores } from '@/hooks/useStores';
-import { Skeleton } from './ui/skeleton';
+import {useStores} from '@/hooks/useStores';
+import {Pages} from '@/router/constants';
+import {Database} from 'lucide-react';
+import {observer} from 'mobx-react-lite';
+import {useEffect} from 'react';
+import {Link} from 'react-router-dom';
 import DomainHistoryItem from './DomainHistoryItem';
-import { Button } from './ui/button';
-import { Database } from 'lucide-react';
+import {Button} from './ui/button';
+import {Skeleton} from './ui/skeleton';
 
 const DomainsHistory = observer(() => {
     const { rootStore } = useStores();
@@ -47,7 +49,13 @@ const DomainsHistory = observer(() => {
                 ) : rootStore.domains.length > 0 ? (
                     <>
                         {rootStore.domains.map((domain) => (
-                            <DomainHistoryItem key={domain.id} domain={domain} />
+                            <Link
+                                key={domain.id}
+                                to={`/${Pages.Domain}/${domain.id}`}
+                                className='block cursor-pointer'
+                            >
+                                <DomainHistoryItem key={domain.id} domain={domain} />
+                            </Link>
                         ))}
 
                         {rootStore.hasMoreDomains && (

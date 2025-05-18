@@ -1,14 +1,16 @@
-import { Route, Routes } from 'react-router-dom';
-import { Login } from './pages/Login';
-import Chat from './pages/Chat';
-import { RequireAuth } from './auth/RequireAuth';
-import { AuthProvider } from './auth/AuthProvider';
-import { RequireUnauth } from './auth/RequireUnauth';
-import { Dashboard } from './components/Dashboard';
-import { Toaster } from './components/ui/toaster';
-import { Pages } from './router/constants';
-import { useEffect } from 'react';
+import {useEffect} from 'react';
+import {Route, Routes} from 'react-router-dom';
+import {AuthProvider} from './auth/AuthProvider';
+import {RequireAuth} from './auth/RequireAuth';
+import {RequireUnauth} from './auth/RequireUnauth';
+import {Dashboard} from './components/Dashboard';
+import HomeBanner from './components/HomeBanner';
+import {Toaster} from './components/ui/toaster';
+import ChatFromDomain from './pages/ChatFromDomain';
+import ChatFromHistory from './pages/ChatFromHistory';
 import CreateDomain from './pages/CreateDomain';
+import {Login} from './pages/Login';
+import {Pages} from './router/constants';
 
 function App() {
     useEffect(() => {
@@ -44,7 +46,17 @@ function App() {
                         element={
                             <RequireAuth>
                                 <Dashboard>
-                                    <Chat />
+                                    <ChatFromHistory />
+                                </Dashboard>
+                            </RequireAuth>
+                        }
+                    />
+                    <Route
+                        path={`/${Pages.Domain}/:domainId`}
+                        element={
+                            <RequireAuth>
+                                <Dashboard>
+                                    <ChatFromDomain />
                                 </Dashboard>
                             </RequireAuth>
                         }
@@ -54,7 +66,7 @@ function App() {
                         element={
                             <RequireAuth>
                                 <Dashboard>
-                                    <Chat />
+                                    <HomeBanner />
                                 </Dashboard>
                             </RequireAuth>
                         }

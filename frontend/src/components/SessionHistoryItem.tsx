@@ -1,11 +1,12 @@
-import { ShortChatSession } from '@/api/models';
-import { useStores } from '@/hooks/useStores';
-import { useState } from 'react';
-import { useToast } from './ui/use-toast';
-import { Loader2, TrashIcon } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Pages } from '@/router/constants';
-import { observer } from 'mobx-react-lite';
+import {ShortChatSession} from '@/api/models';
+import {useStores} from '@/hooks/useStores';
+import {Pages} from '@/router/constants';
+import {Format, formatDate} from '@/utils/date-utils';
+import {Loader2, TrashIcon} from 'lucide-react';
+import {observer} from 'mobx-react-lite';
+import {useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
+import {useToast} from './ui/use-toast';
 
 type Props = {
     session: ShortChatSession;
@@ -57,7 +58,10 @@ const SessionHistoryItem = observer(({ session }: Props) => {
                 </h3>
                 <div className='flex items-center justify-between'>
                     <p className='text-gray-500 text-sm'>
-                        {new Date(session.createdAt.seconds).toLocaleDateString()}
+                        {formatDate(
+                            new Date(session.createdAt.seconds * 1000),
+                            Format.DayMonthYearTime
+                        )}
                     </p>
                     <button
                         onClick={(event) => {

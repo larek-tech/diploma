@@ -25,7 +25,6 @@ go.work.sum
 .env
 
 # else
-.vscode
 venv
 .venv
 .DS_Store
@@ -36,5 +35,13 @@ google.golang.org
 temp/
 config-local.yaml
 vendor/
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
 
 *.log
