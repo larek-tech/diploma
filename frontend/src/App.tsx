@@ -6,7 +6,6 @@ import {RequireUnauth} from './auth/RequireUnauth';
 import {Dashboard} from './components/Dashboard';
 import HomeBanner from './components/HomeBanner';
 import {Toaster} from './components/ui/toaster';
-import Chat from './pages/Chat';
 import ChatFromDomain from './pages/ChatFromDomain';
 import ChatFromHistory from './pages/ChatFromHistory';
 import CreateDomain from './pages/CreateDomain';
