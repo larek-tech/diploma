@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { Pages } from '@/router/constants';
-import { PlusCircle } from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {Pages} from '@/router/constants';
+import {PlusCircle} from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
 
 const HomeBanner = () => {
     const navigate = useNavigate();
@@ -13,7 +13,7 @@ const HomeBanner = () => {
                     Для продолжения выберете домен или создайте новый
                 </h2>
                 <p className='text-gray-500 mb-4'>
-                    Создайте свой первый домен, чтобы начать работу с чатами и сценариями.
+                    Создайте домен, чтобы начать работу с чатами и сценариями.
                 </p>
                 <Button size='lg' onClick={() => navigate(`/${Pages.CreateDomain}`)}>
                     Создать домен
