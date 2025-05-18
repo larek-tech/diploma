@@ -1,20 +1,20 @@
 import ChatApiService from '@/api/ChatApiService';
-import { DomainApiService } from '@/api/DomainApiService';
+import {DomainApiService} from '@/api/DomainApiService';
 import {
-    DeleteSessionParams,
-    GetSessionParams,
-    RenameSessionParams,
-    ShortChatSession,
-    ChatSession,
-    SessionContentMessages,
-    DisplayedChat,
-    WSMessage,
-    WSMessageType,
+  ChatSession,
+  DeleteSessionParams,
+  DisplayedChat,
+  GetSessionParams,
+  RenameSessionParams,
+  SessionContentMessages,
+  ShortChatSession,
+  WSMessage,
+  WSMessageType,
 } from '@/api/models';
-import { Domain } from '@/api/models/domain';
-import { LOCAL_STORAGE_KEY } from '@/auth/AuthProvider';
-import { WS_URL } from '@/config';
-import { makeAutoObservable, runInAction } from 'mobx';
+import {Domain, Scenario} from '@/api/models/domain';
+import {LOCAL_STORAGE_KEY} from '@/auth/AuthProvider';
+import {WS_URL} from '@/config';
+import {makeAutoObservable, runInAction} from 'mobx';
 
 export class RootStore {
     sessions: ShortChatSession[] = [];
@@ -26,7 +26,9 @@ export class RootStore {
     domainsLimit: number = 10;
     hasMoreDomains: boolean = true;
     selectedDomainId: number | null = null;
+    selectedDomain: Domain | null = null;
     selectedScenarioId: number | null = null;
+    selectedScenario: Scenario | null = null;
 
     activeSessionId: string | null = null;
     activeSession: ChatSession | null = null;
@@ -61,39 +63,39 @@ export class RootStore {
         }
     }
 
-    setSelectedDomain(domainId: number) {
+    async setSelectedDomain(domainId: number) {
         this.selectedDomainId = domainId;
 
         // Сохраняем выбранный домен в localStorage
         localStorage.setItem('selectedDomainId', domainId.toString());
 
-        // Сбрасываем выбранный сценарий
-        this.selectedScenarioId = null;
-        localStorage.removeItem('selectedScenarioId');
+        // Получаем выбранный домен сетевым запросом
+        const selectedDomain = await DomainApiService.getDomainById(domainId);
 
-        // Если есть активное соединение - переподключаемся, чтобы использовать новый domainId
-        if (this.activeSessionId) {
-            this.connectWebSocket(this.activeSessionId);
+        this.selectedDomain = selectedDomain;
+
+        const selectedScenarioId = selectedDomain.scenarioIds[0] || null;
+        if (selectedScenarioId) {
+            this.setSelectedScenario(selectedScenarioId);
         }
     }
 
-    setSelectedScenario(scenarioId: number) {
-        this.selectedScenarioId = scenarioId;
+    private async setSelectedScenario(scenarioId: number) {
+        console.log('scenarioId', scenarioId);
+
+        // Получаем выбранный сценарий сетевым запросом
+        const selectedScenario = await DomainApiService.getScenarioById(scenarioId);
+
+        this.selectedScenario = selectedScenario;
 
         // Сохраняем выбранный сценарий в localStorage
         localStorage.setItem('selectedScenarioId', scenarioId.toString());
-
-        // Если есть активное соединение - переподключаемся, чтобы использовать новый scenarioId
-        if (this.activeSessionId) {
-            this.connectWebSocket(this.activeSessionId);
-        }
     }
 
     getSelectedDomainTitle(): string {
-        if (!this.selectedDomainId) return 'Выберите домен';
+        if (!this.selectedDomain) return 'Выберите домен';
 
-        const selectedDomain = this.domains.find((domain) => domain.id === this.selectedDomainId);
-        return selectedDomain ? selectedDomain.title : 'Домен не найден';
+        return this.selectedDomain ? this.selectedDomain.title : 'Домен не найден';
     }
 
     getSelectedScenarioId(): number | null {
