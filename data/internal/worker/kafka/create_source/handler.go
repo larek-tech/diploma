@@ -11,7 +11,6 @@ import (
 	"github.com/IBM/sarama"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/queue/messages"
-	"github.com/larek-tech/diploma/data/pkg/metric"
 )
 
 const (
@@ -45,7 +44,7 @@ func (h Handler) Handle(ctx context.Context, msg *sarama.ConsumerMessage) error 
 	payload.ExternalKey = msg.Key
 
 	newSource, err := h.service.CreateSource(ctx, payload)
-	metric.IncrementSourcesCreated("undefined", newSource.ID, err)
+
 	if err != nil {
 		return fmt.Errorf("failed to create new source: %w", err)
 	}

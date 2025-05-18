@@ -10,6 +10,7 @@ import (
 	"github.com/larek-tech/diploma/data/internal/domain/site"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
+	"github.com/larek-tech/diploma/data/pkg/metric"
 )
 
 type Service struct {
@@ -126,6 +127,6 @@ func (s Service) CreateSource(ctx context.Context, msg source.DataMessage) (*sou
 	if err != nil {
 		return nil, err
 	}
-
+	metric.IncrementSourcesCreated((string(src.Type)), src.ID, err)
 	return src, nil
 }
