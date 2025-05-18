@@ -4,8 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"go.dataddo.com/pgq"
+)
+
+const (
+	parallelMessages = 10
+	pollingInterval  = 1 * time.Second
 )
 
 type Consumer struct {
@@ -29,7 +35,10 @@ func (m adapter) HandleMessage(ctx context.Context, msg *pgq.MessageIncoming) (p
 }
 
 func (c *Consumer) Run(ctx context.Context, queue Queue, h handler) error {
-	consumer, err := pgq.NewConsumer(c.db, string(queue), adapter{h: h})
+	consumer, err := pgq.NewConsumer(c.db, string(queue), adapter{h: h},
+		pgq.WithMaxParallelMessages(parallelMessages),
+		pgq.WithPollingInterval(pollingInterval),
+	)
 	if err != nil {
 		return fmt.Errorf("failed to create consumer: %w", err)
 	}
