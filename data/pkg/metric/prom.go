@@ -92,6 +92,7 @@ func errToString(err error) string {
 }
 
 func RunPrometheusServer(port string) {
+	InitializeMetrics()
 	http.Handle("/metrics", promhttp.Handler())
 	log.Printf("Starting Prometheus server on port %s", port)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
