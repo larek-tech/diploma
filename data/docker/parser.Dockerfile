@@ -9,10 +9,18 @@ RUN apt-get install -y -qq \
     libmupdf-dev libfreetype6-dev \
     libmujs-dev libgumbo-dev libopenjp2-7-dev \
     libjbig2dec0-dev libjpeg-dev \
-    libharfbuzz-dev zlib1g-dev \
-    && sed -i '/^Requires: / s/$/ harfbuzz/' /usr/lib/aarch64-linux-gnu/pkgconfig/mupdf.pc \
-    && echo "Updated mupdf.pc content:" \
-    && cat /usr/lib/aarch64-linux-gnu/pkgconfig/mupdf.pc
+    libharfbuzz-dev zlib1g-dev
+
+# Find mupdf.pc file
+RUN MUPDF_PC=$(find /usr -name "mupdf.pc" 2>/dev/null || echo "") \
+    && if [ -n "$MUPDF_PC" ]; then \
+    echo "Found mupdf.pc at $MUPDF_PC"; \
+    sed -i '/^Requires: / s/$/ harfbuzz/' $MUPDF_PC; \
+    echo "Updated mupdf.pc content:"; \
+    cat $MUPDF_PC; \
+    else \
+    echo "mupdf.pc not found, continuing without modification"; \
+    fi
 
 ARG MODULE_NAME=github.com/larek-tech/diploma/data
 
