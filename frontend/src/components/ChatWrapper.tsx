@@ -8,10 +8,11 @@ import {useToast} from '@/components/ui/use-toast';
 import {useStores} from '@/hooks/useStores';
 import {Pages} from '@/router/constants';
 import debounce from 'lodash/debounce';
-import {ArrowUpIcon, BookOpen, Database, FilePenIcon, Loader2, MicIcon, StopCircleIcon} from 'lucide-react';
+import {ArrowUpIcon, BookOpen, Database, FilePenIcon, Loader2, MicIcon, Settings, StopCircleIcon} from 'lucide-react';
 import {observer} from 'mobx-react-lite';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
+import ScenarioSettingsModal from './ScenarioSettingsModal';
 
 const ChatWrapper = observer(() => {
     const { rootStore } = useStores();
@@ -21,6 +22,7 @@ const ChatWrapper = observer(() => {
     const [message, setMessage] = useState('');
     const [titleValue, setTitleValue] = useState('');
     const [recognizing, setRecognizing] = useState(false);
+    const [isScenarioSettingsOpen, setIsScenarioSettingsOpen] = useState(false);
 
     const titleInputRef = useRef<HTMLInputElement>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -224,7 +226,6 @@ const ChatWrapper = observer(() => {
 
                         {rootStore.selectedDomainId && rootStore.hasScenarios() && (
                             <div className='flex items-center gap-1'>
-                                <BookOpen className='h-4 w-4 text-primary' />
                                 <span
                                     className={
                                         rootStore.selectedScenarioId
@@ -232,9 +233,28 @@ const ChatWrapper = observer(() => {
                                             : 'text-gray-500'
                                     }
                                 >
-                                    {rootStore.getSelectedScenarioId()
-                                        ? `Сценарий #${rootStore.getSelectedScenarioId()}`
-                                        : 'Выберите сценарий'}
+                                    <div className='flex items-center gap-1'>
+                                        <BookOpen className='h-4 w-4 text-primary' />
+                                        <span
+                                            className={
+                                                rootStore.selectedScenarioId
+                                                    ? 'text-primary-600 font-medium'
+                                                    : 'text-gray-500'
+                                            }
+                                        >
+                                            {rootStore.selectedScenarioId
+                                                ? `Сценарий #${rootStore.getSelectedScenarioId()}`
+                                                : 'Выберите сценарий'}
+                                        </span>
+                                        <Button
+                                            variant='ghost'
+                                            size='icon'
+                                            className='rounded-full hover:bg-gray-100 dark:hover:bg-[#1e293b] transition-colors p-1'
+                                            onClick={() => setIsScenarioSettingsOpen(true)}
+                                        >
+                                            <Settings className='w-4 h-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300' />
+                                        </Button>
+                                    </div>
                                 </span>
                             </div>
                         )}
@@ -350,6 +370,11 @@ const ChatWrapper = observer(() => {
                     </div>
                 </div>
             </div>
+
+            <ScenarioSettingsModal
+                open={isScenarioSettingsOpen}
+                onOpenChange={setIsScenarioSettingsOpen}
+            />
         </>
     );
 });

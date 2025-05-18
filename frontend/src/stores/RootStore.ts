@@ -46,28 +46,10 @@ export class RootStore {
 
         this.sessions = [];
         this.domains = [];
-
-        // Попытка восстановить выбранный domain и scenario из localStorage
-        try {
-            const savedDomainId = localStorage.getItem('selectedDomainId');
-            if (savedDomainId) {
-                this.selectedDomainId = parseInt(savedDomainId, 10);
-            }
-
-            const savedScenarioId = localStorage.getItem('selectedScenarioId');
-            if (savedScenarioId) {
-                this.selectedScenarioId = parseInt(savedScenarioId, 10);
-            }
-        } catch (e) {
-            console.error('Ошибка при чтении данных из localStorage:', e);
-        }
     }
 
     async setSelectedDomain(domainId: number) {
         this.selectedDomainId = domainId;
-
-        // Сохраняем выбранный домен в localStorage
-        localStorage.setItem('selectedDomainId', domainId.toString());
 
         // Получаем выбранный домен сетевым запросом
         const selectedDomain = await DomainApiService.getDomainById(domainId);
@@ -80,16 +62,14 @@ export class RootStore {
         }
     }
 
-    private async setSelectedScenario(scenarioId: number) {
+    async setSelectedScenario(scenarioId: number) {
+        this.selectedScenarioId = scenarioId;
         console.log('scenarioId', scenarioId);
 
         // Получаем выбранный сценарий сетевым запросом
         const selectedScenario = await DomainApiService.getScenarioById(scenarioId);
 
         this.selectedScenario = selectedScenario;
-
-        // Сохраняем выбранный сценарий в localStorage
-        localStorage.setItem('selectedScenarioId', scenarioId.toString());
     }
 
     getSelectedDomainTitle(): string {
