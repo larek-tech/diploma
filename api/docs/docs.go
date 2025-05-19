@@ -1087,7 +1087,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "List scenarios create by user.",
+                "description": "List scenarios created by user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1111,6 +1111,63 @@ const docTemplate = `{
                         "description": "Pagination limit",
                         "name": "limit",
                         "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of scenarios",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListScenariosResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list scenarios",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/scenario/list_by_domain/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List scenarios by domain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scenario"
+                ],
+                "summary": "List scenarios by domain.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -1370,6 +1427,63 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Failed to list sources",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/source/list_by_domain/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List sources by domain to which user has access.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "List sources by domain.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of sources by domain",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListSourcesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list sources by domain",
                         "schema": {
                             "type": "string"
                         }
@@ -1972,20 +2086,8 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "metadata": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
                 "scenarioId": {
                     "type": "integer"
-                },
-                "sourceIds": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 },
                 "userId": {
                     "type": "integer"
@@ -2054,6 +2156,9 @@ const docTemplate = `{
         "pb.CreateScenarioRequest": {
             "type": "object",
             "properties": {
+                "contextSize": {
+                    "type": "integer"
+                },
                 "domainId": {
                     "type": "integer"
                 },
@@ -2405,6 +2510,9 @@ const docTemplate = `{
         "pb.Scenario": {
             "type": "object",
             "properties": {
+                "contextSize": {
+                    "type": "integer"
+                },
                 "createdAt": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
                 },
@@ -2555,6 +2663,9 @@ const docTemplate = `{
         "pb.UpdateScenarioRequest": {
             "type": "object",
             "properties": {
+                "domainId": {
+                    "type": "integer"
+                },
                 "modelName": {
                     "type": "string"
                 },

@@ -12,16 +12,8 @@ definitions:
         type: integer
       id:
         type: integer
-      metadata:
-        items:
-          type: integer
-        type: array
       scenarioId:
         type: integer
-      sourceIds:
-        items:
-          type: string
-        type: array
       userId:
         type: integer
     type: object
@@ -65,6 +57,8 @@ definitions:
     type: object
   pb.CreateScenarioRequest:
     properties:
+      contextSize:
+        type: integer
       domainId:
         type: integer
       model:
@@ -296,6 +290,8 @@ definitions:
     type: object
   pb.Scenario:
     properties:
+      contextSize:
+        type: integer
       createdAt:
         $ref: '#/definitions/timestamppb.Timestamp'
       domainId:
@@ -399,6 +395,8 @@ definitions:
     type: object
   pb.UpdateScenarioRequest:
     properties:
+      domainId:
+        type: integer
       modelName:
         type: string
       modelTopK:
@@ -1283,7 +1281,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: List scenarios create by user.
+      description: List scenarios created by user.
       parameters:
       - description: Pagination offset
         in: query
@@ -1309,6 +1307,43 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: List scenarios.
+      tags:
+      - scenario
+  /api/v1/scenario/list_by_domain/{id}:
+    get:
+      consumes:
+      - application/json
+      description: List scenarios by domain.
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: Pagination limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: Domain ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of scenarios
+          schema:
+            $ref: '#/definitions/pb.ListScenariosResponse'
+        "400":
+          description: Failed to list scenarios
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List scenarios by domain.
       tags:
       - scenario
   /api/v1/source/:
@@ -1466,6 +1501,43 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: List sources.
+      tags:
+      - source
+  /api/v1/source/list_by_domain/{id}:
+    get:
+      consumes:
+      - application/json
+      description: List sources by domain to which user has access.
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: Pagination limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: Domain ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of sources by domain
+          schema:
+            $ref: '#/definitions/pb.ListSourcesResponse'
+        "400":
+          description: Failed to list sources by domain
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List sources by domain.
       tags:
       - source
   /api/v1/source/permissions/roles/{id}:

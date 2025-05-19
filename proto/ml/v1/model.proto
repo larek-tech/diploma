@@ -42,6 +42,7 @@ message Scenario {
   google.protobuf.Timestamp updatedAt = 7;
   string title = 8;
   int64 domainId = 9;
+  int64 contextSize = 10;
 };
 
 message Query {

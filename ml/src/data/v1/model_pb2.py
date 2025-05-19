@@ -4,43 +4,44 @@
 # source: data/v1/model.proto
 # Protobuf Python Version: 5.29.0
 """Generated protocol buffer code."""
-
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import runtime_version as _runtime_version
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
-
 _runtime_version.ValidateProtobufRuntimeVersion(
-    _runtime_version.Domain.PUBLIC, 5, 29, 0, "", "data/v1/model.proto"
+    _runtime_version.Domain.PUBLIC,
+    5,
+    29,
+    0,
+    '',
+    'data/v1/model.proto'
 )
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
-    b'\n\x13\x64\x61ta/v1/model.proto\x12\x07\x64\x61ta.v1"n\n\x13VectorSearchRequest\x12\r\n\x05query\x18\x01 \x01(\t\x12\x11\n\tsourceIds\x18\x02 \x03(\t\x12\x0c\n\x04topK\x18\x03 \x01(\x04\x12\x11\n\tthreshold\x18\x04 \x01(\x02\x12\x14\n\x0cuseQuestions\x18\x05 \x01(\x08"a\n\rDocumentChunk\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05index\x18\x02 \x01(\x03\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\x12\x10\n\x08metadata\x18\x04 \x01(\x0c\x12\x12\n\nsimilarity\x18\x05 \x01(\x02">\n\x14VectorSearchResponse\x12&\n\x06\x63hunks\x18\x01 \x03(\x0b\x32\x16.data.v1.DocumentChunk">\n\x0eGetDocumentsIn\x12\x10\n\x08sourceId\x18\x01 \x01(\t\x12\x0c\n\x04size\x18\x02 \x01(\r\x12\x0c\n\x04page\x18\x03 \x01(\r"Y\n\x08\x44ocument\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08sourceId\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x04 \x01(\t\x12\x10\n\x08metadata\x18\x05 \x01(\t"b\n\x0fGetDocumentsOut\x12\x0c\n\x04size\x18\x01 \x01(\r\x12\x0c\n\x04page\x18\x02 \x01(\r\x12\r\n\x05total\x18\x03 \x01(\r\x12$\n\tdocuments\x18\x04 \x03(\x0b\x32\x11.data.v1.DocumentB\x12Z\x10internal/data/pbb\x06proto3'
-)
+
+
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13\x64\x61ta/v1/model.proto\x12\x07\x64\x61ta.v1\"n\n\x13VectorSearchRequest\x12\r\n\x05query\x18\x01 \x01(\t\x12\x11\n\tsourceIds\x18\x02 \x03(\t\x12\x0c\n\x04topK\x18\x03 \x01(\x04\x12\x11\n\tthreshold\x18\x04 \x01(\x02\x12\x14\n\x0cuseQuestions\x18\x05 \x01(\x08\"a\n\rDocumentChunk\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05index\x18\x02 \x01(\x03\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\x12\x10\n\x08metadata\x18\x04 \x01(\x0c\x12\x12\n\nsimilarity\x18\x05 \x01(\x02\">\n\x14VectorSearchResponse\x12&\n\x06\x63hunks\x18\x01 \x03(\x0b\x32\x16.data.v1.DocumentChunk\">\n\x0eGetDocumentsIn\x12\x10\n\x08sourceId\x18\x01 \x01(\t\x12\x0c\n\x04size\x18\x02 \x01(\r\x12\x0c\n\x04page\x18\x03 \x01(\r\"Y\n\x08\x44ocument\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08sourceId\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x04 \x01(\t\x12\x10\n\x08metadata\x18\x05 \x01(\t\"b\n\x0fGetDocumentsOut\x12\x0c\n\x04size\x18\x01 \x01(\r\x12\x0c\n\x04page\x18\x02 \x01(\r\x12\r\n\x05total\x18\x03 \x01(\r\x12$\n\tdocuments\x18\x04 \x03(\x0b\x32\x11.data.v1.DocumentB\x12Z\x10internal/data/pbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(
-    DESCRIPTOR, "data.v1.model_pb2", _globals
-)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'data.v1.model_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
-    _globals["DESCRIPTOR"]._loaded_options = None
-    _globals["DESCRIPTOR"]._serialized_options = b"Z\020internal/data/pb"
-    _globals["_VECTORSEARCHREQUEST"]._serialized_start = 32
-    _globals["_VECTORSEARCHREQUEST"]._serialized_end = 142
-    _globals["_DOCUMENTCHUNK"]._serialized_start = 144
-    _globals["_DOCUMENTCHUNK"]._serialized_end = 241
-    _globals["_VECTORSEARCHRESPONSE"]._serialized_start = 243
-    _globals["_VECTORSEARCHRESPONSE"]._serialized_end = 305
-    _globals["_GETDOCUMENTSIN"]._serialized_start = 307
-    _globals["_GETDOCUMENTSIN"]._serialized_end = 369
-    _globals["_DOCUMENT"]._serialized_start = 371
-    _globals["_DOCUMENT"]._serialized_end = 460
-    _globals["_GETDOCUMENTSOUT"]._serialized_start = 462
-    _globals["_GETDOCUMENTSOUT"]._serialized_end = 560
+  _globals['DESCRIPTOR']._loaded_options = None
+  _globals['DESCRIPTOR']._serialized_options = b'Z\020internal/data/pb'
+  _globals['_VECTORSEARCHREQUEST']._serialized_start=32
+  _globals['_VECTORSEARCHREQUEST']._serialized_end=142
+  _globals['_DOCUMENTCHUNK']._serialized_start=144
+  _globals['_DOCUMENTCHUNK']._serialized_end=241
+  _globals['_VECTORSEARCHRESPONSE']._serialized_start=243
+  _globals['_VECTORSEARCHRESPONSE']._serialized_end=305
+  _globals['_GETDOCUMENTSIN']._serialized_start=307
+  _globals['_GETDOCUMENTSIN']._serialized_end=369
+  _globals['_DOCUMENT']._serialized_start=371
+  _globals['_DOCUMENT']._serialized_end=460
+  _globals['_GETDOCUMENTSOUT']._serialized_start=462
+  _globals['_GETDOCUMENTSOUT']._serialized_end=560
 # @@protoc_insertion_point(module_scope)

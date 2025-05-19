@@ -14,4 +14,5 @@ service ScenarioService {
   rpc UpdateScenario(UpdateScenarioRequest) returns (pb.ml.Scenario) {};
   rpc DeleteScenario(DeleteScenarioRequest) returns (google.protobuf.Empty) {};
   rpc ListScenarios(ListScenariosRequest) returns(ListScenariosResponse) {};
+  rpc ListScenariosByDomain(ListScenariosByDomainRequest) returns(ListScenariosResponse) {};
 };

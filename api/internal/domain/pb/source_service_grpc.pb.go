@@ -26,6 +26,7 @@ const (
 	SourceService_UpdateSource_FullMethodName         = "/domain.v1.SourceService/UpdateSource"
 	SourceService_DeleteSource_FullMethodName         = "/domain.v1.SourceService/DeleteSource"
 	SourceService_ListSources_FullMethodName          = "/domain.v1.SourceService/ListSources"
+	SourceService_ListSourcesByDomain_FullMethodName  = "/domain.v1.SourceService/ListSourcesByDomain"
 	SourceService_GetPermittedUsers_FullMethodName    = "/domain.v1.SourceService/GetPermittedUsers"
 	SourceService_UpdatePermittedUsers_FullMethodName = "/domain.v1.SourceService/UpdatePermittedUsers"
 	SourceService_GetPermittedRoles_FullMethodName    = "/domain.v1.SourceService/GetPermittedRoles"
@@ -42,6 +43,7 @@ type SourceServiceClient interface {
 	UpdateSource(ctx context.Context, in *UpdateSourceRequest, opts ...grpc.CallOption) (*Source, error)
 	DeleteSource(ctx context.Context, in *DeleteSourceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListSources(ctx context.Context, in *ListSourcesRequest, opts ...grpc.CallOption) (*ListSourcesResponse, error)
+	ListSourcesByDomain(ctx context.Context, in *ListSourcesByDomainRequest, opts ...grpc.CallOption) (*ListSourcesResponse, error)
 	GetPermittedUsers(ctx context.Context, in *GetResourcePermissionsRequest, opts ...grpc.CallOption) (*PermittedUsers, error)
 	UpdatePermittedUsers(ctx context.Context, in *PermittedUsers, opts ...grpc.CallOption) (*PermittedUsers, error)
 	GetPermittedRoles(ctx context.Context, in *GetResourcePermissionsRequest, opts ...grpc.CallOption) (*PermittedRoles, error)
@@ -116,6 +118,16 @@ func (c *sourceServiceClient) ListSources(ctx context.Context, in *ListSourcesRe
 	return out, nil
 }
 
+func (c *sourceServiceClient) ListSourcesByDomain(ctx context.Context, in *ListSourcesByDomainRequest, opts ...grpc.CallOption) (*ListSourcesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListSourcesResponse)
+	err := c.cc.Invoke(ctx, SourceService_ListSourcesByDomain_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *sourceServiceClient) GetPermittedUsers(ctx context.Context, in *GetResourcePermissionsRequest, opts ...grpc.CallOption) (*PermittedUsers, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PermittedUsers)
@@ -166,6 +178,7 @@ type SourceServiceServer interface {
 	UpdateSource(context.Context, *UpdateSourceRequest) (*Source, error)
 	DeleteSource(context.Context, *DeleteSourceRequest) (*emptypb.Empty, error)
 	ListSources(context.Context, *ListSourcesRequest) (*ListSourcesResponse, error)
+	ListSourcesByDomain(context.Context, *ListSourcesByDomainRequest) (*ListSourcesResponse, error)
 	GetPermittedUsers(context.Context, *GetResourcePermissionsRequest) (*PermittedUsers, error)
 	UpdatePermittedUsers(context.Context, *PermittedUsers) (*PermittedUsers, error)
 	GetPermittedRoles(context.Context, *GetResourcePermissionsRequest) (*PermittedRoles, error)
@@ -197,6 +210,9 @@ func (UnimplementedSourceServiceServer) DeleteSource(context.Context, *DeleteSou
 }
 func (UnimplementedSourceServiceServer) ListSources(context.Context, *ListSourcesRequest) (*ListSourcesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListSources not implemented")
+}
+func (UnimplementedSourceServiceServer) ListSourcesByDomain(context.Context, *ListSourcesByDomainRequest) (*ListSourcesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListSourcesByDomain not implemented")
 }
 func (UnimplementedSourceServiceServer) GetPermittedUsers(context.Context, *GetResourcePermissionsRequest) (*PermittedUsers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPermittedUsers not implemented")
@@ -339,6 +355,24 @@ func _SourceService_ListSources_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SourceService_ListSourcesByDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSourcesByDomainRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SourceServiceServer).ListSourcesByDomain(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SourceService_ListSourcesByDomain_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SourceServiceServer).ListSourcesByDomain(ctx, req.(*ListSourcesByDomainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _SourceService_GetPermittedUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetResourcePermissionsRequest)
 	if err := dec(in); err != nil {
@@ -441,6 +475,10 @@ var SourceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListSources",
 			Handler:    _SourceService_ListSources_Handler,
+		},
+		{
+			MethodName: "ListSourcesByDomain",
+			Handler:    _SourceService_ListSourcesByDomain_Handler,
 		},
 		{
 			MethodName: "GetPermittedUsers",

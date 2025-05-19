@@ -25,25 +25,27 @@ var File_domain_v1_scenario_service_proto protoreflect.FileDescriptor
 
 const file_domain_v1_scenario_service_proto_rawDesc = "" +
 	"\n" +
-	" domain/v1/scenario_service.proto\x12\tdomain.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1edomain/v1/scenario_model.proto\x1a\x11ml/v1/model.proto2\xd3\x03\n" +
+	" domain/v1/scenario_service.proto\x12\tdomain.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1edomain/v1/scenario_model.proto\x1a\x11ml/v1/model.proto2\xb9\x04\n" +
 	"\x0fScenarioService\x12E\n" +
 	"\x0eCreateScenario\x12 .domain.v1.CreateScenarioRequest\x1a\x0f.pb.ml.Scenario\"\x00\x12?\n" +
 	"\vGetScenario\x12\x1d.domain.v1.GetScenarioRequest\x1a\x0f.pb.ml.Scenario\"\x00\x12M\n" +
 	"\x12GetDefaultScenario\x12$.domain.v1.GetDefaultScenarioRequest\x1a\x0f.pb.ml.Scenario\"\x00\x12E\n" +
 	"\x0eUpdateScenario\x12 .domain.v1.UpdateScenarioRequest\x1a\x0f.pb.ml.Scenario\"\x00\x12L\n" +
 	"\x0eDeleteScenario\x12 .domain.v1.DeleteScenarioRequest\x1a\x16.google.protobuf.Empty\"\x00\x12T\n" +
-	"\rListScenarios\x12\x1f.domain.v1.ListScenariosRequest\x1a .domain.v1.ListScenariosResponse\"\x00B\x14Z\x12internal/domain/pbb\x06proto3"
+	"\rListScenarios\x12\x1f.domain.v1.ListScenariosRequest\x1a .domain.v1.ListScenariosResponse\"\x00\x12d\n" +
+	"\x15ListScenariosByDomain\x12'.domain.v1.ListScenariosByDomainRequest\x1a .domain.v1.ListScenariosResponse\"\x00B\x14Z\x12internal/domain/pbb\x06proto3"
 
 var file_domain_v1_scenario_service_proto_goTypes = []any{
-	(*CreateScenarioRequest)(nil),     // 0: domain.v1.CreateScenarioRequest
-	(*GetScenarioRequest)(nil),        // 1: domain.v1.GetScenarioRequest
-	(*GetDefaultScenarioRequest)(nil), // 2: domain.v1.GetDefaultScenarioRequest
-	(*UpdateScenarioRequest)(nil),     // 3: domain.v1.UpdateScenarioRequest
-	(*DeleteScenarioRequest)(nil),     // 4: domain.v1.DeleteScenarioRequest
-	(*ListScenariosRequest)(nil),      // 5: domain.v1.ListScenariosRequest
-	(*Scenario)(nil),                  // 6: pb.ml.Scenario
-	(*emptypb.Empty)(nil),             // 7: google.protobuf.Empty
-	(*ListScenariosResponse)(nil),     // 8: domain.v1.ListScenariosResponse
+	(*CreateScenarioRequest)(nil),        // 0: domain.v1.CreateScenarioRequest
+	(*GetScenarioRequest)(nil),           // 1: domain.v1.GetScenarioRequest
+	(*GetDefaultScenarioRequest)(nil),    // 2: domain.v1.GetDefaultScenarioRequest
+	(*UpdateScenarioRequest)(nil),        // 3: domain.v1.UpdateScenarioRequest
+	(*DeleteScenarioRequest)(nil),        // 4: domain.v1.DeleteScenarioRequest
+	(*ListScenariosRequest)(nil),         // 5: domain.v1.ListScenariosRequest
+	(*ListScenariosByDomainRequest)(nil), // 6: domain.v1.ListScenariosByDomainRequest
+	(*Scenario)(nil),                     // 7: pb.ml.Scenario
+	(*emptypb.Empty)(nil),                // 8: google.protobuf.Empty
+	(*ListScenariosResponse)(nil),        // 9: domain.v1.ListScenariosResponse
 }
 var file_domain_v1_scenario_service_proto_depIdxs = []int32{
 	0, // 0: domain.v1.ScenarioService.CreateScenario:input_type -> domain.v1.CreateScenarioRequest
@@ -52,14 +54,16 @@ var file_domain_v1_scenario_service_proto_depIdxs = []int32{
 	3, // 3: domain.v1.ScenarioService.UpdateScenario:input_type -> domain.v1.UpdateScenarioRequest
 	4, // 4: domain.v1.ScenarioService.DeleteScenario:input_type -> domain.v1.DeleteScenarioRequest
 	5, // 5: domain.v1.ScenarioService.ListScenarios:input_type -> domain.v1.ListScenariosRequest
-	6, // 6: domain.v1.ScenarioService.CreateScenario:output_type -> pb.ml.Scenario
-	6, // 7: domain.v1.ScenarioService.GetScenario:output_type -> pb.ml.Scenario
-	6, // 8: domain.v1.ScenarioService.GetDefaultScenario:output_type -> pb.ml.Scenario
-	6, // 9: domain.v1.ScenarioService.UpdateScenario:output_type -> pb.ml.Scenario
-	7, // 10: domain.v1.ScenarioService.DeleteScenario:output_type -> google.protobuf.Empty
-	8, // 11: domain.v1.ScenarioService.ListScenarios:output_type -> domain.v1.ListScenariosResponse
-	6, // [6:12] is the sub-list for method output_type
-	0, // [0:6] is the sub-list for method input_type
+	6, // 6: domain.v1.ScenarioService.ListScenariosByDomain:input_type -> domain.v1.ListScenariosByDomainRequest
+	7, // 7: domain.v1.ScenarioService.CreateScenario:output_type -> pb.ml.Scenario
+	7, // 8: domain.v1.ScenarioService.GetScenario:output_type -> pb.ml.Scenario
+	7, // 9: domain.v1.ScenarioService.GetDefaultScenario:output_type -> pb.ml.Scenario
+	7, // 10: domain.v1.ScenarioService.UpdateScenario:output_type -> pb.ml.Scenario
+	8, // 11: domain.v1.ScenarioService.DeleteScenario:output_type -> google.protobuf.Empty
+	9, // 12: domain.v1.ScenarioService.ListScenarios:output_type -> domain.v1.ListScenariosResponse
+	9, // 13: domain.v1.ScenarioService.ListScenariosByDomain:output_type -> domain.v1.ListScenariosResponse
+	7, // [7:14] is the sub-list for method output_type
+	0, // [0:7] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

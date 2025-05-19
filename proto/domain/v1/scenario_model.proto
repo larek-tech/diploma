@@ -12,6 +12,7 @@ message CreateScenarioRequest {
   optional pb.ml.VectorSearch vectorSearch = 4;
   pb.ml.LlmModel model = 5;
   int64 domainId = 6;
+  int64 contextSize = 7;
 };
 
 message GetScenarioRequest {
@@ -40,6 +41,7 @@ message UpdateScenarioRequest {
   optional float threshold = 15;
   optional bool searchByQuery = 16;
   string title = 17;
+  int64 domainId = 18;
 };
 
 message DeleteScenarioRequest {
@@ -49,6 +51,12 @@ message DeleteScenarioRequest {
 message ListScenariosRequest {
   uint64 offset = 1;
   uint64 limit = 2;
+};
+
+message ListScenariosByDomainRequest {
+  int64 domainId = 1;
+  uint64 offset = 2;
+  uint64 limit = 3;
 };
 
 message ListScenariosResponse {

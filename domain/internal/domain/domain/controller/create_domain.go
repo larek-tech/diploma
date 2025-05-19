@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"time"
 
 	authpb "github.com/larek-tech/diploma/domain/internal/auth/pb"
 	"github.com/larek-tech/diploma/domain/internal/domain/domain/model"
@@ -28,6 +29,8 @@ func (ctrl *Controller) CreateDomain(ctx context.Context, req *pb.CreateDomainRe
 		Title:     req.GetTitle(),
 		UserID:    meta.GetUserId(),
 		SourceIDs: req.GetSourceIds(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	domainID, err := ctrl.dr.InsertDomain(ctx, domain)

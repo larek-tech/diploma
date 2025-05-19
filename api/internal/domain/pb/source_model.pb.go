@@ -753,6 +753,66 @@ func (x *ListSourcesRequest) GetLimit() uint64 {
 	return 0
 }
 
+type ListSourcesByDomainRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DomainId      int64                  `protobuf:"varint,1,opt,name=domainId,proto3" json:"domainId,omitempty"`
+	Offset        uint64                 `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit         uint64                 `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSourcesByDomainRequest) Reset() {
+	*x = ListSourcesByDomainRequest{}
+	mi := &file_domain_v1_source_model_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSourcesByDomainRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSourcesByDomainRequest) ProtoMessage() {}
+
+func (x *ListSourcesByDomainRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_domain_v1_source_model_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSourcesByDomainRequest.ProtoReflect.Descriptor instead.
+func (*ListSourcesByDomainRequest) Descriptor() ([]byte, []int) {
+	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ListSourcesByDomainRequest) GetDomainId() int64 {
+	if x != nil {
+		return x.DomainId
+	}
+	return 0
+}
+
+func (x *ListSourcesByDomainRequest) GetOffset() uint64 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+func (x *ListSourcesByDomainRequest) GetLimit() uint64 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
 type ListSourcesResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Sources       []*Source              `protobuf:"bytes,1,rep,name=sources,proto3" json:"sources,omitempty"`
@@ -762,7 +822,7 @@ type ListSourcesResponse struct {
 
 func (x *ListSourcesResponse) Reset() {
 	*x = ListSourcesResponse{}
-	mi := &file_domain_v1_source_model_proto_msgTypes[10]
+	mi := &file_domain_v1_source_model_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -774,7 +834,7 @@ func (x *ListSourcesResponse) String() string {
 func (*ListSourcesResponse) ProtoMessage() {}
 
 func (x *ListSourcesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_source_model_proto_msgTypes[10]
+	mi := &file_domain_v1_source_model_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -787,7 +847,7 @@ func (x *ListSourcesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSourcesResponse.ProtoReflect.Descriptor instead.
 func (*ListSourcesResponse) Descriptor() ([]byte, []int) {
-	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{10}
+	return file_domain_v1_source_model_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListSourcesResponse) GetSources() []*Source {
@@ -859,7 +919,11 @@ const file_domain_v1_source_model_proto_rawDesc = "" +
 	"\bsourceId\x18\x01 \x01(\x03R\bsourceId\"B\n" +
 	"\x12ListSourcesRequest\x12\x16\n" +
 	"\x06offset\x18\x01 \x01(\x04R\x06offset\x12\x14\n" +
-	"\x05limit\x18\x02 \x01(\x04R\x05limit\"B\n" +
+	"\x05limit\x18\x02 \x01(\x04R\x05limit\"f\n" +
+	"\x1aListSourcesByDomainRequest\x12\x1a\n" +
+	"\bdomainId\x18\x01 \x01(\x03R\bdomainId\x12\x16\n" +
+	"\x06offset\x18\x02 \x01(\x04R\x06offset\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x04R\x05limit\"B\n" +
 	"\x13ListSourcesResponse\x12+\n" +
 	"\asources\x18\x01 \x03(\v2\x11.domain.v1.SourceR\asources*x\n" +
 	"\n" +
@@ -888,30 +952,31 @@ func file_domain_v1_source_model_proto_rawDescGZIP() []byte {
 }
 
 var file_domain_v1_source_model_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_domain_v1_source_model_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_domain_v1_source_model_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_domain_v1_source_model_proto_goTypes = []any{
-	(SourceType)(0),               // 0: domain.v1.SourceType
-	(SourceStatus)(0),             // 1: domain.v1.SourceStatus
-	(*CronFormat)(nil),            // 2: domain.v1.CronFormat
-	(*UpdateParams)(nil),          // 3: domain.v1.UpdateParams
-	(*Source)(nil),                // 4: domain.v1.Source
-	(*CreateSourceRequest)(nil),   // 5: domain.v1.CreateSourceRequest
-	(*GetSourceRequest)(nil),      // 6: domain.v1.GetSourceRequest
-	(*GetSourceIDsRequest)(nil),   // 7: domain.v1.GetSourceIDsRequest
-	(*GetSourceIDsResponse)(nil),  // 8: domain.v1.GetSourceIDsResponse
-	(*UpdateSourceRequest)(nil),   // 9: domain.v1.UpdateSourceRequest
-	(*DeleteSourceRequest)(nil),   // 10: domain.v1.DeleteSourceRequest
-	(*ListSourcesRequest)(nil),    // 11: domain.v1.ListSourcesRequest
-	(*ListSourcesResponse)(nil),   // 12: domain.v1.ListSourcesResponse
-	(*timestamppb.Timestamp)(nil), // 13: google.protobuf.Timestamp
+	(SourceType)(0),                    // 0: domain.v1.SourceType
+	(SourceStatus)(0),                  // 1: domain.v1.SourceStatus
+	(*CronFormat)(nil),                 // 2: domain.v1.CronFormat
+	(*UpdateParams)(nil),               // 3: domain.v1.UpdateParams
+	(*Source)(nil),                     // 4: domain.v1.Source
+	(*CreateSourceRequest)(nil),        // 5: domain.v1.CreateSourceRequest
+	(*GetSourceRequest)(nil),           // 6: domain.v1.GetSourceRequest
+	(*GetSourceIDsRequest)(nil),        // 7: domain.v1.GetSourceIDsRequest
+	(*GetSourceIDsResponse)(nil),       // 8: domain.v1.GetSourceIDsResponse
+	(*UpdateSourceRequest)(nil),        // 9: domain.v1.UpdateSourceRequest
+	(*DeleteSourceRequest)(nil),        // 10: domain.v1.DeleteSourceRequest
+	(*ListSourcesRequest)(nil),         // 11: domain.v1.ListSourcesRequest
+	(*ListSourcesByDomainRequest)(nil), // 12: domain.v1.ListSourcesByDomainRequest
+	(*ListSourcesResponse)(nil),        // 13: domain.v1.ListSourcesResponse
+	(*timestamppb.Timestamp)(nil),      // 14: google.protobuf.Timestamp
 }
 var file_domain_v1_source_model_proto_depIdxs = []int32{
 	2,  // 0: domain.v1.UpdateParams.cron:type_name -> domain.v1.CronFormat
 	0,  // 1: domain.v1.Source.typ:type_name -> domain.v1.SourceType
 	3,  // 2: domain.v1.Source.updateParams:type_name -> domain.v1.UpdateParams
 	1,  // 3: domain.v1.Source.status:type_name -> domain.v1.SourceStatus
-	13, // 4: domain.v1.Source.createdAt:type_name -> google.protobuf.Timestamp
-	13, // 5: domain.v1.Source.updatedAt:type_name -> google.protobuf.Timestamp
+	14, // 4: domain.v1.Source.createdAt:type_name -> google.protobuf.Timestamp
+	14, // 5: domain.v1.Source.updatedAt:type_name -> google.protobuf.Timestamp
 	0,  // 6: domain.v1.CreateSourceRequest.typ:type_name -> domain.v1.SourceType
 	3,  // 7: domain.v1.CreateSourceRequest.updateParams:type_name -> domain.v1.UpdateParams
 	3,  // 8: domain.v1.UpdateSourceRequest.updateParams:type_name -> domain.v1.UpdateParams
@@ -938,7 +1003,7 @@ func file_domain_v1_source_model_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_domain_v1_source_model_proto_rawDesc), len(file_domain_v1_source_model_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   11,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

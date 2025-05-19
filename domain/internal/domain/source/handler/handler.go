@@ -24,6 +24,7 @@ type sourceController interface {
 	UpdateSource(ctx context.Context, req *pb.UpdateSourceRequest, meta *authpb.UserAuthMetadata) (*pb.Source, error)
 	DeleteSource(ctx context.Context, sourceID int64, meta *authpb.UserAuthMetadata) error
 	ListSources(ctx context.Context, req *pb.ListSourcesRequest, meta *authpb.UserAuthMetadata) (*pb.ListSourcesResponse, error)
+	ListSourcesByDomain(ctx context.Context, req *pb.ListSourcesByDomainRequest, meta *authpb.UserAuthMetadata) (*pb.ListSourcesResponse, error)
 	GetPermittedRoles(ctx context.Context, req *pb.GetResourcePermissionsRequest, meta *authpb.UserAuthMetadata) (*pb.PermittedRoles, error)
 	GetPermittedUsers(ctx context.Context, req *pb.GetResourcePermissionsRequest, meta *authpb.UserAuthMetadata) (*pb.PermittedUsers, error)
 	UpdatePermittedRoles(ctx context.Context, req *pb.PermittedRoles, meta *authpb.UserAuthMetadata) (*pb.PermittedRoles, error)
