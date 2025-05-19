@@ -6,6 +6,7 @@ package pb.ml;
 option go_package="internal/domain/pb";
 
 import "ml/v1/model.proto";
+import "google/protobuf/empty.proto";
 
 service MLService {
   rpc ProcessQuery (ProcessQueryRequest) returns (stream ProcessQueryResponse) {};

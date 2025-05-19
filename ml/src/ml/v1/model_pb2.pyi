@@ -109,6 +109,8 @@ class Scenario(_message.Message):
     model: LlmModel
     createdAt: _timestamp_pb2.Timestamp
     updatedAt: _timestamp_pb2.Timestamp
+    title: str
+    domainId: int
     def __init__(
         self,
         id: _Optional[int] = ...,

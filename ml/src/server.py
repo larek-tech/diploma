@@ -90,6 +90,29 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
             logger.error("Timeout error processing request")
             await context.abort(grpc.StatusCode.DEADLINE_EXCEEDED, "Timeout")
 
+    async def ProcessFirstQuery(  # noqa: N802
+        self,
+        request: ml_pb2_model.ProcessFirstQueryRequest,
+        context: aio.ServicerContext,
+    ) -> ml_pb2_model.ProcessFirstQueryResponse:
+        client_ip = context.peer().split(":")[-1]
+
+        logger.info(f"New request [From {client_ip}\nQuery: {request.query}\n")
+        try:
+            response = await self.rag.ollama_client.generate(
+                prompt=FIRST_MESSAE_PROMPT.format(message=request.query),
+                model=OLLAMA_BASE_MODEL,
+            )
+            return ml_pb2_model.ProcessFirstQueryResponse(query=response)
+        except grpc.RpcError as e:
+            logger.error(
+                f"gRPC error processing request: {e.code()}: {e.details()}"
+            )
+            await context.abort(e.code(), e.details())
+        except TimeoutError:
+            logger.error("Timeout error processing request")
+            await context.abort(grpc.StatusCode.DEADLINE_EXCEEDED, "Timeout")
+
     async def GetDefaultParams(  # noqa: N802
         self,
         request,
