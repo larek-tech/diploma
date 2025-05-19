@@ -13,6 +13,7 @@ type ScenarioDao struct {
 	Title             string    `db:"title"`
 	UserID            int64     `db:"user_id"`
 	DomainID          int64     `db:"domain_id"`
+	ContextSize       int64     `db:"context_size"`
 	UseMultiquery     bool      `db:"use_multiquery"`
 	NQueries          int64     `db:"n_queries"`
 	QueryModelName    string    `db:"query_model_name"`

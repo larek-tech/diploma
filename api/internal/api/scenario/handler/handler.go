@@ -6,6 +6,7 @@ import (
 
 const (
 	scenarioIDParam = "id"
+	domainIDParam   = "domain_id"
 	offsetParam     = "offset"
 	limitParam      = "limit"
 )

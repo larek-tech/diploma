@@ -6,6 +6,7 @@ import (
 
 const (
 	sourceIDParam = "id"
+	domainIDParam = "id"
 	offsetParam   = "offset"
 	limitParam    = "limit"
 )

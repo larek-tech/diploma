@@ -14,6 +14,7 @@ type scenarioRepo interface {
 	UpdateScenario(ctx context.Context, s model.ScenarioDao, userID int64) error
 	DeleteScenario(ctx context.Context, id, userID int64) error
 	ListScenarios(ctx context.Context, userID int64, offset, limit uint64) ([]model.ScenarioDao, error)
+	ListScenariosByDomain(ctx context.Context, domainID int64, offset, limit uint64) ([]model.ScenarioDao, error)
 }
 
 // Controller implements scenario methods on logic layer.

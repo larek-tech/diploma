@@ -25,7 +25,8 @@ const updateScenario = `
 	    top_n=$15,
 	    threshold=$16,
 	    search_by_query=$17,
-		title=$18
+		title=$18,
+		context_size=$19
 	where id = $1
 		and user_id = $2;
 `
@@ -53,6 +54,7 @@ func (r *Repo) UpdateScenario(ctx context.Context, s model.ScenarioDao, userID i
 		s.Threshold,
 		s.SearchByQuery,
 		s.Title,
+		s.ContextSize,
 	)
 	if err != nil {
 		return errs.WrapErr(err, "update scenario")

@@ -35,6 +35,7 @@ type sourceRepo interface {
 	UpdateSource(ctx context.Context, s model.SourceDao, userID int64, roleIDs []int64) error
 	DeleteSource(ctx context.Context, id, userID int64, roleIDs []int64) error
 	ListSources(ctx context.Context, userID int64, roleIDs []int64, offset, limit uint64) ([]model.SourceDao, error)
+	ListSourcesByDomain(ctx context.Context, userID, domainID int64, roleIDs []int64, offset, limit uint64) ([]model.SourceDao, error)
 	GetPermittedUsers(ctx context.Context, sourceID int64) ([]int64, error)
 	GetPermittedRoles(ctx context.Context, sourceID int64) ([]int64, error)
 	UpdatePermittedUsers(ctx context.Context, sourceID int64, userIDs []int64) ([]int64, error)

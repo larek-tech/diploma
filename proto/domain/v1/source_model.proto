@@ -83,6 +83,12 @@ message ListSourcesRequest {
   uint64 limit = 2;
 };
 
+message ListSourcesByDomainRequest {
+  int64 domainId = 1;
+  uint64 offset = 2;
+  uint64 limit = 3;
+};
+
 message ListSourcesResponse {
   repeated Source sources = 1;
 };

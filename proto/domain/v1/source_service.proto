@@ -14,6 +14,7 @@ service SourceService {
   rpc UpdateSource(UpdateSourceRequest) returns (Source) {};
   rpc DeleteSource(DeleteSourceRequest) returns (google.protobuf.Empty) {};
   rpc ListSources(ListSourcesRequest) returns(ListSourcesResponse) {};
+  rpc ListSourcesByDomain(ListSourcesByDomainRequest) returns (ListSourcesResponse) {};
 
   rpc GetPermittedUsers(GetResourcePermissionsRequest) returns (PermittedUsers) {};
   rpc UpdatePermittedUsers(PermittedUsers) returns (PermittedUsers) {};

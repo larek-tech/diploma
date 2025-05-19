@@ -29,6 +29,7 @@ type CreateScenarioRequest struct {
 	VectorSearch  *VectorSearch          `protobuf:"bytes,4,opt,name=vectorSearch,proto3,oneof" json:"vectorSearch,omitempty"`
 	Model         *LlmModel              `protobuf:"bytes,5,opt,name=model,proto3" json:"model,omitempty"`
 	DomainId      int64                  `protobuf:"varint,6,opt,name=domainId,proto3" json:"domainId,omitempty"`
+	ContextSize   int64                  `protobuf:"varint,7,opt,name=contextSize,proto3" json:"contextSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -101,6 +102,13 @@ func (x *CreateScenarioRequest) GetModel() *LlmModel {
 func (x *CreateScenarioRequest) GetDomainId() int64 {
 	if x != nil {
 		return x.DomainId
+	}
+	return 0
+}
+
+func (x *CreateScenarioRequest) GetContextSize() int64 {
+	if x != nil {
+		return x.ContextSize
 	}
 	return 0
 }
@@ -212,6 +220,7 @@ type UpdateScenarioRequest struct {
 	Threshold         *float32               `protobuf:"fixed32,15,opt,name=threshold,proto3,oneof" json:"threshold,omitempty"`
 	SearchByQuery     *bool                  `protobuf:"varint,16,opt,name=searchByQuery,proto3,oneof" json:"searchByQuery,omitempty"`
 	Title             string                 `protobuf:"bytes,17,opt,name=title,proto3" json:"title,omitempty"`
+	DomainId          int64                  `protobuf:"varint,18,opt,name=domainId,proto3" json:"domainId,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -365,6 +374,13 @@ func (x *UpdateScenarioRequest) GetTitle() string {
 	return ""
 }
 
+func (x *UpdateScenarioRequest) GetDomainId() int64 {
+	if x != nil {
+		return x.DomainId
+	}
+	return 0
+}
+
 type DeleteScenarioRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ScenarioId    int64                  `protobuf:"varint,1,opt,name=scenarioId,proto3" json:"scenarioId,omitempty"`
@@ -461,6 +477,66 @@ func (x *ListScenariosRequest) GetLimit() uint64 {
 	return 0
 }
 
+type ListScenariosByDomainRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DomainId      int64                  `protobuf:"varint,1,opt,name=domainId,proto3" json:"domainId,omitempty"`
+	Offset        uint64                 `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit         uint64                 `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListScenariosByDomainRequest) Reset() {
+	*x = ListScenariosByDomainRequest{}
+	mi := &file_domain_v1_scenario_model_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListScenariosByDomainRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListScenariosByDomainRequest) ProtoMessage() {}
+
+func (x *ListScenariosByDomainRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_domain_v1_scenario_model_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListScenariosByDomainRequest.ProtoReflect.Descriptor instead.
+func (*ListScenariosByDomainRequest) Descriptor() ([]byte, []int) {
+	return file_domain_v1_scenario_model_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ListScenariosByDomainRequest) GetDomainId() int64 {
+	if x != nil {
+		return x.DomainId
+	}
+	return 0
+}
+
+func (x *ListScenariosByDomainRequest) GetOffset() uint64 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+func (x *ListScenariosByDomainRequest) GetLimit() uint64 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
 type ListScenariosResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Scenarios     []*Scenario            `protobuf:"bytes,1,rep,name=scenarios,proto3" json:"scenarios,omitempty"`
@@ -470,7 +546,7 @@ type ListScenariosResponse struct {
 
 func (x *ListScenariosResponse) Reset() {
 	*x = ListScenariosResponse{}
-	mi := &file_domain_v1_scenario_model_proto_msgTypes[6]
+	mi := &file_domain_v1_scenario_model_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -482,7 +558,7 @@ func (x *ListScenariosResponse) String() string {
 func (*ListScenariosResponse) ProtoMessage() {}
 
 func (x *ListScenariosResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_v1_scenario_model_proto_msgTypes[6]
+	mi := &file_domain_v1_scenario_model_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -495,7 +571,7 @@ func (x *ListScenariosResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListScenariosResponse.ProtoReflect.Descriptor instead.
 func (*ListScenariosResponse) Descriptor() ([]byte, []int) {
-	return file_domain_v1_scenario_model_proto_rawDescGZIP(), []int{6}
+	return file_domain_v1_scenario_model_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ListScenariosResponse) GetScenarios() []*Scenario {
@@ -509,7 +585,7 @@ var File_domain_v1_scenario_model_proto protoreflect.FileDescriptor
 
 const file_domain_v1_scenario_model_proto_rawDesc = "" +
 	"\n" +
-	"\x1edomain/v1/scenario_model.proto\x12\tdomain.v1\x1a\x11ml/v1/model.proto\"\xc5\x02\n" +
+	"\x1edomain/v1/scenario_model.proto\x12\tdomain.v1\x1a\x11ml/v1/model.proto\"\xe7\x02\n" +
 	"\x15CreateScenarioRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x126\n" +
 	"\n" +
@@ -518,7 +594,8 @@ const file_domain_v1_scenario_model_proto_rawDesc = "" +
 	"\breranker\x18\x03 \x01(\v2\x0f.pb.ml.RerankerH\x01R\breranker\x88\x01\x01\x12<\n" +
 	"\fvectorSearch\x18\x04 \x01(\v2\x13.pb.ml.VectorSearchH\x02R\fvectorSearch\x88\x01\x01\x12%\n" +
 	"\x05model\x18\x05 \x01(\v2\x0f.pb.ml.LlmModelR\x05model\x12\x1a\n" +
-	"\bdomainId\x18\x06 \x01(\x03R\bdomainIdB\r\n" +
+	"\bdomainId\x18\x06 \x01(\x03R\bdomainId\x12 \n" +
+	"\vcontextSize\x18\a \x01(\x03R\vcontextSizeB\r\n" +
 	"\v_multiQueryB\v\n" +
 	"\t_rerankerB\x0f\n" +
 	"\r_vectorSearch\"4\n" +
@@ -527,7 +604,7 @@ const file_domain_v1_scenario_model_proto_rawDesc = "" +
 	"scenarioId\x18\x01 \x01(\x03R\n" +
 	"scenarioId\"?\n" +
 	"\x19GetDefaultScenarioRequest\x12\"\n" +
-	"\fdefaultTitle\x18\x01 \x01(\tR\fdefaultTitle\"\xee\x06\n" +
+	"\fdefaultTitle\x18\x01 \x01(\tR\fdefaultTitle\"\x8a\a\n" +
 	"\x15UpdateScenarioRequest\x12\x1e\n" +
 	"\n" +
 	"scenarioId\x18\x01 \x01(\x03R\n" +
@@ -549,7 +626,8 @@ const file_domain_v1_scenario_model_proto_rawDesc = "" +
 	"\x04topN\x18\x0e \x01(\x03H\fR\x04topN\x88\x01\x01\x12!\n" +
 	"\tthreshold\x18\x0f \x01(\x02H\rR\tthreshold\x88\x01\x01\x12)\n" +
 	"\rsearchByQuery\x18\x10 \x01(\bH\x0eR\rsearchByQuery\x88\x01\x01\x12\x14\n" +
-	"\x05title\x18\x11 \x01(\tR\x05titleB\x10\n" +
+	"\x05title\x18\x11 \x01(\tR\x05title\x12\x1a\n" +
+	"\bdomainId\x18\x12 \x01(\x03R\bdomainIdB\x10\n" +
 	"\x0e_useMultiqueryB\v\n" +
 	"\t_nQueriesB\x11\n" +
 	"\x0f_queryModelNameB\f\n" +
@@ -575,7 +653,11 @@ const file_domain_v1_scenario_model_proto_rawDesc = "" +
 	"scenarioId\"D\n" +
 	"\x14ListScenariosRequest\x12\x16\n" +
 	"\x06offset\x18\x01 \x01(\x04R\x06offset\x12\x14\n" +
-	"\x05limit\x18\x02 \x01(\x04R\x05limit\"F\n" +
+	"\x05limit\x18\x02 \x01(\x04R\x05limit\"h\n" +
+	"\x1cListScenariosByDomainRequest\x12\x1a\n" +
+	"\bdomainId\x18\x01 \x01(\x03R\bdomainId\x12\x16\n" +
+	"\x06offset\x18\x02 \x01(\x04R\x06offset\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x04R\x05limit\"F\n" +
 	"\x15ListScenariosResponse\x12-\n" +
 	"\tscenarios\x18\x01 \x03(\v2\x0f.pb.ml.ScenarioR\tscenariosB\x14Z\x12internal/domain/pbb\x06proto3"
 
@@ -591,27 +673,28 @@ func file_domain_v1_scenario_model_proto_rawDescGZIP() []byte {
 	return file_domain_v1_scenario_model_proto_rawDescData
 }
 
-var file_domain_v1_scenario_model_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_domain_v1_scenario_model_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_domain_v1_scenario_model_proto_goTypes = []any{
-	(*CreateScenarioRequest)(nil),     // 0: domain.v1.CreateScenarioRequest
-	(*GetScenarioRequest)(nil),        // 1: domain.v1.GetScenarioRequest
-	(*GetDefaultScenarioRequest)(nil), // 2: domain.v1.GetDefaultScenarioRequest
-	(*UpdateScenarioRequest)(nil),     // 3: domain.v1.UpdateScenarioRequest
-	(*DeleteScenarioRequest)(nil),     // 4: domain.v1.DeleteScenarioRequest
-	(*ListScenariosRequest)(nil),      // 5: domain.v1.ListScenariosRequest
-	(*ListScenariosResponse)(nil),     // 6: domain.v1.ListScenariosResponse
-	(*MultiQuery)(nil),                // 7: pb.ml.MultiQuery
-	(*Reranker)(nil),                  // 8: pb.ml.Reranker
-	(*VectorSearch)(nil),              // 9: pb.ml.VectorSearch
-	(*LlmModel)(nil),                  // 10: pb.ml.LlmModel
-	(*Scenario)(nil),                  // 11: pb.ml.Scenario
+	(*CreateScenarioRequest)(nil),        // 0: domain.v1.CreateScenarioRequest
+	(*GetScenarioRequest)(nil),           // 1: domain.v1.GetScenarioRequest
+	(*GetDefaultScenarioRequest)(nil),    // 2: domain.v1.GetDefaultScenarioRequest
+	(*UpdateScenarioRequest)(nil),        // 3: domain.v1.UpdateScenarioRequest
+	(*DeleteScenarioRequest)(nil),        // 4: domain.v1.DeleteScenarioRequest
+	(*ListScenariosRequest)(nil),         // 5: domain.v1.ListScenariosRequest
+	(*ListScenariosByDomainRequest)(nil), // 6: domain.v1.ListScenariosByDomainRequest
+	(*ListScenariosResponse)(nil),        // 7: domain.v1.ListScenariosResponse
+	(*MultiQuery)(nil),                   // 8: pb.ml.MultiQuery
+	(*Reranker)(nil),                     // 9: pb.ml.Reranker
+	(*VectorSearch)(nil),                 // 10: pb.ml.VectorSearch
+	(*LlmModel)(nil),                     // 11: pb.ml.LlmModel
+	(*Scenario)(nil),                     // 12: pb.ml.Scenario
 }
 var file_domain_v1_scenario_model_proto_depIdxs = []int32{
-	7,  // 0: domain.v1.CreateScenarioRequest.multiQuery:type_name -> pb.ml.MultiQuery
-	8,  // 1: domain.v1.CreateScenarioRequest.reranker:type_name -> pb.ml.Reranker
-	9,  // 2: domain.v1.CreateScenarioRequest.vectorSearch:type_name -> pb.ml.VectorSearch
-	10, // 3: domain.v1.CreateScenarioRequest.model:type_name -> pb.ml.LlmModel
-	11, // 4: domain.v1.ListScenariosResponse.scenarios:type_name -> pb.ml.Scenario
+	8,  // 0: domain.v1.CreateScenarioRequest.multiQuery:type_name -> pb.ml.MultiQuery
+	9,  // 1: domain.v1.CreateScenarioRequest.reranker:type_name -> pb.ml.Reranker
+	10, // 2: domain.v1.CreateScenarioRequest.vectorSearch:type_name -> pb.ml.VectorSearch
+	11, // 3: domain.v1.CreateScenarioRequest.model:type_name -> pb.ml.LlmModel
+	12, // 4: domain.v1.ListScenariosResponse.scenarios:type_name -> pb.ml.Scenario
 	5,  // [5:5] is the sub-list for method output_type
 	5,  // [5:5] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
@@ -633,7 +716,7 @@ func file_domain_v1_scenario_model_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_domain_v1_scenario_model_proto_rawDesc), len(file_domain_v1_scenario_model_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

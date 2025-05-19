@@ -297,6 +297,7 @@ type Scenario struct {
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
 	Title         string                 `protobuf:"bytes,8,opt,name=title,proto3" json:"title,omitempty"`
 	DomainId      int64                  `protobuf:"varint,9,opt,name=domainId,proto3" json:"domainId,omitempty"`
+	ContextSize   int64                  `protobuf:"varint,10,opt,name=contextSize,proto3" json:"contextSize,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -390,6 +391,13 @@ func (x *Scenario) GetTitle() string {
 func (x *Scenario) GetDomainId() int64 {
 	if x != nil {
 		return x.DomainId
+	}
+	return 0
+}
+
+func (x *Scenario) GetContextSize() int64 {
+	if x != nil {
+		return x.ContextSize
 	}
 	return 0
 }
@@ -835,7 +843,7 @@ const file_ml_v1_model_proto_rawDesc = "" +
 	"\fVectorSearch\x12\x12\n" +
 	"\x04topN\x18\x01 \x01(\x03R\x04topN\x12\x1c\n" +
 	"\tthreshold\x18\x02 \x01(\x02R\tthreshold\x12$\n" +
-	"\rsearchByQuery\x18\x03 \x01(\bR\rsearchByQuery\"\xbc\x03\n" +
+	"\rsearchByQuery\x18\x03 \x01(\bR\rsearchByQuery\"\xde\x03\n" +
 	"\bScenario\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x126\n" +
 	"\n" +
@@ -847,7 +855,9 @@ const file_ml_v1_model_proto_rawDesc = "" +
 	"\tcreatedAt\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
 	"\tupdatedAt\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x14\n" +
 	"\x05title\x18\b \x01(\tR\x05title\x12\x1a\n" +
-	"\bdomainId\x18\t \x01(\x03R\bdomainIdB\r\n" +
+	"\bdomainId\x18\t \x01(\x03R\bdomainId\x12 \n" +
+	"\vcontextSize\x18\n" +
+	" \x01(\x03R\vcontextSizeB\r\n" +
 	"\v_multiQueryB\v\n" +
 	"\t_rerankerB\x0f\n" +
 	"\r_vectorSearch\"I\n" +

@@ -20,12 +20,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ScenarioService_CreateScenario_FullMethodName     = "/domain.v1.ScenarioService/CreateScenario"
-	ScenarioService_GetScenario_FullMethodName        = "/domain.v1.ScenarioService/GetScenario"
-	ScenarioService_GetDefaultScenario_FullMethodName = "/domain.v1.ScenarioService/GetDefaultScenario"
-	ScenarioService_UpdateScenario_FullMethodName     = "/domain.v1.ScenarioService/UpdateScenario"
-	ScenarioService_DeleteScenario_FullMethodName     = "/domain.v1.ScenarioService/DeleteScenario"
-	ScenarioService_ListScenarios_FullMethodName      = "/domain.v1.ScenarioService/ListScenarios"
+	ScenarioService_CreateScenario_FullMethodName        = "/domain.v1.ScenarioService/CreateScenario"
+	ScenarioService_GetScenario_FullMethodName           = "/domain.v1.ScenarioService/GetScenario"
+	ScenarioService_GetDefaultScenario_FullMethodName    = "/domain.v1.ScenarioService/GetDefaultScenario"
+	ScenarioService_UpdateScenario_FullMethodName        = "/domain.v1.ScenarioService/UpdateScenario"
+	ScenarioService_DeleteScenario_FullMethodName        = "/domain.v1.ScenarioService/DeleteScenario"
+	ScenarioService_ListScenarios_FullMethodName         = "/domain.v1.ScenarioService/ListScenarios"
+	ScenarioService_ListScenariosByDomain_FullMethodName = "/domain.v1.ScenarioService/ListScenariosByDomain"
 )
 
 // ScenarioServiceClient is the client API for ScenarioService service.
@@ -38,6 +39,7 @@ type ScenarioServiceClient interface {
 	UpdateScenario(ctx context.Context, in *UpdateScenarioRequest, opts ...grpc.CallOption) (*Scenario, error)
 	DeleteScenario(ctx context.Context, in *DeleteScenarioRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListScenarios(ctx context.Context, in *ListScenariosRequest, opts ...grpc.CallOption) (*ListScenariosResponse, error)
+	ListScenariosByDomain(ctx context.Context, in *ListScenariosByDomainRequest, opts ...grpc.CallOption) (*ListScenariosResponse, error)
 }
 
 type scenarioServiceClient struct {
@@ -108,6 +110,16 @@ func (c *scenarioServiceClient) ListScenarios(ctx context.Context, in *ListScena
 	return out, nil
 }
 
+func (c *scenarioServiceClient) ListScenariosByDomain(ctx context.Context, in *ListScenariosByDomainRequest, opts ...grpc.CallOption) (*ListScenariosResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListScenariosResponse)
+	err := c.cc.Invoke(ctx, ScenarioService_ListScenariosByDomain_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ScenarioServiceServer is the server API for ScenarioService service.
 // All implementations must embed UnimplementedScenarioServiceServer
 // for forward compatibility.
@@ -118,6 +130,7 @@ type ScenarioServiceServer interface {
 	UpdateScenario(context.Context, *UpdateScenarioRequest) (*Scenario, error)
 	DeleteScenario(context.Context, *DeleteScenarioRequest) (*emptypb.Empty, error)
 	ListScenarios(context.Context, *ListScenariosRequest) (*ListScenariosResponse, error)
+	ListScenariosByDomain(context.Context, *ListScenariosByDomainRequest) (*ListScenariosResponse, error)
 	mustEmbedUnimplementedScenarioServiceServer()
 }
 
@@ -145,6 +158,9 @@ func (UnimplementedScenarioServiceServer) DeleteScenario(context.Context, *Delet
 }
 func (UnimplementedScenarioServiceServer) ListScenarios(context.Context, *ListScenariosRequest) (*ListScenariosResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListScenarios not implemented")
+}
+func (UnimplementedScenarioServiceServer) ListScenariosByDomain(context.Context, *ListScenariosByDomainRequest) (*ListScenariosResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListScenariosByDomain not implemented")
 }
 func (UnimplementedScenarioServiceServer) mustEmbedUnimplementedScenarioServiceServer() {}
 func (UnimplementedScenarioServiceServer) testEmbeddedByValue()                         {}
@@ -275,6 +291,24 @@ func _ScenarioService_ListScenarios_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ScenarioService_ListScenariosByDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListScenariosByDomainRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScenarioServiceServer).ListScenariosByDomain(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ScenarioService_ListScenariosByDomain_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScenarioServiceServer).ListScenariosByDomain(ctx, req.(*ListScenariosByDomainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ScenarioService_ServiceDesc is the grpc.ServiceDesc for ScenarioService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -305,6 +339,10 @@ var ScenarioService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListScenarios",
 			Handler:    _ScenarioService_ListScenarios_Handler,
+		},
+		{
+			MethodName: "ListScenariosByDomain",
+			Handler:    _ScenarioService_ListScenariosByDomain_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

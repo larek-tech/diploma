@@ -15,6 +15,7 @@ type scenarioController interface {
 	UpdateScenario(ctx context.Context, req *pb.UpdateScenarioRequest, meta *authpb.UserAuthMetadata) (*pb.Scenario, error)
 	DeleteScenario(ctx context.Context, sourceID int64, meta *authpb.UserAuthMetadata) error
 	ListScenarios(ctx context.Context, req *pb.ListScenariosRequest, meta *authpb.UserAuthMetadata) (*pb.ListScenariosResponse, error)
+	ListScenariosByDomain(ctx context.Context, req *pb.ListScenariosByDomainRequest, meta *authpb.UserAuthMetadata) (*pb.ListScenariosResponse, error)
 }
 
 // Handler implements source methods on transport level.

@@ -32,6 +32,8 @@ func (ctrl *Controller) CreateScenario(ctx context.Context, req *pb.CreateScenar
 	scenario := model.ScenarioDao{
 		Title:             req.GetTitle(),
 		UserID:            meta.GetUserId(),
+		DomainID:          req.GetDomainId(),
+		ContextSize:       req.GetContextSize(),
 		UseMultiquery:     multiQuery.GetUseMultiquery(),
 		NQueries:          multiQuery.GetNQueries(),
 		QueryModelName:    multiQuery.GetQueryModelName(),
@@ -47,8 +49,8 @@ func (ctrl *Controller) CreateScenario(ctx context.Context, req *pb.CreateScenar
 		TopN:              vectorSearch.GetTopN(),
 		Threshold:         vectorSearch.GetThreshold(),
 		SearchByQuery:     vectorSearch.GetSearchByQuery(),
-		CreatedAt:         time.Time{},
-		UpdatedAt:         time.Time{},
+		CreatedAt:         time.Now(),
+		UpdatedAt:         time.Now(),
 	}
 
 	scenarioID, err := ctrl.sr.InsertScenario(ctx, scenario)
