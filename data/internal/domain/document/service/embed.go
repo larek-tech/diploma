@@ -11,7 +11,7 @@ import (
 
 const (
 	// ChunkSize is the size of each chunk in characters.
-	ChunkSize = 8192
+	ChunkSize = 4096
 	// ChunkOverlap is the number of overlapping characters between chunks.
 	ChunkOverlap  = 100
 	EmbeddingSize = 1024
