@@ -22,10 +22,14 @@ import (
 	"github.com/larek-tech/diploma/data/internal/infrastructure/kafka"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/ollama"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/s3"
 	chunkStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/chunk"
 	documentStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/document"
+	fileStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/file"
+	pageStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/page"
 	sourceStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/source"
 	"github.com/larek-tech/diploma/data/internal/worker/kafka/create_source"
+	"github.com/larek-tech/diploma/data/pkg/metric"
 	"github.com/larek-tech/storage/postgres"
 	"google.golang.org/grpc/reflection"
 )
@@ -63,6 +67,8 @@ func run() int {
 
 	pub := qaas.NewPublisher(sqlDB)
 	pub.CreateAllTables([]qaas.Queue{
+		qaas.ParseFileQueue,
+		qaas.ParseFileResult,
 		qaas.ParseSiteQueue,
 		qaas.ParsePageResultQueue,
 		qaas.ParsePageQueue,
@@ -71,8 +77,23 @@ func run() int {
 		qaas.EmbedResultQueue,
 	})
 
+	objectStorage, err := s3.New(getS3Credentials())
+	if err != nil {
+		slog.Error("failed to create s3 client", "error", err)
+		return -1
+	}
+	err = objectStorage.CreateBuckets(ctx,
+		pageStorage.PageBucketName,
+		fileStorage.FileBucketName,
+	)
+	if err != nil {
+		slog.Error("failed to create s3 bucket", "error", err)
+		return -1
+	}
+
+	fileStorage := fileStorage.New(pg, objectStorage)
 	sourceStore := sourceStorage.New(pg)
-	srcService := sourceService.New(sourceStore, sitemap.New(), pub, trManager)
+	srcService := sourceService.New(sourceStore, fileStorage, sitemap.New(), pub, trManager)
 	documentStore := documentStorage.New(pg)
 	chunkStore := chunkStorage.New(pg, trManager)
 	host, _ := getOllamaConfig()
@@ -96,6 +117,14 @@ func run() int {
 	}
 
 	http.Handle("/test", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 		slog.Info("Received test request")
 		if r.Method != http.MethodPost {
 			logError(w, "Method not allowed", nil, http.StatusMethodNotAllowed)
@@ -122,6 +151,14 @@ func run() int {
 	}))
 
 	http.Handle("/q", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 		if r.Method != http.MethodPost {
 			slog.Error("Method not allowed")
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -186,6 +223,12 @@ func run() int {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		metric.RunPrometheusServer("9090")
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		slog.Info("gRPC server started")
 		grpcErr := srv.Run()
 		if grpcErr != nil {
@@ -217,6 +260,14 @@ func run() int {
 	}()
 	wg.Wait()
 	return 0
+}
+
+func getS3Credentials() s3.Credentials {
+	endpoint := os.Getenv("S3_ENDPOINT")
+	if endpoint == "" {
+		endpoint = "localhost:9000"
+	}
+	return s3.NewCredentials(endpoint, os.Getenv("S3_ACCESS_KEY_ID"), os.Getenv("S3_SECRET_ACCESS_KEY"), true)
 }
 
 // string query = 1;

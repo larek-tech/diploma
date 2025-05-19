@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 5s
+  external_labels:
+    monitor: 'monitoring'
+
+scrape_configs:
+  - job_name: 'crawler'
+    static_configs:
+      - targets: ['crawler:9090']
+
+  - job_name: 'parser'
+    static_configs:
+      - targets: ['parser:9090']

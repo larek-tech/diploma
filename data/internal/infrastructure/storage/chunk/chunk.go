@@ -53,10 +53,7 @@ func (s Storage) Update(ctx context.Context, documentID string, chunks []*docume
 			return fmt.Errorf("failed to delete old chunks: %w", err)
 		}
 		for _, chunk := range chunks {
-			// metadata, err := json.Marshal(chunk.Metadata)
-			// if err != nil {
-			// 	return fmt.Errorf("failed to marshal metadata: %w", err)
-			// }
+			chunk.Content = document.CleanUTF8(chunk.Content)
 
 			if err := s.db.Exec(
 				txCtx,

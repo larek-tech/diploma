@@ -1,8 +1,10 @@
 package embed_document
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -15,13 +17,15 @@ type Handler struct {
 	embeddingService embeddingService
 	pageStore        pageStore
 	siteStore        siteStore
+	fileStore        fileStore
 }
 
-func New(embeddingService embeddingService, pageStore pageStore, siteStore siteStore) *Handler {
+func New(embeddingService embeddingService, pageStore pageStore, siteStore siteStore, fileStore fileStore) *Handler {
 	return &Handler{
 		embeddingService: embeddingService,
 		pageStore:        pageStore,
 		siteStore:        siteStore,
+		fileStore:        fileStore,
 	}
 }
 
@@ -58,10 +62,48 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 			return true, fmt.Errorf("failed to process page in embed_document: %w", err)
 		}
 		return true, nil
-
+	case qaas.ParseFileQueue:
+		var job qaas.FileJob
+		if err := json.Unmarshal(msg.Payload, &job); err != nil {
+			return true, fmt.Errorf("failed to unmarshal FileJob: %w", err)
+		}
+		file, err := h.fileStore.GetByID(ctx, job.Payload.ID)
+		if err != nil {
+			return true, fmt.Errorf("failed o get file from db: %w", err)
+		}
+		if file == nil {
+			return true, fmt.Errorf("got empty file from storage: %v", job)
+		}
+		ext, err := getFileExt(file.Filename)
+		if err != nil {
+			return true, fmt.Errorf("failed to determine file extension")
+		}
+		err = h.embeddingService.Process(
+			ctx,
+			bytes.NewReader(file.Raw),
+			ext,
+			file,
+			file.SourceID,
+		)
+		if err != nil {
+			return true, fmt.Errorf("failed to process file in embed_document: %w", err)
+		}
 	default:
 		return true, fmt.Errorf("unknown job type: %T", msg)
 	}
+	return true, nil
+}
+
+func getFileExt(title string) (document.FileExtension, error) {
+	parts := strings.Split(title, ".")
+	if len(parts) < 2 {
+		return document.PNG, errors.New("file extension not found in title")
+	}
+	ext := "." + strings.ToLower(parts[len(parts)-1])
+	if val, ok := document.FileExtensionMap[ext]; ok {
+		return val, nil
+	}
+	return document.PNG, errors.New("unsupported file extension: " + ext)
 }
 
 func UnmarshalJob(objType string, payload []byte) (any, error) {

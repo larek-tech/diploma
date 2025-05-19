@@ -75,7 +75,7 @@ func (p *Publisher) Publish(ctx context.Context, rawMsg []any, opts ...PublishOp
 	msgs := make([]*pgq.MessageOutgoing, len(rawMsg))
 	for i := 0; i < len(rawMsg); i++ {
 		switch v := rawMsg[i].(type) {
-		case SiteJob, PageJob, EmbedJob:
+		case SiteJob, PageJob, EmbedJob, FileJob:
 			payload, err := json.Marshal(rawMsg[i])
 			if err != nil {
 				return nil, fmt.Errorf("failed to marshal message: %w", err)

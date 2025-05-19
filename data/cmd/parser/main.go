@@ -13,14 +13,18 @@ import (
 	documentService "github.com/larek-tech/diploma/data/internal/domain/document/service"
 	"github.com/larek-tech/diploma/data/internal/domain/site/service/crawler"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/kafka"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/ocr"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/ollama"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/s3"
 	chunkStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/chunk"
 	documentStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/document"
+	fileStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/file"
 	pageStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/page"
 	questionStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/question"
 	siteStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/site"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/storage/sitejob"
+	"github.com/larek-tech/diploma/data/pkg/metric"
+	"github.com/otiai10/gosseract"
 
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/embed_document"
@@ -96,12 +100,21 @@ func run() int {
 		slog.Error("failed to create s3 client", "error", err)
 		return -1
 	}
-	err = objectStorage.CreateBuckets(ctx, pageStorage.PageBucketName)
+	err = objectStorage.CreateBuckets(ctx,
+		pageStorage.PageBucketName,
+		fileStorage.FileBucketName,
+	)
 	if err != nil {
 		slog.Error("failed to create s3 bucket", "error", err)
 		return -1
 	}
 
+	tesseract := gosseract.NewClient()
+	tesseract.Languages = []string{"rus", "eng"}
+	defer tesseract.Close()
+
+	ocr := ocr.New(tesseract)
+	fileStorage := fileStorage.New(pg, objectStorage)
 	siteStore := siteStorage.New(pg)
 	documentStore := documentStorage.New(pg)
 	questionStore := questionStorage.New(pg, trManager)
@@ -109,11 +122,17 @@ func run() int {
 	pageStore := pageStorage.New(pg, objectStorage)
 	siteJobStore := sitejob.New(pg)
 	pageService := crawler.New(httpClient, siteStore, pageStore, siteJobStore, trManager)
-	embeddingService := documentService.New(documentStore, chunkStore, questionStore, embedderModel, llm, trManager)
+	embeddingService := documentService.New(documentStore, chunkStore, questionStore, embedderModel, ocr, llm, trManager)
 	consumer := qaas.NewConsumer(sqlDB)
 
 	slog.Info("Starting consumer")
 	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		metric.RunPrometheusServer("9090")
+	}()
+
 	wg.Add(1)
 	// site parser
 	go func() {
@@ -133,9 +152,18 @@ func run() int {
 		}
 	}()
 	wg.Add(1)
+
 	go func() {
 		defer wg.Done()
-		err = consumer.Run(ctx, qaas.ParsePageResultQueue, embed_document.New(embeddingService, pageStore, siteStore))
+		err = consumer.Run(ctx, qaas.ParsePageResultQueue, embed_document.New(embeddingService, pageStore, siteStore, fileStorage))
+		if err != nil {
+			slog.Error("failed to run consumer", "error", err)
+		}
+	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = consumer.Run(ctx, qaas.ParseFileQueue, embed_document.New(embeddingService, pageStore, siteStore, fileStorage))
 		if err != nil {
 			slog.Error("failed to run consumer", "error", err)
 		}

@@ -3,14 +3,30 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/kafka"
 )
 
 func main() {
+	msgType := flag.String("type", "site", "Type of message: site or png")
+	flag.Parse()
+
+	var testPayload *DataMessage
+	switch *msgType {
+	case "site":
+		testPayload = getSiteMsg()
+	case "png":
+		testPayload = getPngMsg()
+	default:
+		slog.Error("unknown message type", "type", *msgType)
+		return
+	}
+
 	ctx := context.Background()
 	kafkaCfg, err := getKafkaConfig()
 	if err != nil {
@@ -22,15 +38,7 @@ func main() {
 		slog.Error("failed to create kafka producer", "err", err)
 		return
 	}
-	str := "https://notes.kiriha.ru/sitemap.xml"
-	// content := base64.StdEncoding.EncodeToString([]byte(str))
-	testPayload := &DataMessage{
-		Title:        "gitflic",
-		Content:      []byte(str),
-		Type:         Web,
-		Credentials:  nil,
-		UpdateParams: nil,
-	}
+
 	payload, err := json.Marshal(testPayload)
 	if err != nil {
 		slog.Error("failed to marshal payload", "err", err)
@@ -43,13 +51,39 @@ func main() {
 		return
 	}
 }
-
 func getKafkaConfig() (*kafka.Config, error) {
 	var cfg kafka.Config
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
 		return nil, fmt.Errorf("failed to read kafka config: %w", err)
 	}
 	return &cfg, nil
+}
+
+func getSiteMsg() *DataMessage {
+	str := "https://notes.kiriha.ru/sitemap.xml"
+	return &DataMessage{
+		Title:        "gitflic",
+		Content:      []byte(str),
+		Type:         Web,
+		Credentials:  nil,
+		UpdateParams: nil,
+	}
+}
+
+func getPngMsg() *DataMessage {
+	filePath := "mocks/image.png"
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		slog.Error("failed to read png file", "err", err)
+		return nil
+	}
+	return &DataMessage{
+		Title:        "image.png",
+		Content:      data,
+		Type:         SingleFile,
+		Credentials:  nil,
+		UpdateParams: nil,
+	}
 }
 
 type SourceType uint8

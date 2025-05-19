@@ -1,0 +1,85 @@
+@startuml Document Processing Workflow
+
+!theme plain
+skinparam backgroundColor white
+skinparam handwritten false
+skinparam defaultFontName Times New Roman
+skinparam defaultFontSize 14
+skinparam roundCorner 10
+skinparam dpi 300
+
+' Color palette
+!define PRIMARY_COLOR #3498DB
+!define SECONDARY_COLOR #2ECC71
+!define ACCENT_COLOR #E74C3C
+!define NEUTRAL_COLOR #95A5A6
+!define DARK_COLOR #34495E
+
+skinparam activity {
+  BackgroundColor PRIMARY_COLOR
+  BorderColor DARK_COLOR
+  FontColor white
+  ArrowColor DARK_COLOR
+}
+
+skinparam activityDiagram {
+  StartColor ACCENT_COLOR
+  EndColor ACCENT_COLOR
+}
+
+skinparam partition {
+  BackgroundColor white
+  BorderColor DARK_COLOR
+  FontColor DARK_COLOR
+}
+
+title Процесс обработки источника пользователя
+
+start
+
+partition "Backend" {
+  :Создает сообщение в очередь на обработку;
+}
+
+partition "Crawler" {
+  :Получает сообщение из очереди;
+  :Обрабатывает данные;
+  :Извлекает метаданные;
+  :Планирует задачу в QAAS;
+}
+
+partition "QAAS" {
+  :Получает запланированную задачу;
+  :Создает отложенное сообщение в очередь на обработку;
+}
+
+partition "Parser" {
+  :Получает сообщение из очереди QAAS;
+  :Анализирует контент;
+  
+  if (Тип документа?) then (PDF)
+    :Извлечение текста из PDF;
+  elseif (Изображение) then
+    :OCR-обработка изображения;
+  elseif (Веб-страница) then
+    :Парсинг HTML-контента;
+  else (Текстовый файл)
+    :Прямое считывание текста;
+  endif
+  
+  :Преобразует данные в Document;
+  :Разделяет текст на chunks;
+  :Генерирует эмбеддинги для chunks;
+}
+
+partition "Storage" {
+  :Сохраняет Document в базе данных;
+  :Сохраняет chunks с эмбеддингами;
+  :Индексирует данные для векторного поиска;
+}
+
+stop
+
+footer  v0.1
+
+@enduml

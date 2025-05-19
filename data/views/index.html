@@ -1,0 +1,150 @@
+<!-- Sample HTML page to send a file in JSON body via HTTP POST -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Send File in JSON</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Send File as JSON</h2>
+
+    <div class="form-group">
+        <label for="apiUrl">API URL:</label>
+        <input type="text" id="apiUrl" value="http://localhost:8080/test" />
+    </div>
+
+    <div class="form-group">
+        <label for="fileInput">Select File:</label>
+        <input type="file" id="fileInput" />
+    </div>
+
+    <button onclick="sendFile()">Send</button>
+
+    <pre id="result"></pre>
+
+    <script>
+        function uint8ToBase64(u8Arr) {
+            let CHUNK_SIZE = 0x8000; // 32KB
+            let index = 0;
+            let length = u8Arr.length;
+            let result = '';
+            let slice;
+            while (index < length) {
+                slice = u8Arr.subarray(index, Math.min(index + CHUNK_SIZE, length));
+                result += String.fromCharCode.apply(null, slice);
+                index += CHUNK_SIZE;
+            }
+            return btoa(result);
+        }
+
+        function getFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (ext === 'zip') return 3; // ArchivedFiles
+            if (['pdf', 'png', 'jpeg', 'jpg', 'txt', 'md', 'markdown'].includes(ext)) return 2; // SingleFile
+            return 0; // Undefined
+        }
+
+        async function sendFile() {
+            const fileInput = document.getElementById('fileInput');
+            const apiUrlInput = document.getElementById('apiUrl');
+
+            // Get the API URL from the input field
+            const apiUrl = apiUrlInput.value.trim();
+            if (!apiUrl) {
+                alert('Please enter an API URL.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file.');
+                return;
+            }
+
+            // Show loading indicator
+            document.getElementById('result').textContent = 'Sending file, please wait...';
+
+            try {
+                // Read file as ArrayBuffer, then convert to Base64
+                const arrayBuffer = await file.arrayBuffer();
+                const uint8Array = new Uint8Array(arrayBuffer);
+                const base64String = uint8ToBase64(uint8Array);
+
+                // Determine type from extension
+                const type = getFileType(file.name);
+
+                // Prepare JSON body
+                const data = {
+                    title: file.name,
+                    content: base64String,
+                    type: type,
+                    credentials: "",
+                    update_params: {
+                        every_period: 0,
+                        on_time: new Date().toISOString()
+                    }
+                };
+
+                // Send JSON via POST
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.text();
+                document.getElementById('result').textContent = result;
+            } catch (error) {
+                document.getElementById('result').textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+
+</html>

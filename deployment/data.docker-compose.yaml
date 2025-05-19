@@ -7,13 +7,8 @@ services:
     restart: unless-stopped
     env_file:
       - configs/data.migrator.env
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-      POSTGRES_DB: ${POSTGRES_DB:-master}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # - ./init-scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     healthcheck:
@@ -32,12 +27,6 @@ services:
         condition: service_healthy
     env_file:
         - configs/data.migrator.env
-    environment:
-      POSTGRES_DB: ${MIGRATOR_POSTGRES_DB:-master}
-      POSTGRES_HOST: ${MIGRATOR_POSTGRES_HOST:-postgres_local}
-      POSTGRES_PORT: ${MIGRATOR_POSTGRES_PORT:-5432}
-      POSTGRES_USER: ${MIGRATOR_POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${MIGRATOR_POSTGRES_PASSWORD:-password}
 
   crawler:
     build:
@@ -50,6 +39,7 @@ services:
     env_file:
         - configs/data.crawler.env
     ports:
+      - "9091:9090"
       - "9998:8080"
       - "50051:50051"
   parser:
@@ -64,6 +54,7 @@ services:
         - configs/data.parser.env
     ports:
       - "9999:8081"
+      - "9095:9090"
 
 
 

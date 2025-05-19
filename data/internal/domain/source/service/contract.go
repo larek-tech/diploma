@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 
+	"github.com/larek-tech/diploma/data/internal/domain/file"
 	"github.com/larek-tech/diploma/data/internal/domain/sitemap"
 	"github.com/larek-tech/diploma/data/internal/domain/source"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
@@ -15,6 +16,11 @@ type (
 		GetByID(ctx context.Context, id string) (*source.Source, error)
 		Save(ctx context.Context, source *source.Source) error
 	}
+	fileStorage interface {
+		GetByID(ctx context.Context, id string) (*file.File, error)
+		Save(ctx context.Context, file *file.File) error
+	}
+
 	publisher interface {
 		Publish(ctx context.Context, rawMsg []any, opts ...qaas.PublishOption) ([]string, error)
 	}

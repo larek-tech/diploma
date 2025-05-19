@@ -53,11 +53,11 @@ type Page struct {
 	URL           string            `db:"url"`           // URL адрес страницы
 	Metadata      map[string]string `db:"metadata"`      // Metadata метаданные страницы (needs JSONB in Postgres)
 	RawObjectID   string            `db:"raw_object_id"` // RawObjectID идентификатор объекта в S3 с необработанным содержанием страницы
-	Raw           string            // Raw необработанное содержание страницы
-	Content       string            `db:"content"`    // Content текстовое содержание страницы
-	OutgoingPages []string          `db:"outgoing"`   // OutgoingPages список UUID страниц на которые ссылается текущая страница
-	CreatedAt     time.Time         `db:"created_at"` // CreatedAt время создания страницы
-	UpdatedAt     time.Time         `db:"updated_at"` // UpdatedAt время последнего обновления страницы
+	Raw           string            `db:"-" json:"-"`    // Raw необработанное содержание страницы
+	Content       string            `db:"content"`       // Content текстовое содержание страницы
+	OutgoingPages []string          `db:"outgoing"`      // OutgoingPages список UUID страниц на которые ссылается текущая страница
+	CreatedAt     time.Time         `db:"created_at"`    // CreatedAt время создания страницы
+	UpdatedAt     time.Time         `db:"updated_at"`    // UpdatedAt время последнего обновления страницы
 }
 
 // NewPage конструктор для новой страницы, перед сохранением в хранилище

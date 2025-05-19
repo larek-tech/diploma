@@ -1,16 +1,23 @@
-package service
+package html
 
 import (
 	"bytes"
 	"fmt"
 	"io"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/larek-tech/diploma/data/internal/domain/document"
 )
 
-// ParseHTML извлекает основной текстовый контент из HTML-документа, удаляя элементы,
+type Service struct {
+}
+
+func New() *Service {
+	return &Service{}
+}
+
+// Parse извлекает основной текстовый контент из HTML-документа, удаляя элементы,
 // не несущие ценности для основного содержания страницы.
 //
 // Функция принимает io.ReadSeeker с HTML-контентом, очищает его от следующих элементов:
@@ -26,13 +33,12 @@ import (
 //
 // Пример использования:
 //
-//	text, err := ParseHTML(reader)
+//	s := html.New()
+//	text, err := s.Parse(reader)
 //	if err != nil {
 //	    // обработка ошибки
 //	}
-//
-// TODO: FIXME: failed to process page in embed_document: failed to process document: failed to update chunks: failed to insert chunk: ERROR: invalid byte sequence for encoding "UTF8": 0xbd (SQLSTATE 22021)
-func ParseHTML(content io.ReadSeeker) (string, error) {
+func (s Service) Parse(content io.ReadSeeker) (string, error) {
 	_, err := content.Seek(0, io.SeekStart)
 	if err != nil {
 		return "", fmt.Errorf("failed to seek HTML content: %w", err)
@@ -68,22 +74,5 @@ func ParseHTML(content io.ReadSeeker) (string, error) {
 	if text == "" {
 		text = strings.Join(strings.Fields(doc.Text()), " ")
 	}
-	return cleanUTF8(text), nil
-}
-
-func cleanUTF8(input string) string {
-	b := []byte(input)
-	var buf bytes.Buffer
-
-	for len(b) > 0 {
-		r, size := utf8.DecodeRune(b)
-		if r == utf8.RuneError && size == 1 {
-			buf.WriteRune('�') // Replacement character
-			b = b[1:]
-		} else {
-			buf.WriteRune(r)
-			b = b[size:]
-		}
-	}
-	return buf.String()
+	return document.CleanUTF8(text), nil
 }

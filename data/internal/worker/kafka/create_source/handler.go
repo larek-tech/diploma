@@ -44,6 +44,7 @@ func (h Handler) Handle(ctx context.Context, msg *sarama.ConsumerMessage) error 
 	payload.ExternalKey = msg.Key
 
 	newSource, err := h.service.CreateSource(ctx, payload)
+
 	if err != nil {
 		return fmt.Errorf("failed to create new source: %w", err)
 	}
@@ -55,8 +56,6 @@ func (h Handler) Handle(ctx context.Context, msg *sarama.ConsumerMessage) error 
 	if err != nil {
 		return fmt.Errorf("create_source failed to send status msg: %w", err)
 	}
-
-	
 
 	return nil
 }

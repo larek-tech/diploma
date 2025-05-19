@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/larek-tech/diploma/data/internal/domain/document"
+	"github.com/larek-tech/diploma/data/internal/domain/file"
 	"github.com/larek-tech/diploma/data/internal/domain/site"
 )
 
@@ -17,5 +18,8 @@ type (
 	}
 	siteStore interface {
 		GetByID(ctx context.Context, id string) (*site.Site, error)
+	}
+	fileStore interface {
+		GetByID(ctx context.Context, id string) (*file.File, error)
 	}
 )
