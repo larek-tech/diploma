@@ -131,9 +131,8 @@ async def generate_dataset(
 ) -> None:
     generator = SyntheticDatasetGenerator(model=OLLAMA_BASE_MODEL)
     for source_id in source_ids:
-        response = await data_client.get_documents(source_id, size=25, page=1)
+        response = await data_client.get_documents(source_id, n_samples=25)
         chunks = [doc.content for doc in response.documents]
-        logger.info(chunks)
         dataset = await generator.generate_qa_pair(chunks, n_questions=5)
 
         output_path = "synthetic_dataset.jsonl"

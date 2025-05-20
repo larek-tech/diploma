@@ -1,5 +1,6 @@
 import asyncio
 import json
+import time
 import traceback
 from typing import Any
 
@@ -14,12 +15,15 @@ from ragas.metrics import (
     SemanticSimilarity,
 )
 
+from data_client import AsyncDataServiceClient
 import ml.v1.model_pb2 as ml_pb2_model
 from config import (
     DATA_SERVICE_HOST,
+    DATA_SERVICE_PORT,
     DEFAULT_EMBEDER_MODEL,
     DEFAULT_REDIS_URL,
     OLLAMA_BASE_MODEL,
+    OLLAMA_BASE_URL,
 )
 from RAG_pipeline import RAGPipeline
 from utils.logger import logger
@@ -43,7 +47,7 @@ class OptunaPipeline:
         self.redis_url = redis_url if redis_url else DEFAULT_REDIS_URL
         self.embedings_model = embedings_model
         self.embeder = OllamaEmbeddings(
-            base_url=f"http://{DATA_SERVICE_HOST}:11434",
+            base_url=OLLAMA_BASE_URL,
             model=embedings_model
             if embedings_model
             else DEFAULT_EMBEDER_MODEL,
@@ -53,7 +57,6 @@ class OptunaPipeline:
             embeddings=LangchainEmbeddingsWrapper(self.embeder)
         )
         self.rag_pipeline = RAGPipeline()
-        
 
     async def calculate_ragas_metrics(
         self, model_outputs: list[dict[str, Any]]
@@ -161,14 +164,31 @@ class OptunaPipeline:
     async def make_test_request(
         self, params: dict, test_dataset: list[dict[str, str]]
     ) -> Dataset:
+        average_time = 0.0
         results = []
         for entry in test_dataset:
             request = self.build_request(entry, params)
             try:
-                generated_answer, chunks = await self.rag_pipeline.generate(
-                    request
-                )
+                # start = time.perf_counter()
+                # (
+                #     generated_answer,
+                #     chunks,
+                # ) = await self.rag_pipeline.generate_stream(request)
+                # end = time.perf_counter()
+                start = time.perf_counter()
 
+                gen = self.rag_pipeline.generate_stream(request)
+
+                first_answer_part, chunks = await anext(gen)
+                end = time.perf_counter()
+
+                answer_parts = [first_answer_part]
+
+                async for answer_part, _ in gen:
+                    answer_parts.append(answer_part)
+
+                generated_answer = "".join(answer_parts)
+                average_time += end - start
                 logger.debug("Content: %s", generated_answer)
                 logger.debug(
                     "Threashold: %s", params["vectorSearch"]["threshold"]
@@ -196,22 +216,24 @@ class OptunaPipeline:
                     }
                 )
 
-        return results
+        return results, average_time / len(test_dataset)
 
     async def evaluate_rag_pipeline(
         self, params: dict, test_dataset: list[dict[str, str]]
     ) -> tuple[float, float]:
         try:
-            model_answers = await self.make_test_request(params, test_dataset)
+            model_answers, average_time = await self.make_test_request(
+                params, test_dataset
+            )
             (
                 context_precision_score,
                 semantic_score,
             ) = await self.calculate_ragas_metrics(model_answers)
-            return context_precision_score, semantic_score
+            return context_precision_score, semantic_score, average_time
         except Exception as e:
             tb = traceback.format_exc()
             logger.error(f"Error during evaluation: {e}\n{tb}")
-            return 0.0, 0.0
+            return 0.0, 0.0, 0.0
 
     async def objective(
         self,
@@ -221,39 +243,41 @@ class OptunaPipeline:
     ) -> float:
         params = {
             "vectorSearch": {
-                "topN": trial.suggest_int("vectorSearch.topN", 9, 20),
+                "topN": trial.suggest_int("vectorSearch.topN", 10, 15),
                 "threshold": trial.suggest_float(
-                    "vectorSearch.threshold", 0.1, 0.7
+                    "vectorSearch.threshold", 0.3, 0.8, step=0.05
                 ),
                 "searchByQuery": trial.suggest_categorical(
-                    "vectorSearch.searchByQuery", [True, False]
+                    "vectorSearch.searchByQuery", [False]
                 ),
             },
-            "reranker": {
-                "useRerank": trial.suggest_categorical(
-                    "reranker.useRerank", [True, False]
-                ),
-                "topK": trial.suggest_int("reranker.topK", 4, 8),
-                "rerankerMaxLength": trial.suggest_categorical(
-                    "reranker.rerankerMaxLength", [8192]
-                ),
-                "rerankerModel": "BAAI/bge-reranker-v2-m3",
-            },
+            # "reranker": {
+            #     "useRerank": trial.suggest_categorical(
+            #         "reranker.useRerank", [True, False]
+            #     ),
+            #     "topK": trial.suggest_int("reranker.topK", 4, 8)
+            #     if trial.params["reranker.useRerank"]
+            #     else None,
+            #     "rerankerMaxLength": 4096,
+            #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
+            # },
             "model": {
                 "temperature": trial.suggest_float(
-                    "model.temperature", 0.0, 1.0
+                    "model.temperature", 0.0, 0.5, step=0.1
                 ),
-                "topK": trial.suggest_int("model.topK", 1, 100),
-                "topP": trial.suggest_float("model.topP", 0.1, 1.0),
+                "topK": trial.suggest_int("model.topK", 5, 50),
+                "topP": trial.suggest_float("model.topP", 0.1, 1.0, step=0.05),
                 "modelName": OLLAMA_BASE_MODEL,
             },
-            "multiQuery": {
-                "useMultiquery": trial.suggest_categorical(
-                    "multiQuery.useMultiquery", [True, False]
-                ),
-                "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 8),
-                "queryModelName": None,
-            },
+            # "multiQuery": {
+            #     "useMultiquery": trial.suggest_categorical(
+            #         "multiQuery.useMultiquery", [True, False]
+            #     ),
+            #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 5)
+            #     if trial.params["multiQuery.useMultiquery"]
+            #     else None,
+            #     "queryModelName": None,
+            # },
             "sourceIds": source_ids,
         }
         return await self.evaluate_rag_pipeline(params, test_dataset)
@@ -271,12 +295,9 @@ class OptunaPipeline:
         - vectorSearch.searchByQuery
         - reranker.useRerank
         - reranker.topK
-        - reranker.rerankerMaxLength
-        - reranker.rerankerModel
         - model.temperature
         - model.topK
         - model.topP
-        - model.modelName
         - multiQuery.useMultiquery
         - multiQuery.nQueries
         - multiQuery.queryModelName
@@ -315,29 +336,31 @@ class OptunaPipeline:
                     "params": params,
                 }
             ]
-        storage_path = f"sqlite:///optuna_study_{'_'.join(source_ids)}.db"
+        storage_path = f"sqlite:///optuna_study_default_rag_{'_'.join(source_ids)}.db"
         study = optuna.create_study(
             directions=["maximize", "maximize"],
-            study_name=f"Full RAG params in sources: {source_ids}",
+            study_name=f"Default RAG params in sources: {source_ids}",
             storage=storage_path,
             load_if_exists=True,
         )
         logger.info("Study name: %s", study.study_name)
-        for trial_num in range(5):
+        for trial_num in range(50):
             trial = study.ask()
             try:
                 (
                     context_precision_score,
                     similarity_score,
+                    average_time,
                 ) = await self.objective(trial, test_dataset, source_ids)
             except Exception as e:
                 logger.error(f"Trial failed: {e}")
                 context_precision_score, similarity_score = 0.0, 0.0
             logger.info(
-                "Trial #%d params: %s metric: %s",
+                "Trial #%d\n params: %s\n metric: %s\n time: %s\n",
                 trial_num,
                 trial.params,
                 (context_precision_score, similarity_score),
+                average_time,
             )
             study.tell(trial, [context_precision_score, similarity_score])
         best_trial = max(
@@ -418,34 +441,15 @@ async def main():
         redis_url="redis://localhost:6379",
         embedings_model=DEFAULT_EMBEDER_MODEL,
     )
-    source_ids = ["be5e140c-548b-4635-9cac-8aeba54414d0"]
-    defaul_rag_params = {
-        "vectorSearch": {
-            "topN": 10,
-            "threshold": 0.4,
-            "searchByQuery": False,
-        },
-        "reranker": {
-            "useRerank": True,
-            "topK": 5,
-            "rerankerMaxLength": 1024,
-            "rerankerModel": "BAAI/bge-reranker-v2-m3",
-        },
-        "model": {
-            "temperature": 0.7,
-            "topK": 20,
-            "topP": 0.9,
-            "modelName": OLLAMA_BASE_MODEL,
-        },
-        "multiQuery": {
-            "useMultiquery": False,
-            "nQueries": 5,
-            "queryModelName": None,
-        },
-        "sourceIds": source_ids,
-    }
-    logger.info(await pipline.study(source_ids, defaul_rag_params))
-
+    data_client = AsyncDataServiceClient(
+        host=DATA_SERVICE_HOST, port=DATA_SERVICE_PORT
+    )
+    source_ids = ["d028f055-c743-4b5f-9995-bd9fcf3b4330"]
+    # await generate_dataset(source_ids, data_client)
+    params = await pipline.study(
+        source_ids=source_ids,
+    )
+    logger.info("Best params: %s", params)
 
 def foo():
     default_rag_params = {
