@@ -1,6 +1,7 @@
 import asyncio
 
 from grpc import aio
+import random
 
 import data.v1.model_pb2 as pb
 import data.v1.service_pb2_grpc as pb_grpc
@@ -20,7 +21,6 @@ class AsyncDataServiceClient:
 
     def __init__(self, host: str = "localhost", port: int = 9990) -> None:
         self.channel = aio.insecure_channel(f"{host}:{port}")
-        logger.info(f"{host}:{port}")
         self.stub = pb_grpc.DataServiceStub(self.channel)
 
     async def close(self) -> None:
@@ -65,27 +65,47 @@ class AsyncDataServiceClient:
         )
         return await self.stub.VectorSearch(request)
 
+   
     async def get_documents(
-        self, source_id: str, size: int = 10, page: int = 1
+        self, source_id: str, n_samples: int
     ) -> pb.GetDocumentsOut:
-        """Получает документы по source_id с пагинацией.
+        """Получает случайные документы по source_id."""
+        size = 10
 
-        Parameters
-        ----------
-        source_id : str
-            Идентификатор источника.
-        size : int, optional
-            Количество документов на странице.
-        page : int, optional
-            Номер страницы.
+        initial_request = pb.GetDocumentsIn(sourceId=source_id, size=1, page=1)
+        initial_response = await self.stub.GetDocuments(initial_request)
+        total_docs = initial_response.total
 
-        Returns
-        -------
-        pb.GetDocumentsOut
-            Ответ с документами от сервера.
-        """
-        request = pb.GetDocumentsIn(sourceId=source_id, size=size, page=page)
-        return await self.stub.GetDocuments(request)
+        if n_samples > total_docs:
+            raise ValueError("Запрошено больше документов, чем существует")
+
+        import random
+        random_indices = random.sample(range(total_docs), n_samples)
+
+        from collections import defaultdict
+        page_offsets = defaultdict(list)
+        for idx in random_indices:
+            page = (idx // size) + 1
+            offset = idx % size
+            page_offsets[page].append(offset)
+
+        tasks = [
+            self.stub.GetDocuments(pb.GetDocumentsIn(sourceId=source_id, size=size, page=page))
+            for page in page_offsets.keys()
+        ]
+        responses = await asyncio.gather(*tasks)
+
+        selected_docs = []
+        for page, resp in zip(page_offsets.keys(), responses):
+            valid_offsets = [offset for offset in page_offsets[page] if offset < len(resp.documents)]
+            selected_docs.extend(resp.documents[offset] for offset in valid_offsets)
+
+        return pb.GetDocumentsOut(
+            documents=selected_docs,
+            total=len(selected_docs),
+            page=0,
+            size=len(selected_docs)
+        )
 
 
 async def main() -> None:

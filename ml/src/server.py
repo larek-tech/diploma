@@ -154,7 +154,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
             f"New request [From {client_ip}"
             f"\nDocuments: {len(request.sourceIds)}"
         )
-        await generate_dataset(request.sourceIds, self.rag.data_client)
+        # await generate_dataset(request.sourceIds, self.rag.data_client)
         return await self.optuna_optimizer.study(
             source_ids=request.sourceIds,
         )
