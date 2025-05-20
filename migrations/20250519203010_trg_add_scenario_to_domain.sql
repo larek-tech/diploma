@@ -8,6 +8,7 @@ begin
     set scenario_ids = array_append(scenario_ids, new.id),
         updated_at = current_timestamp
     where id = new.domain_id;
+    return new;
 end;
 $$
     language plpgsql;
@@ -25,6 +26,7 @@ begin
     set scenario_ids = array_remove(scenario_ids, old.id),
         updated_at = current_timestamp
     where id = old.domain_id;
+    return old;
 end;
 $$
     language plpgsql;
