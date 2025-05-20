@@ -44,8 +44,7 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 		return true, fmt.Errorf("failed to get siteJobID from job")
 	}
 
-	// FIXME: find place with empty uuid and how to prevent that?
-	slog.Info("handled page job", "jon", job)
+	slog.Debug("handled page job", "jon", job)
 	page := job.Payload
 	if page == nil {
 		return true, fmt.Errorf("failed to get page from job")

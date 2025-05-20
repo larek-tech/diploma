@@ -129,7 +129,7 @@ func run() int {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		slog.Info("Received test request")
+		slog.Debug("Received test request")
 		if r.Method != http.MethodPost {
 			logError(w, "Method not allowed", nil, http.StatusMethodNotAllowed)
 			return

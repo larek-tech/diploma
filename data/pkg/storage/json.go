@@ -49,7 +49,7 @@ func (s *JSONStorage) GetByID(ctx context.Context, id string) (*document.Documen
 }
 
 func (s *JSONStorage) Save(ctx context.Context, doc *document.Document) error {
-	slog.Info("json: saving document")
+	slog.Debug("json: saving document")
 	if doc == nil {
 		return fmt.Errorf("cannot save nil document")
 	}

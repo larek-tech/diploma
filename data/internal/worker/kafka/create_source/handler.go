@@ -31,7 +31,7 @@ func New(service service, kafkaProducer kafkaProducer) *Handler {
 }
 
 func (h Handler) Handle(ctx context.Context, msg *sarama.ConsumerMessage) error {
-	slog.Info("received new msg", "msg", string(msg.Key))
+	slog.Debug("received new msg", "msg", string(msg.Key))
 
 	var payload source.DataMessage
 	if err := json.NewDecoder(bytes.NewReader(msg.Value)).Decode(&payload); err != nil {

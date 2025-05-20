@@ -12,6 +12,6 @@ func New() *Handler {
 }
 
 func (h Handler) Handle(ctx context.Context, job any) error {
-	slog.Info("handled result message", "job", job)
+	slog.Debug("handled result message", "job", job)
 	return nil
 }
