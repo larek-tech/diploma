@@ -2,36 +2,32 @@ import json
 
 from config import MULTI_QUESTION_PROMPT
 from ollama_client import AsyncOllamaClient
-from utils.logger import logger
 
-def generate_schema(n: int = 1) -> dict:
-    """Генерирует JSON Schema для списка объектов
-    с полями 'question' и 'answer'.
 
-    Parameters
-    ----------
-    n : int
-        Ожидаемое количество объектов в списке (повторений).
+def generate_schema(
+    n: int,
+    schema_title: str,
+    title_template: str,
+    base_name: str = "question_id",
+) -> dict:
+    """Сгенерировать словарь с настраиваемой структурой для JSON Schema."""
+    properties = {}
+    required = []
 
-    Returns
-    -------
-    dict
-        JSON Schema как словарь Python.
-    """
+    for i in range(1, n + 1):
+        field_name = f"{base_name}_{i}"
+        properties[field_name] = {
+            "title": title_template.format(n=i),
+            "type": "string",
+        }
+        required.append(field_name)
+
     return {
-        "type": "array",
-        "minItems": n,
-        "maxItems": n,
-        "items": {
-            "type": "object",
-            "properties": {
-                "question": {"type": "string"},
-            },
-            "required": ["question"],
-            "additionalProperties": False,
-        },
+        "properties": properties,
+        "required": required,
+        "title": schema_title,
+        "type": "object",
     }
-
 
 
 async def get_multi_questions(
@@ -42,10 +38,11 @@ async def get_multi_questions(
 ) -> list[str]:
     schema = generate_schema(
         n=n_questions,
-        # schema_title="{i} перефразированный вопрос пользователя.",
-        # title_template="Перефразированные вопрос пользователя.",
+        schema_title="{i} перефразированный вопрос пользователя.",
+        title_template="Перефразированные вопрос пользователя.",
     )
-    answers =  json.loads(
+    return list(
+        json.loads(
             await client.generate(
                 prompt=MULTI_QUESTION_PROMPT.format(
                     query=user_prompt,
@@ -54,6 +51,5 @@ async def get_multi_questions(
                 format=schema,
                 model=model,
             )
-        )
-    logger.info(answers)
-    return answers
+        ).values()
+    )

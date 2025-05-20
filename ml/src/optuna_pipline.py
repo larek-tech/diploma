@@ -269,15 +269,15 @@ class OptunaPipeline:
                 "topP": trial.suggest_float("model.topP", 0.1, 1.0, step=0.05),
                 "modelName": OLLAMA_BASE_MODEL,
             },
-            # "multiQuery": {
-            #     "useMultiquery": trial.suggest_categorical(
-            #         "multiQuery.useMultiquery", [True, False]
-            #     ),
-            #     "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 5)
-            #     if trial.params["multiQuery.useMultiquery"]
-            #     else None,
-            #     "queryModelName": None,
-            # },
+            "multiQuery": {
+                "useMultiquery": trial.suggest_categorical(
+                    "multiQuery.useMultiquery", [True]
+                ),
+                "nQueries": trial.suggest_int("multiQuery.nQueries", 3, 5)
+                if trial.params["multiQuery.useMultiquery"]
+                else None,
+                "queryModelName": None,
+            },
             "sourceIds": source_ids,
         }
         return await self.evaluate_rag_pipeline(params, test_dataset)
@@ -336,10 +336,10 @@ class OptunaPipeline:
                     "params": params,
                 }
             ]
-        storage_path = f"sqlite:///optuna_study_default_rag_{'_'.join(source_ids)}.db"
+        storage_path = f"sqlite:///optuna_study_multiquery_rag_{'_'.join(source_ids)}.db"
         study = optuna.create_study(
             directions=["maximize", "maximize"],
-            study_name=f"Default RAG params in sources: {source_ids}",
+            study_name=f"Multiquery RAG params in sources: {source_ids}",
             storage=storage_path,
             load_if_exists=True,
         )
@@ -438,7 +438,7 @@ class OptunaPipeline:
 
 async def main():
     pipline = OptunaPipeline(
-        redis_url="redis://localhost:6379",
+        redis_url="redis://192.168.1.5:6379",
         embedings_model=DEFAULT_EMBEDER_MODEL,
     )
     data_client = AsyncDataServiceClient(

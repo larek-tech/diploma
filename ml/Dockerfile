@@ -19,4 +19,3 @@ ENV PATH="/project/.venv/bin:$PATH"
 
 
 COPY src /project/src
-CMD ["python", "/project/src/server.py"]
