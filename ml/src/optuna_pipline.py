@@ -15,7 +15,6 @@ from ragas.metrics import (
     SemanticSimilarity,
 )
 
-from data_client import AsyncDataServiceClient
 import ml.v1.model_pb2 as ml_pb2_model
 from config import (
     DATA_SERVICE_HOST,
@@ -25,6 +24,7 @@ from config import (
     OLLAMA_BASE_MODEL,
     OLLAMA_BASE_URL,
 )
+from data_client import AsyncDataServiceClient
 from RAG_pipeline import RAGPipeline
 from utils.logger import logger
 
@@ -73,7 +73,6 @@ class OptunaPipeline:
             - semantic_similarity_score
         """
         context_result = 0.0
-        generate_result = 0.0
         total_samples = len(model_outputs)
 
         for sample in model_outputs:
@@ -81,20 +80,15 @@ class OptunaPipeline:
             context_result += await self.context_metric.single_turn_ascore(
                 rag_sample
             )
-            generate_result += await self.generate_metric.single_turn_ascore(
-                rag_sample
-            )
 
         if total_samples == 0:
             return 0.0, 0.0
 
         context_score = context_result / total_samples
-        generate_score = generate_result / total_samples
 
         logger.info("Context Precision: %s", context_score)
-        logger.info("Semantic Similarity: %s", generate_score)
 
-        return context_score, generate_score
+        return context_score
 
     async def load_all_qa_samples_from_redis(
         self, key_prefix: str = "qa:"
@@ -164,32 +158,13 @@ class OptunaPipeline:
     async def make_test_request(
         self, params: dict, test_dataset: list[dict[str, str]]
     ) -> Dataset:
-        average_time = 0.0
         results = []
         for entry in test_dataset:
             request = self.build_request(entry, params)
             try:
-                # start = time.perf_counter()
-                # (
-                #     generated_answer,
-                #     chunks,
-                # ) = await self.rag_pipeline.generate_stream(request)
-                # end = time.perf_counter()
-                start = time.perf_counter()
 
-                gen = self.rag_pipeline.generate_stream(request)
+                chunks = await self.rag_pipeline._prepare_chunks(request)
 
-                first_answer_part, chunks = await anext(gen)
-                end = time.perf_counter()
-
-                answer_parts = [first_answer_part]
-
-                async for answer_part, _ in gen:
-                    answer_parts.append(answer_part)
-
-                generated_answer = "".join(answer_parts)
-                average_time += end - start
-                logger.debug("Content: %s", generated_answer)
                 logger.debug(
                     "Threashold: %s", params["vectorSearch"]["threshold"]
                 )
@@ -199,7 +174,6 @@ class OptunaPipeline:
                         "user_input": entry["question"],
                         "reference": entry["answer"],
                         "reference_contexts": [entry["context"]],
-                        "response": generated_answer,
                         "retrieved_contexts": chunks,
                     }
                 )
@@ -216,20 +190,20 @@ class OptunaPipeline:
                     }
                 )
 
-        return results, average_time / len(test_dataset)
+        return results
 
     async def evaluate_rag_pipeline(
         self, params: dict, test_dataset: list[dict[str, str]]
     ) -> tuple[float, float]:
         try:
-            model_answers, average_time = await self.make_test_request(
+            model_answers= await self.make_test_request(
                 params, test_dataset
             )
             (
-                context_precision_score,
-                semantic_score,
+                context_precision_score
+                # semantic_score,
             ) = await self.calculate_ragas_metrics(model_answers)
-            return context_precision_score, semantic_score, average_time
+            return context_precision_score
         except Exception as e:
             tb = traceback.format_exc()
             logger.error(f"Error during evaluation: {e}\n{tb}")
@@ -243,9 +217,9 @@ class OptunaPipeline:
     ) -> float:
         params = {
             "vectorSearch": {
-                "topN": trial.suggest_int("vectorSearch.topN", 10, 15),
+                "topN": trial.suggest_int("vectorSearch.topN", 8, 15),
                 "threshold": trial.suggest_float(
-                    "vectorSearch.threshold", 0.3, 0.8, step=0.05
+                    "vectorSearch.threshold", 0.2, 0.9, step=0.01
                 ),
                 "searchByQuery": trial.suggest_categorical(
                     "vectorSearch.searchByQuery", [False]
@@ -262,11 +236,9 @@ class OptunaPipeline:
             #     "rerankerModel": "BAAI/bge-reranker-v2-m3",
             # },
             "model": {
-                "temperature": trial.suggest_float(
-                    "model.temperature", 0.0, 0.5, step=0.1
-                ),
-                "topK": trial.suggest_int("model.topK", 5, 50),
-                "topP": trial.suggest_float("model.topP", 0.1, 1.0, step=0.05),
+                "temperature": 0.2,
+                "topK":20,
+                "topP": 0.5,
                 "modelName": OLLAMA_BASE_MODEL,
             },
             "multiQuery": {
@@ -338,8 +310,8 @@ class OptunaPipeline:
             ]
         storage_path = f"sqlite:///optuna_study_multiquery_rag_{'_'.join(source_ids)}.db"
         study = optuna.create_study(
-            directions=["maximize", "maximize"],
-            study_name=f"Multiquery RAG params in sources: {source_ids}",
+            direction="maximize",
+            study_name=f"Default RAG params in sources: {source_ids}",
             storage=storage_path,
             load_if_exists=True,
         )
@@ -347,37 +319,33 @@ class OptunaPipeline:
         for trial_num in range(50):
             trial = study.ask()
             try:
-                (
-                    context_precision_score,
-                    similarity_score,
-                    average_time,
-                ) = await self.objective(trial, test_dataset, source_ids)
+                context_precision_score = await self.objective(trial, test_dataset, source_ids)
             except Exception as e:
                 logger.error(f"Trial failed: {e}")
-                context_precision_score, similarity_score = 0.0, 0.0
+                context_precision_score = 0.0
             logger.info(
-                "Trial #%d\n params: %s\n metric: %s\n time: %s\n",
+                "Trial #%d\n params: %s\n metric: %s\n",
                 trial_num,
                 trial.params,
-                (context_precision_score, similarity_score),
-                average_time,
+                context_precision_score,
+                # average_time,
             )
-            study.tell(trial, [context_precision_score, similarity_score])
-        best_trial = max(
-            study.best_trials,
-            key=lambda t: (
-                t.values[0],
-                t.values[1],
-            ),  # сортировка по двум метрикам
-        )
-        logger.info("Best trial found:")
-        logger.info(
-            " - Values: context=%.4f, semantic=%.4f",
-            best_trial.values[0],
-            best_trial.values[1],
-        )
-        logger.info(" - Params: %s", best_trial.params)
-        return self.trial_to_model_params(best_trial.params)
+            study.tell(trial, context_precision_score)
+        # best_trial = max(
+        #     study.best_trials,
+        #     key=lambda t: (
+        #         t.values[0],
+        #         t.values[1],
+        #     ),  # сортировка по двум метрикам
+        # )
+        # logger.info("Best trial found:")
+        # logger.info(
+        #     " - Values: context=%.4f, semantic=%.4f",
+        #     best_trial.values[0],
+        #     best_trial.values[1],
+        # )
+        logger.info(" - Params: %s", study.best_params)
+        return self.trial_to_model_params(study.best_params)
 
     def trial_to_model_params(self, params):
         model_params = ml_pb2_model.ModelParams()
@@ -428,9 +396,9 @@ class OptunaPipeline:
             ]
 
         model_params.model.modelName = OLLAMA_BASE_MODEL
-        model_params.model.temperature = float(params["model.temperature"])
-        model_params.model.topK = int(params["model.topK"])
-        model_params.model.topP = float(params["model.topP"])
+        # model_params.model.temperature = float(params["model.temperature"])
+        # model_params.model.topK = int(params["model.topK"])
+        # model_params.model.topP = float(params["model.topP"])
         model_params.model.systemPrompt = ""
 
         return model_params
