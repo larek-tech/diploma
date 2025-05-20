@@ -1,6 +1,7 @@
 import asyncio
 from collections.abc import AsyncGenerator
 from concurrent import futures
+import json
 
 import grpc
 from grpc import aio
@@ -12,6 +13,7 @@ from config import (
     DEFAULT_REDIS_URL,
     DEFAULT_RERANKER_NAME,
     FIRST_MESSAE_PROMPT,
+    JSON_SCHEMA,
     ML_SERVICE_PORT,
     OLLAMA_BASE_MODEL,
 )
@@ -99,11 +101,13 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
 
         logger.info(f"New request [From {client_ip}\nQuery: {request.query}\n")
         try:
-            response = await self.rag.ollama_client.generate(
+            json_response = await self.rag.ollama_client.generate(
                 prompt=FIRST_MESSAE_PROMPT.format(message=request.query),
                 model=OLLAMA_BASE_MODEL,
+                format=JSON_SCHEMA,
             )
-            return ml_pb2_model.ProcessFirstQueryResponse(query=response)
+            response = json.loads(json_response)
+            return ml_pb2_model.ProcessFirstQueryResponse(query=response["chat_title"])
         except grpc.RpcError as e:
             logger.error(
                 f"gRPC error processing request: {e.code()}: {e.details()}"
