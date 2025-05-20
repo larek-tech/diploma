@@ -44,15 +44,15 @@ func (h Handler) Handle(ctx context.Context, msg *sarama.ConsumerMessage) error 
 	payload.ExternalKey = msg.Key
 
 	newSource, err := h.service.CreateSource(ctx, payload)
-
 	if err != nil {
+		produceErr := h.produceErrorMessage(ctx, payload.ExternalKey, err)
+		if produceErr != nil {
+			slog.Error("failed to produce error message", "error", produceErr)
+		}
 		return fmt.Errorf("failed to create new source: %w", err)
 	}
-	key, value, err := h.assembleMessage(msg, newSource)
-	if err != nil {
-		return fmt.Errorf("failed to create response msg: %w", err)
-	}
-	err = h.kafkaProducer.Produce(ctx, resultTopic, key, value)
+
+	err = h.produceStatusMessage(ctx, msg.Key, newSource)
 	if err != nil {
 		return fmt.Errorf("create_source failed to send status msg: %w", err)
 	}
@@ -60,9 +60,9 @@ func (h Handler) Handle(ctx context.Context, msg *sarama.ConsumerMessage) error 
 	return nil
 }
 
-func (h Handler) assembleMessage(incomingMsg *sarama.ConsumerMessage, src *source.Source) (key []byte, value []byte, err error) {
+func (h Handler) produceStatusMessage(ctx context.Context, incomingMessageKey []byte, src *source.Source) error {
 	if src == nil {
-		return nil, nil, fmt.Errorf("failed to assemble create source message source is nil")
+		return fmt.Errorf("failed to publish create source message source is nil")
 	}
 	msg := messages.ParsingStatus{
 		SourceID:  src.ID,
@@ -71,10 +71,27 @@ func (h Handler) assembleMessage(incomingMsg *sarama.ConsumerMessage, src *sourc
 		Processed: 0,
 		Total:     0,
 	}
-	value, err = json.Marshal(msg)
+	value, err := json.Marshal(msg)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to marshal payload of ParsingStatus: %w", err)
+		return fmt.Errorf("failed to marshal payload of ParsingStatus: %w", err)
 	}
-	key = incomingMsg.Key
-	return
+	return h.kafkaProducer.Produce(ctx, resultTopic, incomingMessageKey, value)
+}
+
+func (h Handler) produceErrorMessage(ctx context.Context, incomingMessageKey []byte, err error) error {
+	if err == nil {
+		return fmt.Errorf("failed to publish create source message error is nil")
+	}
+	msg := messages.ParsingStatus{
+		SourceID:  "",
+		Status:    messages.StatusFailed,
+		JobID:     "",
+		Processed: 0,
+		Total:     0,
+	}
+	value, err := json.Marshal(msg)
+	if err != nil {
+		return fmt.Errorf("failed to marshal payload of ParsingStatus: %w", err)
+	}
+	return h.kafkaProducer.Produce(ctx, resultTopic, incomingMessageKey, value)
 }

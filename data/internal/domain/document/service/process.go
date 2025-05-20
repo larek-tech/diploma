@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 
 	"github.com/larek-tech/diploma/data/internal/domain/document"
 	"github.com/larek-tech/diploma/data/internal/domain/file"
@@ -38,14 +39,23 @@ func (s Service) Process(ctx context.Context, obj io.ReadSeeker, fileExt documen
 		if txErr != nil {
 			return fmt.Errorf("failed to update chunks: %w", txErr)
 		}
-		//questions, txErr := s.generateQuestions(ctx, chunks)
-		//if txErr != nil {
-		//	return fmt.Errorf("failed to generate questions: %w", txErr)
-		//}
-		//txErr = s.questionStorage.Save(ctx, questions)
-		//if txErr != nil {
-		//	return fmt.Errorf("failed to save questions: %w", txErr)
-		//}
+
+		// Add check for nil questionService
+		if s.questionService == nil {
+			slog.Warn("question service is not initialized, skipping question generation")
+		} else {
+			questions, txErr := s.questionService.GenerateQuestions(ctx, chunks)
+			if txErr != nil {
+				return fmt.Errorf("failed to generate questions: %w", txErr)
+			}
+			if questions != nil && len(questions) > 0 {
+				txErr = s.questionStorage.Save(ctx, questions)
+				if txErr != nil {
+					return fmt.Errorf("failed to save questions: %w", txErr)
+				}
+			}
+		}
+
 		doc.Chunks = lo.Map(chunks, func(chunk *document.Chunk, _ int) string {
 			return chunk.ID
 		})

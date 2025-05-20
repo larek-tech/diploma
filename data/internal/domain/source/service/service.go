@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/larek-tech/diploma/data/internal/domain/file"
@@ -33,9 +34,11 @@ func New(sourceStorage sourceStorage, fileStorage fileStorage, sitemapParser sit
 
 func (s Service) CreateSource(ctx context.Context, msg source.DataMessage) (*source.Source, error) {
 	src := &source.Source{
-		ID:    uuid.NewString(),
-		Title: msg.Title,
-		Type:  msg.Type,
+		ID:        uuid.NewString(),
+		Title:     msg.Title,
+		Type:      msg.Type,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	err := s.trManager.Do(ctx, func(ctx context.Context) error {
 		err := s.sourceStorage.Save(ctx, src)

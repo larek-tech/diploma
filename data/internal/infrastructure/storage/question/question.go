@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/larek-tech/diploma/data/internal/domain/document"
+	"github.com/larek-tech/diploma/data/internal/domain/question"
 )
 
 type Storage struct {
@@ -19,7 +19,7 @@ func New(db db, trManager trManager) *Storage {
 	}
 }
 
-func (s Storage) Save(ctx context.Context, questions []*document.Questions) error {
+func (s Storage) Save(ctx context.Context, questions []*question.Questions) error {
 	return s.trManager.Do(ctx, func(txCtx context.Context) error {
 		for _, q := range questions {
 			if err := s.db.Exec(

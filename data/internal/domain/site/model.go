@@ -40,9 +40,11 @@ func NewSite(sourceID, siteURL string) (*Site, error) {
 		return nil, fmt.Errorf("failed to create site: %w, %w", ErrInvalidURL, err)
 	}
 	site := &Site{
-		ID:       uuid.NewString(),
-		SourceID: sourceID,
-		URL:      siteURL,
+		ID:        uuid.NewString(),
+		SourceID:  sourceID,
+		URL:       siteURL,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	return site, nil
 }

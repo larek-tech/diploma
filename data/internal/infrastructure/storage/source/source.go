@@ -19,14 +19,14 @@ func New(db db) *Storage {
 
 func (s Storage) Save(ctx context.Context, src *source.Source) error {
 	var currentSource *source.Source
-	currentSource, err := s.GetByName(ctx, src.Title)
+	currentSource, err := s.GetByID(ctx, src.ID)
 	if err != nil {
 		return err
 	}
 	if currentSource == nil {
 		err = s.db.Exec(ctx, `
-INSERT INTO sources (id, title, type, credentials)
-VALUES ($1, $2, $3, $4);
+INSERT INTO sources (id, title, type, credentials, created_at, updated_at)
+VALUES ($1, $2, $3, $4, NOW(), NOW());
 `, src.ID, src.Title, src.Type, src.Credentials)
 		if err != nil {
 			return err
@@ -36,7 +36,7 @@ VALUES ($1, $2, $3, $4);
 
 	err = s.db.Exec(ctx, `
 UPDATE sources
-SET title = $1, type = $2, credentials = $3
+SET title = $1, type = $2, credentials = $3, updated_at = NOW()
 WHERE id = $4;
 `, src.Title, src.Type, src.Credentials, src.ID)
 	src.ID = currentSource.ID

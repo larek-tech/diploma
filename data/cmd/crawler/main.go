@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -96,8 +97,11 @@ func run() int {
 	srcService := sourceService.New(sourceStore, fileStorage, sitemap.New(), pub, trManager)
 	documentStore := documentStorage.New(pg)
 	chunkStore := chunkStorage.New(pg, trManager)
-	host, _ := getOllamaConfig()
-	embedder, err := ollama.New(host)
+	embedderURL, embedderModel, embeddingsSize := getEmbedderConfig()
+	embedderService, err := ollama.New(embedderURL, &ollama.Config{
+		EmbeddingSize:   embeddingsSize,
+		EmbeddingsModel: embedderModel,
+	})
 	if err != nil {
 		slog.Error("failed to create ollama client", "error", err)
 		return 1
@@ -182,7 +186,7 @@ func run() int {
 		if payload.Threshold == 0 {
 			payload.Threshold = 0.1
 		}
-		embedding, err := embedder.CreateEmbedding(ctx, []string{payload.Query})
+		embedding, err := embedderService.CreateEmbedding(ctx, []string{payload.Query})
 		if err != nil {
 			slog.Error("Failed to create embedding", "error", err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -215,7 +219,7 @@ func run() int {
 	pb.RegisterDataServiceServer(
 		srv.GetSrv(),
 		server.NewHandlers(
-			vector_search.New(chunkStore, embedder),
+			vector_search.New(chunkStore, embedderService),
 			get_documents.New(documentStore),
 		),
 	)
@@ -289,16 +293,22 @@ func getSqlCon(db *postgres.DB) *sql.DB {
 	return sqlCon
 }
 
-func getOllamaConfig() (string, string) {
-	host := os.Getenv("OLLAMA_HOST")
+func getEmbedderConfig() (string, string, int) {
+	host := os.Getenv("OLLAMA_EMBEDDER_ENDPOINT")
 	if host == "" {
 		host = "http://localhost:11434"
 	}
-	model := os.Getenv("OLLAMA_MODEL")
+	model := os.Getenv("OLLAMA_EMBEDDER_MODEL")
 	if model == "" {
 		model = "bge-m3:latest"
 	}
-	return host, model
+	embeddingSize := os.Getenv("OLLAMA_EMBEDDER_SIZE")
+	size, err := strconv.Atoi(embeddingSize)
+	if err != nil {
+		size = 514
+	}
+
+	return host, model, size
 }
 
 func getPGConfig() (*postgres.Cfg, error) {

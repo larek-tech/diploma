@@ -23,18 +23,6 @@ func (s Service) ParsePage(ctx context.Context, page *site.Page, parseSiteJobID 
 		return nil, false, errors.New("page already parsed")
 	}
 
-	siteInfo, err := s.siteStore.GetByID(ctx, page.SiteID)
-	if err != nil {
-		return nil, false, fmt.Errorf("failed to get site: %w", err)
-	}
-	sameDomain, err := isSameDomain(page.URL, siteInfo.URL)
-	if err != nil {
-		return nil, false, fmt.Errorf("failed to check domain: %w", err)
-	}
-	if !sameDomain {
-		return nil, false, fmt.Errorf("url %s is not in the same domain as site %s", page.URL, siteInfo.URL)
-	}
-
 	_, err = s.fetchContent(ctx, page)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to fetch content: %w", err)
