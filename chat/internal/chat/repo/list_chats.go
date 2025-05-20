@@ -12,6 +12,7 @@ const listChats = `
 	from chat.chat
 	where user_id = $1
 		and is_deleted = false
+	order by updated_at desc
 	offset $2
 	limit $3;
 `
