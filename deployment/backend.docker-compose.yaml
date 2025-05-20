@@ -5,8 +5,6 @@ networks:
 volumes:
   pg_data:
     driver: local
-  redis_data:
-    driver: local
 
 services:
   pg:
@@ -62,10 +60,3 @@ services:
       - "9003:9003"
     depends_on:
       - pg
-  redis:
-    image: redis:7
-    restart: always
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
