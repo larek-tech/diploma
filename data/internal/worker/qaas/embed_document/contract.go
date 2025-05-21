@@ -11,7 +11,7 @@ import (
 
 type (
 	embeddingService interface {
-		Process(ctx context.Context, obj io.ReadSeeker, fileExt document.FileExtension, sourceObj any, sourceID string) error
+		Process(ctx context.Context, obj io.ReadSeeker, fileExt document.FileExtension, sourceObj any, sourceID string, metadata map[string]any) error
 	}
 	pageStore interface {
 		GetByID(ctx context.Context, id string) (*site.Page, error)

@@ -38,12 +38,16 @@ func run() int {
 		time.Sleep(time.Second * 1)
 	}
 	pub := qaas.NewPublisher(stdlib.OpenDBFromPool(db.GetPool()))
-	pub.CreateAllTables([]qaas.Queue{
+	err = pub.CreateAllTables([]qaas.Queue{
 		qaas.ParseSiteQueue,
 		qaas.ParsePageResultQueue,
 		qaas.ParsePageQueue,
 		qaas.EmbedResultQueue,
 	})
+	if err != nil {
+		slog.Error("failed to create all tables", "error", err)
+		return 1
+	}
 
 	slog.Info("migration finished")
 	return 0

@@ -6,6 +6,7 @@ import (
 	"github.com/larek-tech/diploma/data/internal/domain/document/service/img"
 	"github.com/larek-tech/diploma/data/internal/domain/document/service/markdown"
 	"github.com/larek-tech/diploma/data/internal/domain/document/service/pdf"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Service struct {
@@ -16,6 +17,7 @@ type Service struct {
 	parsers         map[document.FileExtension]parser
 	embedder        embedder
 	trManager       trManager
+	tracer          trace.Tracer
 }
 
 func New(
@@ -26,6 +28,7 @@ func New(
 	embedder embedder,
 	ocr ocr,
 	trManager trManager,
+	tracer trace.Tracer,
 ) *Service {
 	img := img.New(ocr)
 
@@ -43,5 +46,6 @@ func New(
 		},
 		embedder:  embedder,
 		trManager: trManager,
+		tracer:    tracer,
 	}
 }

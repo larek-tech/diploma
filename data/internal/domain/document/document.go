@@ -42,6 +42,7 @@ type Chunk struct {
 
 type SearchResult struct {
 	Chunk
+	DocumentName     string  `db:"document_name"`
 	CosineSimilarity float32 `db:"cosine_similarity"` // оценка релевантности чанка к запросу
 }
 

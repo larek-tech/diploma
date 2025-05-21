@@ -13,6 +13,9 @@ const ParsingDelta = time.Hour * 12
 
 // ParsePage parses the page and returns a list of outgoing pages.
 func (s Service) ParsePage(ctx context.Context, page *site.Page, parseSiteJobID string) ([]*site.Page, bool, error) {
+	ctx, span := s.tracer.Start(ctx, "ParsePage")
+	defer span.End()
+
 	err := validate(page)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to validate page: %w", err)

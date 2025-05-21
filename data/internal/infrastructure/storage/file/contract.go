@@ -13,8 +13,8 @@ type (
 		QueryStructs(ctx context.Context, dst interface{}, sql string, args ...interface{}) error
 	}
 	objectStore interface {
+		GetBaseURL() string
 		Upload(ctx context.Context, object *s3.Object) error
 		Download(ctx context.Context, bucketName, key string) (*s3.Object, error)
 	}
 )
-

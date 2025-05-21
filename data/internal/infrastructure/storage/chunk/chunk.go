@@ -29,6 +29,7 @@ func prepareVector(embeddings []float32) string {
 
 	return string(embeddingsBytes)
 }
+
 func sanitizeUTF8(s string) string {
 	if utf8.ValidString(s) {
 		return s
@@ -72,26 +73,53 @@ func (s Storage) Delete(ctx context.Context, documentID string) error {
 	return s.db.Exec(ctx, "DELETE FROM chunks WHERE document_id = $1", documentID)
 }
 
-func (s Storage) Search(ctx context.Context, query []float32, sourceIDs []string, threshold float32, limit int) ([]*document.SearchResult, error) {
+func (s Storage) Search(ctx context.Context, query []float32, sourceIDs []string, threshold float32, limit int, useQuestions bool) ([]*document.SearchResult, error) {
 	if len(query) == 0 {
 		return nil, fmt.Errorf("query is empty")
 	}
 	if len(sourceIDs) == 0 {
 		return nil, fmt.Errorf("sourceIDs is empty")
 	}
-
-	sql := `
+	var sql string
+	if useQuestions {
+		sql = `
 SELECT
-    id,
-    index,
-    source_id,
-    document_id,
-    content,
-    1 - (embeddings <=> $1) AS cosine_similarity
-FROM chunks
-WHERE source_id = ANY($2) AND 1 - (embeddings <=> $1) > $3
-ORDER BY 1 - (embeddings <=> $1) desc 
-LIMIT $4;`
+	c.id,
+	c.index,
+	c.source_id,
+	c.document_id,
+	c.content,
+	1 - (q.embeddings <=> $1) AS cosine_similarity,
+	d.name as document_name,
+	d.metadata
+FROM chunks c
+JOIN
+	chunk_questions q on c.id = q.chunk_id
+JOIN
+	documents d on c.document_id = d.id
+WHERE c.source_id = ANY($2) AND 1 - (q.embeddings <=> $1) > $3
+ORDER BY  1 - (q.embeddings <=> $1) desc
+LIMIT $4;
+`
+	} else {
+		sql = `
+SELECT
+	c.id,
+	c.index,
+	c.source_id,
+	c.document_id,
+	c.content,
+	1 - (c.embeddings <=> $1) AS cosine_similarity,
+	d.name as document_name,
+	d.metadata
+FROM chunks c
+JOIN
+	documents d on c.document_id = d.id
+WHERE c.source_id = ANY($2) AND 1 - (c.embeddings <=> $1) > $3
+ORDER BY 1 - (c.embeddings <=> $1) desc
+LIMIT $4;
+`
+	}
 
 	var res []*document.SearchResult
 	err := s.db.QueryStructs(ctx, &res, sql, prepareVector(query), sourceIDs, threshold, limit)

@@ -2,9 +2,13 @@ package get_documents
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/larek-tech/diploma/data/internal/data/pb"
+	grpcSpan "github.com/larek-tech/diploma/data/internal/infrastructure/grpc/span"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -12,24 +16,40 @@ import (
 
 type Handler struct {
 	documentsStore documentsStore
+	tracer         trace.Tracer
 }
 
-func New(documentsStore documentsStore) *Handler {
+func New(documentsStore documentsStore, tracer trace.Tracer) *Handler {
 	return &Handler{
 		documentsStore: documentsStore,
+		tracer:         tracer,
 	}
 }
 
 func (h Handler) GetDocuments(ctx context.Context, in *pb.GetDocumentsIn) (*pb.GetDocumentsOut, error) {
-	err := validate(in)
+	ctx, err := grpcSpan.GetTraceCtx(ctx)
 	if err != nil {
+		slog.Error("failed to get trace context", "error", err)
+	}
+	ctx, span := h.tracer.Start(ctx, "VectorSearch", trace.WithAttributes(
+		attribute.String("sourceId", in.SourceId),
+		attribute.Int64("page", int64(in.Page)),
+		attribute.Int64("size", int64(in.Size)),
+	))
+	defer span.End()
+
+	err = validate(in)
+	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 	total, documents, err := h.documentsStore.GetMany(ctx, in.SourceId, int(in.Page), int(in.Size))
 	if err != nil {
+		span.RecordError(err)
 		return nil, status.Errorf(codes.Internal, "failed to get documents: %v", err)
 	}
 	if total == 0 {
+		span.RecordError(status.Error(codes.NotFound, "documents not found"))
 		return nil, status.Error(codes.NotFound, "documents not found")
 	}
 	pbDocs := make([]*pb.Document, 0, len(documents))

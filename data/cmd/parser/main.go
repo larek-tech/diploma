@@ -27,6 +27,7 @@ import (
 	"github.com/larek-tech/diploma/data/internal/infrastructure/storage/sitejob"
 	"github.com/larek-tech/diploma/data/pkg/metric"
 	"github.com/otiai10/gosseract"
+	"github.com/yogenyslav/pkg/infrastructure/tracing"
 
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/embed_document"
@@ -36,18 +37,42 @@ import (
 	"github.com/larek-tech/storage/postgres"
 )
 
+const (
+	serviceName = "parser"
+)
+
 func main() {
 	os.Exit(run())
 }
 
 func run() int {
 	ctx := context.Background()
+	exporter, err := tracing.NewExporter(ctx, getTracingEndpoint())
+	if err != nil {
+		slog.Error(err.Error())
+		return -1
+	}
+	defer func() {
+		if e := exporter.Shutdown(ctx); e != nil {
+			slog.Error("shutdown tracing exporter", "error", e)
+		}
+	}()
+	provider, err := tracing.NewTraceProvider(exporter, serviceName)
+	if err != nil {
+		slog.Error(err.Error())
+		return -1
+	}
+	tracer := provider.Tracer(serviceName)
+
 	var pgCfg postgres.Cfg
 	if err := cleanenv.ReadEnv(&pgCfg); err != nil {
 		slog.Error("failed to read env", "error", err)
 	}
 
-	pg, trManager, err := postgres.New(ctx, pgCfg)
+	pg, trManager, err := postgres.New(ctx, pgCfg,
+		postgres.WithTelemetry(true),
+		postgres.WithTracer(tracer),
+	)
 	if err != nil {
 		slog.Error("failed to create postgres", "error", err)
 		return 1
@@ -96,13 +121,17 @@ func run() int {
 		return -1
 	}
 	pub := qaas.NewPublisher(sqlDB)
-	pub.CreateAllTables([]qaas.Queue{
+	err = pub.CreateAllTables([]qaas.Queue{
 		qaas.ParseSiteQueue,
 		qaas.ParsePageResultQueue,
 		qaas.ParsePageQueue,
 		qaas.EmbedResultQueue,
 		qaas.ParseSiteStatusQueue,
 	})
+	if err != nil {
+		slog.Error("failed to create tables", "error", err)
+		return -1
+	}
 
 	objectStorage, err := s3.New(getS3Credentials())
 	if err != nil {
@@ -130,9 +159,9 @@ func run() int {
 	chunkStore := chunkStorage.New(pg, trManager)
 	pageStore := pageStorage.New(pg, objectStorage)
 	siteJobStore := sitejob.New(pg)
-	pageService := crawler.New(httpClient, siteStore, pageStore, siteJobStore, trManager)
-	questionService := questionService.New(llm, embedderService)
-	embeddingService := documentService.New(documentStore, chunkStore, questionStore, questionService, embedderService, ocr, trManager)
+	pageService := crawler.New(httpClient, siteStore, pageStore, siteJobStore, trManager, tracer)
+	questionSrv := questionService.New(llm, embedderService)
+	embeddingService := documentService.New(documentStore, chunkStore, questionStore, questionSrv, embedderService, ocr, trManager, tracer)
 	consumer := qaas.NewConsumer(sqlDB)
 
 	slog.Info("Starting consumer")
@@ -140,7 +169,7 @@ func run() int {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		metric.RunPrometheusServer("9090")
+		metric.RunPrometheusServer("9091")
 	}()
 
 	wg.Add(1)
@@ -156,7 +185,7 @@ func run() int {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err = consumer.Run(ctx, qaas.ParsePageQueue, parse_page.New(pageStore, pageService, pub))
+		err = consumer.Run(ctx, qaas.ParsePageQueue, parse_page.New(pageStore, pageService, pub, tracer))
 		if err != nil {
 			slog.Error("failed to run consumer", "error", err)
 		}
@@ -239,4 +268,12 @@ func getS3Credentials() s3.Credentials {
 		endpoint = "localhost:9000"
 	}
 	return s3.NewCredentials(endpoint, os.Getenv("S3_ACCESS_KEY_ID"), os.Getenv("S3_SECRET_ACCESS_KEY"), true)
+}
+
+func getTracingEndpoint() string {
+	tracingEndpoint := os.Getenv("TRACING_ENDPOINT")
+	if tracingEndpoint == "" {
+		tracingEndpoint = "localhost:4318"
+	}
+	return tracingEndpoint
 }

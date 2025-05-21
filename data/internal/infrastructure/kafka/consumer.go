@@ -8,9 +8,12 @@ import (
 
 	"github.com/IBM/sarama" // Changed import
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
-const handlerTimeout = 30 * time.Second
+const handlerTimeout = 300 * time.Second
 
 // HandlerFunc signature updated for sarama.ConsumerMessage
 type HandlerFunc func(context.Context, *sarama.ConsumerMessage) error
@@ -21,11 +24,12 @@ type Consumer struct {
 	consumerGroup sarama.ConsumerGroup
 	handlers      map[string]HandlerFunc // map of topic to handler
 	groupID       string
+	tracer        trace.Tracer
 }
 
 // NewConsumer updated for Sarama
 // Added groupID parameter as it's essential for Sarama consumer groups.
-func NewConsumer(cfg Config, groupID string, handlers map[string]HandlerFunc) (*Consumer, error) {
+func NewConsumer(cfg Config, groupID string, handlers map[string]HandlerFunc, tracer trace.Tracer) (*Consumer, error) {
 	if groupID == "" {
 		return nil, fmt.Errorf("kafka consumer groupID cannot be empty")
 	}
@@ -48,6 +52,7 @@ func NewConsumer(cfg Config, groupID string, handlers map[string]HandlerFunc) (*
 		handlers:      handlers,
 		cfg:           cfg,
 		groupID:       groupID,
+		tracer:        tracer,
 	}, nil
 }
 
@@ -55,6 +60,7 @@ func NewConsumer(cfg Config, groupID string, handlers map[string]HandlerFunc) (*
 type saramaGroupHandler struct {
 	handlers       map[string]HandlerFunc
 	handlerTimeout time.Duration
+	tracer         trace.Tracer
 }
 
 func (h *saramaGroupHandler) Setup(session sarama.ConsumerGroupSession) error {
@@ -67,10 +73,33 @@ func (h *saramaGroupHandler) Cleanup(session sarama.ConsumerGroupSession) error 
 	return nil
 }
 
+func getTraceCtx(ctx context.Context, headers []*sarama.RecordHeader) (context.Context, error) {
+	var traceIDString string
+	for _, h := range headers {
+		if string(h.Key) == "x-trace-id" {
+			traceIDString = string(h.Value)
+			break
+		}
+	}
+	if traceIDString == "" {
+		return nil, fmt.Errorf("failed to get trace id")
+	}
+	traceID, err := trace.TraceIDFromHex(traceIDString)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse trace id: %w", err)
+	}
+
+	spanCtx := trace.NewSpanContext(trace.SpanContextConfig{
+		TraceID: traceID,
+	})
+	return trace.ContextWithSpanContext(ctx, spanCtx), nil
+}
+
 func (h *saramaGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for {
 		select {
 		case message, ok := <-claim.Messages():
+			ctx := context.Background()
 			if !ok {
 				slog.Info("Message channel closed for claim", "topic", claim.Topic(), "partition", claim.Partition())
 				return nil // Exit when messages channel is closed
@@ -82,8 +111,18 @@ func (h *saramaGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, c
 			}
 
 			slog.Debug("Message claimed", "value_len", len(message.Value), "topic", message.Topic, "partition", message.Partition, "offset", message.Offset)
+			ctx, err := getTraceCtx(ctx, message.Headers)
+			if err != nil {
+				slog.Error("Failed to get trace context", "err", err, "topic", message.Topic, "partition", message.Partition)
+				session.MarkMessage(message, "") // Mark as processed to avoid blocking partition
+			}
+			ctx, span := h.tracer.Start(ctx, "kafka-consumer")
+
 			handler, exists := h.handlers[message.Topic]
 			if !exists {
+				span.SetStatus(codes.Error, "No handler for topic")
+				err = fmt.Errorf("no handler for topic %s", message.Topic)
+				span.RecordError(err)
 				slog.Error("No handler for topic", "topic", message.Topic)
 				session.MarkMessage(message, "") // Mark as processed to avoid blocking partition
 				continue
@@ -91,10 +130,15 @@ func (h *saramaGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, c
 
 			// Create a new context for each handler invocation with a timeout
 			// Use session.Context() as the parent, it's cancelled when the session ends.
-			handlerCtx, cancel := context.WithTimeout(session.Context(), h.handlerTimeout)
+			handlerCtx, cancel := context.WithTimeout(ctx, h.handlerTimeout)
 
-			err := handler(handlerCtx, message)
+			err = handler(handlerCtx, message)
 			if err != nil {
+				span.SetStatus(codes.Error, "Handler error")
+				span.RecordError(err, trace.WithAttributes(
+					attribute.String("topic", message.Topic),
+					attribute.Int64("offset", message.Offset),
+				))
 				slog.Error("Failed to process sarama msg", "err", err, "topic", message.Topic, "offset", message.Offset)
 				// Error handling: depending on the error, you might not want to mark the message.
 				// For persistent errors, consider a dead-letter queue strategy.
@@ -102,7 +146,7 @@ func (h *saramaGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, c
 			cancel() // Ensure cancel is called for the handlerCtx
 
 			session.MarkMessage(message, "") // Mark message as processed
-
+			span.End()
 		case <-session.Context().Done(): // Check if the session context is cancelled (e.g., rebalance)
 			slog.Info("Session context done, exiting ConsumeClaim", "topic", claim.Topic(), "partition", claim.Partition(), "err", session.Context().Err())
 			return session.Context().Err()
@@ -121,6 +165,7 @@ func (c *Consumer) Run(ctx context.Context) error {
 	groupHandler := &saramaGroupHandler{
 		handlers:       c.handlers,
 		handlerTimeout: handlerTimeout,
+		tracer:         c.tracer,
 	}
 
 	// This loop keeps the consumer active.

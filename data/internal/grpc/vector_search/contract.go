@@ -8,7 +8,7 @@ import (
 
 type (
 	chunkStorage interface {
-		Search(ctx context.Context, query []float32, sourceIDs []string, threshold float32, limit int) ([]*document.SearchResult, error)
+		Search(ctx context.Context, query []float32, sourceIDs []string, threshold float32, limit int, useQuestions bool) ([]*document.SearchResult, error)
 	}
 	embedder interface {
 		CreateEmbedding(ctx context.Context, inputTexts []string) ([][]float32, error)

@@ -20,7 +20,7 @@ type File struct {
 	Extension string    `db:"extension"`
 	Raw       []byte    `db:"-" json:"-"`
 	Size      int64     `db:"size"`
-	ObjectKey string    `db:"object_key"`
+	ObjectURL string    `db:"object_key"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 }
