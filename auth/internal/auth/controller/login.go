@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"errors"
+
 	"github.com/larek-tech/diploma/auth/internal/auth/pb"
 	"github.com/larek-tech/diploma/auth/pkg/jwt"
 	"github.com/yogenyslav/pkg/errs"
@@ -23,7 +24,7 @@ func (ctrl *Controller) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Lo
 
 	user, err := ctrl.ar.FindOneByEmail(ctx, req.Email)
 	if err != nil {
-		return nil, errs.WrapErr(errors.Join(err, ErrUserNotFound))
+		return nil, errs.WrapErr(ErrUserNotFound, err.Error())
 	}
 
 	if !secure.VerifyPassword(user.HashPassword, req.GetPassword()) {

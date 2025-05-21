@@ -3,10 +3,11 @@ package jwt
 import (
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/larek-tech/diploma/auth/internal/auth/pb"
 	"github.com/yogenyslav/pkg/secure"
-	"time"
 )
 
 const (

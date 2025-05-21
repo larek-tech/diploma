@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+
 	"github.com/larek-tech/diploma/auth/internal/auth/model"
 	"github.com/larek-tech/diploma/auth/pkg/jwt"
 	"go.opentelemetry.io/otel/trace"

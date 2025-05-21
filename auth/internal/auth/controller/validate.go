@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/larek-tech/diploma/auth/internal/auth/pb"
 	"github.com/yogenyslav/pkg/errs"
