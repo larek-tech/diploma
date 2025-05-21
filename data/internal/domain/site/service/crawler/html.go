@@ -55,16 +55,6 @@ func extractLinks(doc *goquery.Document, pageUrl string) []string {
 				}
 				href = baseURL.ResolveReference(u).String()
 			}
-			// проверяем, что ссылка ведет на тот же домен
-			sameDomain, err := isSameDomain(pageUrl, href)
-			if err != nil {
-				slog.Error("failed to check domain", "pageUrl", pageUrl, "href", href, "err", err)
-				return
-			}
-			if !sameDomain {
-				slog.Debug("skipping link from different domain", "pageUrl", pageUrl, "href", href)
-				return
-			}
 			links = append(links, href)
 		}
 	})

@@ -6,11 +6,13 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/jackc/pgx/v5/stdlib"
 	documentService "github.com/larek-tech/diploma/data/internal/domain/document/service"
+	questionService "github.com/larek-tech/diploma/data/internal/domain/question/service"
 	"github.com/larek-tech/diploma/data/internal/domain/site/service/crawler"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/kafka"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/ocr"
@@ -25,6 +27,7 @@ import (
 	"github.com/larek-tech/diploma/data/internal/infrastructure/storage/sitejob"
 	"github.com/larek-tech/diploma/data/pkg/metric"
 	"github.com/otiai10/gosseract"
+	"github.com/yogenyslav/pkg/infrastructure/tracing"
 
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 	"github.com/larek-tech/diploma/data/internal/worker/qaas/embed_document"
@@ -34,18 +37,42 @@ import (
 	"github.com/larek-tech/storage/postgres"
 )
 
+const (
+	serviceName = "parser"
+)
+
 func main() {
 	os.Exit(run())
 }
 
 func run() int {
 	ctx := context.Background()
+	exporter, err := tracing.NewExporter(ctx, getTracingEndpoint())
+	if err != nil {
+		slog.Error(err.Error())
+		return -1
+	}
+	defer func() {
+		if e := exporter.Shutdown(ctx); e != nil {
+			slog.Error("shutdown tracing exporter", "error", e)
+		}
+	}()
+	provider, err := tracing.NewTraceProvider(exporter, serviceName)
+	if err != nil {
+		slog.Error(err.Error())
+		return -1
+	}
+	tracer := provider.Tracer(serviceName)
+
 	var pgCfg postgres.Cfg
 	if err := cleanenv.ReadEnv(&pgCfg); err != nil {
 		slog.Error("failed to read env", "error", err)
 	}
-	endpoint, _ := getLLMConfig()
-	pg, trManager, err := postgres.New(ctx, pgCfg)
+
+	pg, trManager, err := postgres.New(ctx, pgCfg,
+		postgres.WithTelemetry(true),
+		postgres.WithTracer(tracer),
+	)
 	if err != nil {
 		slog.Error("failed to create postgres", "error", err)
 		return 1
@@ -75,25 +102,36 @@ func run() int {
 		},
 		Jar: nil,
 	}
-	llm, err := ollama.New(endpoint)
+	endpoint, llmModel, contextSize := getLLMConfig()
+	llm, err := ollama.New(endpoint, &ollama.Config{
+		LLMModel:       llmModel,
+		LLMContextSize: contextSize,
+	})
 	if err != nil {
 		slog.Error("failed to create LLM", "error", err)
 		return -1
 	}
-	embedderURL, _ := getEmbedderConfig()
-	embedderModel, err := ollama.New(embedderURL)
+	embedderURL, embedderModel, embeddingsSize := getEmbedderConfig()
+	embedderService, err := ollama.New(embedderURL, &ollama.Config{
+		EmbeddingSize:   embeddingsSize,
+		EmbeddingsModel: embedderModel,
+	})
 	if err != nil {
 		slog.Error("failed to create embedder", "error", err)
 		return -1
 	}
 	pub := qaas.NewPublisher(sqlDB)
-	pub.CreateAllTables([]qaas.Queue{
+	err = pub.CreateAllTables([]qaas.Queue{
 		qaas.ParseSiteQueue,
 		qaas.ParsePageResultQueue,
 		qaas.ParsePageQueue,
 		qaas.EmbedResultQueue,
 		qaas.ParseSiteStatusQueue,
 	})
+	if err != nil {
+		slog.Error("failed to create tables", "error", err)
+		return -1
+	}
 
 	objectStorage, err := s3.New(getS3Credentials())
 	if err != nil {
@@ -121,8 +159,9 @@ func run() int {
 	chunkStore := chunkStorage.New(pg, trManager)
 	pageStore := pageStorage.New(pg, objectStorage)
 	siteJobStore := sitejob.New(pg)
-	pageService := crawler.New(httpClient, siteStore, pageStore, siteJobStore, trManager)
-	embeddingService := documentService.New(documentStore, chunkStore, questionStore, embedderModel, ocr, llm, trManager)
+	pageService := crawler.New(httpClient, siteStore, pageStore, siteJobStore, trManager, tracer)
+	questionSrv := questionService.New(llm, embedderService)
+	embeddingService := documentService.New(documentStore, chunkStore, questionStore, questionSrv, embedderService, ocr, trManager, tracer)
 	consumer := qaas.NewConsumer(sqlDB)
 
 	slog.Info("Starting consumer")
@@ -130,7 +169,7 @@ func run() int {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		metric.RunPrometheusServer("9090")
+		metric.RunPrometheusServer("9091")
 	}()
 
 	wg.Add(1)
@@ -146,7 +185,7 @@ func run() int {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err = consumer.Run(ctx, qaas.ParsePageQueue, parse_page.New(pageStore, pageService, pub))
+		err = consumer.Run(ctx, qaas.ParsePageQueue, parse_page.New(pageStore, pageService, pub, tracer))
 		if err != nil {
 			slog.Error("failed to run consumer", "error", err)
 		}
@@ -187,19 +226,7 @@ func getSqlCon(db *postgres.DB) *sql.DB {
 	return sqlCon
 }
 
-func getLLMConfig() (string, string) {
-	host := os.Getenv("OLLAMA_LLM_ENDPOINT")
-	if host == "" {
-		host = "http://localhost:11434"
-	}
-	model := os.Getenv("OLLAMA_LLM_MODEL")
-	if model == "" {
-		model = "llama3:latest"
-	}
-	return host, model
-}
-
-func getEmbedderConfig() (string, string) {
+func getEmbedderConfig() (string, string, int) {
 	host := os.Getenv("OLLAMA_EMBEDDER_ENDPOINT")
 	if host == "" {
 		host = "http://localhost:11434"
@@ -208,7 +235,31 @@ func getEmbedderConfig() (string, string) {
 	if model == "" {
 		model = "bge-m3:latest"
 	}
-	return host, model
+	embeddingSize := os.Getenv("OLLAMA_EMBEDDER_SIZE")
+	size, err := strconv.Atoi(embeddingSize)
+	if err != nil {
+		size = 514
+	}
+
+	return host, model, size
+}
+
+func getLLMConfig() (string, string, int) {
+	host := os.Getenv("OLLAMA_LLM_ENDPOINT")
+	if host == "" {
+		host = "http://localhost:11434"
+	}
+	model := os.Getenv("OLLAMA_LLM_MODEL")
+	if model == "" {
+		model = "llama3:latest"
+	}
+	contextSize := os.Getenv("OLLAMA_LLM_CONTEXT_SIZE")
+	size, err := strconv.Atoi(contextSize)
+	if err != nil {
+		size = 32000
+	}
+
+	return host, model, size
 }
 
 func getS3Credentials() s3.Credentials {
@@ -217,4 +268,12 @@ func getS3Credentials() s3.Credentials {
 		endpoint = "localhost:9000"
 	}
 	return s3.NewCredentials(endpoint, os.Getenv("S3_ACCESS_KEY_ID"), os.Getenv("S3_SECRET_ACCESS_KEY"), true)
+}
+
+func getTracingEndpoint() string {
+	tracingEndpoint := os.Getenv("TRACING_ENDPOINT")
+	if tracingEndpoint == "" {
+		tracingEndpoint = "localhost:4318"
+	}
+	return tracingEndpoint
 }

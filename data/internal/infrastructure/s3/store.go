@@ -26,6 +26,10 @@ func New(creds Credentials) (*Store, error) {
 	}, nil
 }
 
+func (s Store) GetBaseURL() string {
+	return s.s3.EndpointURL().String()
+}
+
 func (s Store) CreateBuckets(ctx context.Context, bucketName ...string) error {
 	for _, name := range bucketName {
 		err := s.s3.MakeBucket(ctx, name, minio.MakeBucketOptions{})

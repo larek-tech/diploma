@@ -7,40 +7,52 @@ import (
 	"io"
 	"net/http"
 	"time"
-	"unicode/utf8"
 
 	"github.com/PuerkitoBio/goquery"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/larek-tech/diploma/data/internal/domain/site"
 )
 
 func (s Service) fetchContent(ctx context.Context, page *site.Page) ([]string, error) {
-
+	ctx, span := s.tracer.Start(ctx, "crawlerService.fetchContent", trace.WithAttributes(
+		attribute.String("url", page.URL),
+		attribute.String("pageID", page.ID),
+	))
+	defer span.End()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, page.URL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("create request error: %w", err)
+		err = fmt.Errorf("create request error: %w", err)
+		span.RecordError(err)
+		return nil, err
 	}
 
 	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; DataEngineCrawler/1.0)")
 
 	resp, err := s.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("request error: %w", err)
+		err = fmt.Errorf("http request error: %w", err)
+		span.RecordError(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	// Read response body
 	raw, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("read response body error: %w", err)
+		err = fmt.Errorf("read response body error: %w", err)
+		span.RecordError(err)
+		return nil, err
 	}
 	rawContent := string(raw)
 
 	// Create a goquery document from the raw HTML
-
 	doc, err := goquery.NewDocumentFromReader(io.NopCloser(bytes.NewReader(raw)))
 	if err != nil {
-		return nil, fmt.Errorf("parse HTML error: %w", err)
+		err = fmt.Errorf("create goquery document error: %w", err)
+		span.RecordError(err)
+		return nil, err
 	}
 	// TODO: get back the title of the html page
 	//title := doc.Find("title").Text()
@@ -48,7 +60,9 @@ func (s Service) fetchContent(ctx context.Context, page *site.Page) ([]string, e
 	// fetchMetadata
 	metadata, err := extractMetadata(doc)
 	if err != nil {
-		return nil, fmt.Errorf("extract metadata error: %w", err)
+		err = fmt.Errorf("extract metadata error: %w", err)
+		span.RecordError(err)
+		return nil, err
 	}
 
 	page.Raw = rawContent
@@ -57,22 +71,4 @@ func (s Service) fetchContent(ctx context.Context, page *site.Page) ([]string, e
 
 	links := extractLinks(doc, page.URL)
 	return links, nil
-}
-
-func cleanUTF8(s string) string {
-	if utf8.ValidString(s) {
-		return s
-	}
-	v := make([]rune, 0, len(s))
-	for i, r := range s {
-		if r == utf8.RuneError {
-			_, size := utf8.DecodeRuneInString(s[i:])
-			if size == 1 {
-				// skip invalid byte
-				continue
-			}
-		}
-		v = append(v, r)
-	}
-	return string(v)
 }

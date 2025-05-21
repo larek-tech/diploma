@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/larek-tech/diploma/data/internal/domain/file"
@@ -11,6 +12,8 @@ import (
 	"github.com/larek-tech/diploma/data/internal/domain/source"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/qaas"
 	"github.com/larek-tech/diploma/data/pkg/metric"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Service struct {
@@ -19,24 +22,35 @@ type Service struct {
 	fileStorage   fileStorage
 	pub           publisher
 	trManager     transactionalManager
+	tracer        trace.Tracer
 }
 
-func New(sourceStorage sourceStorage, fileStorage fileStorage, sitemapParser sitemapParser, pub publisher, trManager transactionalManager) *Service {
+func New(sourceStorage sourceStorage, fileStorage fileStorage, sitemapParser sitemapParser, pub publisher, trManager transactionalManager, tracer trace.Tracer) *Service {
 	return &Service{
 		sitemapParser: sitemapParser,
 		sourceStorage: sourceStorage,
 		fileStorage:   fileStorage,
 		pub:           pub,
 		trManager:     trManager,
+		tracer:        tracer,
 	}
 }
 
 func (s Service) CreateSource(ctx context.Context, msg source.DataMessage) (*source.Source, error) {
 	src := &source.Source{
-		ID:    uuid.NewString(),
-		Title: msg.Title,
-		Type:  msg.Type,
+		ID:        uuid.NewString(),
+		Title:     msg.Title,
+		Type:      msg.Type,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
+	ctx, span := s.tracer.Start(ctx, "sourceService.CreateSource", trace.WithAttributes(
+		attribute.String("sourceID", src.ID),
+		attribute.String("sourceType", string(src.Type)),
+		attribute.String("sourceTitle", src.Title),
+		attribute.String("sourceExternalKey", string(msg.ExternalKey)),
+	))
+	defer span.End()
 	err := s.trManager.Do(ctx, func(ctx context.Context) error {
 		err := s.sourceStorage.Save(ctx, src)
 		if err != nil {
@@ -125,8 +139,9 @@ func (s Service) CreateSource(ctx context.Context, msg source.DataMessage) (*sou
 
 	})
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
-	metric.IncrementSourcesCreated((string(src.Type)), src.ID, err)
+	metric.IncrementSourcesCreated(string(src.Type), src.ID, err)
 	return src, nil
 }

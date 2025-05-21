@@ -40,15 +40,9 @@ type Chunk struct {
 	Embeddings []float32 `db:"embeddings"`  // векторное представление чанка
 }
 
-type Questions struct {
-	ID         string    `db:"id"`
-	ChunkID    string    `db:"chunk_id"`
-	Question   string    `db:"question"`
-	Embeddings []float32 `db:"embeddings"`
-}
-
 type SearchResult struct {
 	Chunk
+	DocumentName     string  `db:"document_name"`
 	CosineSimilarity float32 `db:"cosine_similarity"` // оценка релевантности чанка к запросу
 }
 

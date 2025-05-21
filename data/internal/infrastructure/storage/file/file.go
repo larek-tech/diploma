@@ -35,7 +35,7 @@ func (s Store) Save(ctx context.Context, f *file.File) error {
 	if err != nil && !postgres.IsNoRowsError(err) {
 		return err
 	}
-	f.ObjectKey = getObjectStoreKey(f)
+	f.ObjectURL = s.o.GetBaseURL() + getObjectStoreKey(f)
 	if existingFile != nil {
 		err := s.db.Exec(ctx, `
 UPDATE files
@@ -46,7 +46,7 @@ SET
 	object_key = $4,
 	updated_at = NOW()
 WHERE id = $5
-`, f.SourceID, f.Filename, f.Extension, f.ObjectKey, f.ID)
+`, f.SourceID, f.Filename, f.Extension, f.ObjectURL, f.ID)
 		if err != nil {
 			return err
 		}
@@ -54,13 +54,13 @@ WHERE id = $5
 		err := s.db.Exec(ctx, `
 INSERT INTO files (id, source_id, filename, extension, object_key, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-`, f.ID, f.SourceID, f.Filename, f.Extension, f.ObjectKey)
+`, f.ID, f.SourceID, f.Filename, f.Extension, f.ObjectURL)
 		if err != nil {
 			return err
 		}
 	}
 	if f.Raw != nil {
-		obj := s3.NewObject(FileBucketName, f.ObjectKey, f.Raw, s3.ContentTypeUndefined, nil)
+		obj := s3.NewObject(FileBucketName, getObjectStoreKey(f), f.Raw, s3.ContentTypeUndefined, nil)
 		err := s.o.Upload(ctx, obj)
 		if err != nil {
 			return fmt.Errorf("failed to upload file raw content: %w", err)
@@ -86,9 +86,9 @@ WHERE id = $1
 	if err != nil {
 		return nil, err
 	}
-	f.ObjectKey = getObjectStoreKey(&f)
-	if f.ObjectKey != "" {
-		obj, err := s.o.Download(ctx, FileBucketName, f.ObjectKey)
+	f.ObjectURL = s.o.GetBaseURL() + getObjectStoreKey(&f)
+	if f.ObjectURL != "" {
+		obj, err := s.o.Download(ctx, FileBucketName, getObjectStoreKey(&f))
 		if err != nil {
 			return nil, fmt.Errorf("failed to download file raw content: %w", err)
 		}

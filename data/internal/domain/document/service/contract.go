@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/larek-tech/diploma/data/internal/domain/document"
+	"github.com/larek-tech/diploma/data/internal/domain/question"
 )
 
 type (
@@ -15,14 +16,11 @@ type (
 		Update(ctx context.Context, documentID string, chunks []*document.Chunk) error
 		Delete(ctx context.Context, documentID string) error
 	}
-	questionStorage interface {
-		Save(ctx context.Context, questions []*document.Questions) error
-	}
 	embedder interface {
 		CreateEmbedding(ctx context.Context, inputTexts []string) ([][]float32, error)
 	}
-	llm interface {
-		Call(ctx context.Context, prompt string) (string, error)
+	questionStorage interface {
+		Save(ctx context.Context, questions []*question.Questions) error
 	}
 	trManager interface {
 		Do(context.Context, func(ctx context.Context) error) error
@@ -32,5 +30,8 @@ type (
 	}
 	ocr interface {
 		Process(string) (string, error)
+	}
+	questionService interface {
+		GenerateQuestions(ctx context.Context, chunks []*document.Chunk) ([]*question.Questions, error)
 	}
 )

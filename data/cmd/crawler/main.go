@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -31,7 +32,14 @@ import (
 	"github.com/larek-tech/diploma/data/internal/worker/kafka/create_source"
 	"github.com/larek-tech/diploma/data/pkg/metric"
 	"github.com/larek-tech/storage/postgres"
+	"github.com/yogenyslav/pkg/infrastructure/tracing"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/reflection"
+)
+
+const (
+	serviceName = "crawler"
 )
 
 func main() {
@@ -42,18 +50,37 @@ func run() int {
 	ctx := context.Background()
 	slog.Info("Starting server")
 	kafkaCfg, err := getKafkaConfig()
-	slog.Info("kafka config", "cfg", *kafkaCfg)
+	slog.Info("kafka config", "cfg", kafkaCfg)
 	if err != nil {
 		slog.Error(err.Error())
 		return -1
 	}
+	exporter, err := tracing.NewExporter(ctx, getTracingEndpoint())
+	if err != nil {
+		slog.Error(err.Error())
+		return -1
+	}
+	defer func() {
+		if e := exporter.Shutdown(ctx); e != nil {
+			slog.Error("shutdown tracing exporter", "error", e)
+		}
+	}()
+	provider, err := tracing.NewTraceProvider(exporter, serviceName)
+	if err != nil {
+		slog.Error(err.Error())
+		return -1
+	}
+	tracer := provider.Tracer(serviceName)
 
 	pgCfg, err := getPGConfig()
 	if err != nil {
 		slog.Error(err.Error())
 		return -1
 	}
-	pg, trManager, err := postgres.New(ctx, *pgCfg)
+	pg, trManager, err := postgres.New(ctx, pgCfg,
+		postgres.WithTelemetry(true),
+		postgres.WithTracer(tracer),
+	)
 	if err != nil {
 		slog.Error("failed to create postgres", "error", err)
 		return 1
@@ -66,7 +93,7 @@ func run() int {
 	}
 
 	pub := qaas.NewPublisher(sqlDB)
-	pub.CreateAllTables([]qaas.Queue{
+	err = pub.CreateAllTables([]qaas.Queue{
 		qaas.ParseFileQueue,
 		qaas.ParseFileResult,
 		qaas.ParseSiteQueue,
@@ -76,6 +103,10 @@ func run() int {
 		qaas.ParseS3ResultQueue,
 		qaas.EmbedResultQueue,
 	})
+	if err != nil {
+		slog.Error("failed to create all tables", "error", err)
+		return 1
+	}
 
 	objectStorage, err := s3.New(getS3Credentials())
 	if err != nil {
@@ -91,18 +122,21 @@ func run() int {
 		return -1
 	}
 
-	fileStorage := fileStorage.New(pg, objectStorage)
+	fileStore := fileStorage.New(pg, objectStorage)
 	sourceStore := sourceStorage.New(pg)
-	srcService := sourceService.New(sourceStore, fileStorage, sitemap.New(), pub, trManager)
+	srcService := sourceService.New(sourceStore, fileStore, sitemap.New(), pub, trManager, tracer)
 	documentStore := documentStorage.New(pg)
 	chunkStore := chunkStorage.New(pg, trManager)
-	host, _ := getOllamaConfig()
-	embedder, err := ollama.New(host)
+	embedderURL, embedderModel, embeddingsSize := getEmbedderConfig()
+	embedderService, err := ollama.New(embedderURL, &ollama.Config{
+		EmbeddingSize:   embeddingsSize,
+		EmbeddingsModel: embedderModel,
+	})
 	if err != nil {
 		slog.Error("failed to create ollama client", "error", err)
 		return 1
 	}
-	kafkaProducer, err := kafka.NewProducer(*kafkaCfg)
+	kafkaProducer, err := kafka.NewProducer(kafkaCfg)
 	if err != nil {
 		slog.Error("failed to create kafka producer")
 		return 1
@@ -110,13 +144,15 @@ func run() int {
 	kafkaHandlers := map[string]kafka.HandlerFunc{
 		"source": create_source.New(srcService, kafkaProducer).Handle,
 	}
-	kafkaConsumer, err := kafka.NewConsumer(*kafkaCfg, "crawler", kafkaHandlers)
+	kafkaConsumer, err := kafka.NewConsumer(kafkaCfg, "crawler", kafkaHandlers, tracer)
 	if err != nil {
 		// for now kafka can be disabled and we can accept messages from http and grpc
 		slog.Error("failed to create kafka consumer: %w", "err", err)
 	}
 
 	http.Handle("/test", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		reqCtx, span := tracer.Start(r.Context(), "test")
+		defer span.End()
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -125,18 +161,24 @@ func run() int {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		slog.Info("Received test request")
+		slog.Debug("Received test request")
 		if r.Method != http.MethodPost {
+			span.RecordError(fmt.Errorf("method not allowed"),
+				trace.WithAttributes(
+					attribute.String("method", r.Method),
+				))
 			logError(w, "Method not allowed", nil, http.StatusMethodNotAllowed)
 			return
 		}
 		var payload source.DataMessage
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+			span.RecordError(err)
 			logError(w, "Bad request", err, http.StatusBadRequest)
 			return
 		}
-		src, err := srcService.CreateSource(ctx, payload)
+		src, err := srcService.CreateSource(reqCtx, payload)
 		if err != nil {
+			span.RecordError(err)
 			logError(w, "Internal server error", err, http.StatusInternalServerError)
 			return
 		}
@@ -144,6 +186,7 @@ func run() int {
 		w.WriteHeader(http.StatusOK)
 		resp, err := json.Marshal(src)
 		if err != nil {
+			span.RecordError(err)
 			logError(w, "Internal server error", err, http.StatusInternalServerError)
 			return
 		}
@@ -151,6 +194,9 @@ func run() int {
 	}))
 
 	http.Handle("/q", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		reqCtx, span := tracer.Start(r.Context(), "query")
+		defer span.End()
+
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -160,20 +206,26 @@ func run() int {
 			return
 		}
 		if r.Method != http.MethodPost {
+			span.RecordError(fmt.Errorf("method not allowed"))
 			slog.Error("Method not allowed")
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		var payload SearchQuery
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+			span.RecordError(err)
 			slog.Error("Failed to decode request body", "error", err)
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
 		}
 		slog.Info("Received query", "query", payload.Query)
 		if len(payload.SourceIDs) == 0 {
-			slog.Error("Source IDs are required")
-			http.Error(w, "Source IDs are required", http.StatusBadRequest)
+			err = fmt.Errorf("source IDs are required")
+			slog.Error(err.Error())
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err, trace.WithAttributes(
+				attribute.Int("status", http.StatusBadRequest),
+			))
 			return
 		}
 		if payload.TopK == 0 {
@@ -182,26 +234,52 @@ func run() int {
 		if payload.Threshold == 0 {
 			payload.Threshold = 0.1
 		}
-		embedding, err := embedder.CreateEmbedding(ctx, []string{payload.Query})
+		embedding, err := embedderService.CreateEmbedding(reqCtx, []string{payload.Query})
 		if err != nil {
+			err = fmt.Errorf("failed to create embedding: %w", err)
+			span.RecordError(err, trace.WithAttributes(
+				attribute.String("query", payload.Query),
+				attribute.String("sourceIDs", fmt.Sprintf("%v", payload.SourceIDs)),
+				attribute.Float64("threshold", float64(payload.Threshold)),
+				attribute.Int("topK", int(payload.TopK)),
+				attribute.Bool("useQuestions", payload.UseQ),
+			))
+
 			slog.Error("Failed to create embedding", "error", err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
-		res, err := chunkStore.Search(ctx, embedding[0], payload.SourceIDs, payload.Threshold, int(payload.TopK))
+		res, err := chunkStore.Search(ctx, embedding[0], payload.SourceIDs, payload.Threshold, int(payload.TopK), payload.UseQ)
 		if err != nil {
 			slog.Error("Failed to search chunks", "error", err)
 			http.Error(w, "Internal server error:"+err.Error(), http.StatusInternalServerError)
+			span.RecordError(err, trace.WithAttributes(
+				attribute.String("query", payload.Query),
+				attribute.String("sourceIDs", fmt.Sprintf("%v", payload.SourceIDs)),
+				attribute.Float64("threshold", float64(payload.Threshold)),
+				attribute.Int("topK", int(payload.TopK)),
+				attribute.Bool("useQuestions", payload.UseQ),
+			))
 			return
 		}
 		if len(res) == 0 {
-			slog.Error("No results found")
-			http.Error(w, "No results found", http.StatusNotFound)
+			err = fmt.Errorf("no results found")
+			span.RecordError(err)
+			slog.Error(err.Error())
+			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
 		resp, err := json.Marshal(res)
 		if err != nil {
+			err = fmt.Errorf("failed to marshal response: %w", err)
+			span.RecordError(err, trace.WithAttributes(
+				attribute.String("query", payload.Query),
+				attribute.String("sourceIDs", fmt.Sprintf("%v", payload.SourceIDs)),
+				attribute.Float64("threshold", float64(payload.Threshold)),
+				attribute.Int("topK", int(payload.TopK)),
+				attribute.Bool("useQuestions", payload.UseQ),
+			))
 			slog.Error("Failed to marshal response", "error", err)
 			http.Error(w, fmt.Sprintf("marshaling err: %v", err), http.StatusInternalServerError)
 			return
@@ -215,8 +293,8 @@ func run() int {
 	pb.RegisterDataServiceServer(
 		srv.GetSrv(),
 		server.NewHandlers(
-			vector_search.New(chunkStore, embedder),
-			get_documents.New(documentStore),
+			vector_search.New(chunkStore, embedderService, tracer),
+			get_documents.New(documentStore, tracer),
 		),
 	)
 	reflection.Register(srv.GetSrv())
@@ -270,11 +348,6 @@ func getS3Credentials() s3.Credentials {
 	return s3.NewCredentials(endpoint, os.Getenv("S3_ACCESS_KEY_ID"), os.Getenv("S3_SECRET_ACCESS_KEY"), true)
 }
 
-// string query = 1;
-// repeated string sourceIds = 2;
-// uint64 topK = 3;
-// float threshold = 4;
-// bool useQuestions = 5; // hypothetical questions
 type SearchQuery struct {
 	Query     string   `json:"query"`
 	SourceIDs []string `json:"sourceIds"`
@@ -289,16 +362,22 @@ func getSqlCon(db *postgres.DB) *sql.DB {
 	return sqlCon
 }
 
-func getOllamaConfig() (string, string) {
-	host := os.Getenv("OLLAMA_HOST")
+func getEmbedderConfig() (string, string, int) {
+	host := os.Getenv("OLLAMA_EMBEDDER_ENDPOINT")
 	if host == "" {
 		host = "http://localhost:11434"
 	}
-	model := os.Getenv("OLLAMA_MODEL")
+	model := os.Getenv("OLLAMA_EMBEDDER_MODEL")
 	if model == "" {
 		model = "bge-m3:latest"
 	}
-	return host, model
+	embeddingSize := os.Getenv("OLLAMA_EMBEDDER_SIZE")
+	size, err := strconv.Atoi(embeddingSize)
+	if err != nil {
+		size = 514
+	}
+
+	return host, model, size
 }
 
 func getPGConfig() (*postgres.Cfg, error) {
@@ -310,12 +389,20 @@ func getPGConfig() (*postgres.Cfg, error) {
 	return &pgCfg, nil
 }
 
-func getKafkaConfig() (*kafka.Config, error) {
+func getKafkaConfig() (kafka.Config, error) {
 	var cfg kafka.Config
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
-		return nil, fmt.Errorf("failed to read kafka config: %w", err)
+		return cfg, fmt.Errorf("failed to read kafka config: %w", err)
 	}
-	return &cfg, nil
+	return cfg, nil
+}
+
+func getTracingEndpoint() string {
+	tracingEndpoint := os.Getenv("TRACING_ENDPOINT")
+	if tracingEndpoint == "" {
+		tracingEndpoint = "localhost:4318"
+	}
+	return tracingEndpoint
 }
 
 func logError(w http.ResponseWriter, msg string, err error, code int) {

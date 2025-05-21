@@ -13,6 +13,10 @@ import (
 	"go.dataddo.com/pgq"
 )
 
+const (
+	resourceUrlKey = "resourceUrl"
+)
+
 type Handler struct {
 	embeddingService embeddingService
 	pageStore        pageStore
@@ -57,6 +61,9 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 			document.HTML,
 			page,
 			site.SourceID,
+			map[string]any{
+				resourceUrlKey: page.URL,
+			},
 		)
 		if err != nil {
 			return true, fmt.Errorf("failed to process page in embed_document: %w", err)
@@ -84,6 +91,9 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 			ext,
 			file,
 			file.SourceID,
+			map[string]any{
+				resourceUrlKey: file.ObjectURL,
+			},
 		)
 		if err != nil {
 			return true, fmt.Errorf("failed to process file in embed_document: %w", err)

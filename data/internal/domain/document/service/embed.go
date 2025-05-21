@@ -7,11 +7,13 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/larek-tech/diploma/data/internal/domain/document"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
 	// ChunkSize is the size of each chunk in characters.
-	ChunkSize = 8192
+	ChunkSize = 4096
 	// ChunkOverlap is the number of overlapping characters between chunks.
 	ChunkOverlap  = 100
 	EmbeddingSize = 1024
@@ -19,6 +21,13 @@ const (
 
 // embed embeds the document content into chunks and returns them.
 func (s Service) embed(ctx context.Context, doc *document.Document) ([]*document.Chunk, error) {
+	ctx, span := s.tracer.Start(ctx, "embeddingService.embed", trace.WithAttributes(
+		attribute.String("documentID", doc.ID),
+		attribute.String("sourceID", doc.SourceID),
+		attribute.String("objectType", string(doc.ObjectType)),
+		attribute.String("objectID", doc.ObjectID),
+	))
+	defer span.End()
 	err := validateDocument(doc)
 	if err != nil {
 		return nil, fmt.Errorf("failed to validate document: %w", err)

@@ -51,7 +51,7 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 		return true, fmt.Errorf("missing external key in Metadata")
 	}
 
-	slog.Info("handled site job", "job", job)
+	slog.Debug("handled site job", "job", job)
 	currentSite := job.Payload
 
 	if err := h.siteStore.Save(ctx, currentSite); err != nil {

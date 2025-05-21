@@ -34,4 +34,6 @@ type Source struct {
 	Title       string `db:"title"`       // Title название источника
 	Type        Type   `db:"type"`        // Type тип источника (с паролем, без пароля, архив)
 	Credentials []byte `db:"credentials"` // Credentials учетные данные для доступа к источнику
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }

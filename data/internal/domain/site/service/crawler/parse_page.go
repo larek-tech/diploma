@@ -13,6 +13,9 @@ const ParsingDelta = time.Hour * 12
 
 // ParsePage parses the page and returns a list of outgoing pages.
 func (s Service) ParsePage(ctx context.Context, page *site.Page, parseSiteJobID string) ([]*site.Page, bool, error) {
+	ctx, span := s.tracer.Start(ctx, "ParsePage")
+	defer span.End()
+
 	err := validate(page)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to validate page: %w", err)
@@ -21,18 +24,6 @@ func (s Service) ParsePage(ctx context.Context, page *site.Page, parseSiteJobID 
 		return nil, false, fmt.Errorf("failed to check if page is already parsed: %w", err)
 	} else if parsed {
 		return nil, false, errors.New("page already parsed")
-	}
-
-	siteInfo, err := s.siteStore.GetByID(ctx, page.SiteID)
-	if err != nil {
-		return nil, false, fmt.Errorf("failed to get site: %w", err)
-	}
-	sameDomain, err := isSameDomain(page.URL, siteInfo.URL)
-	if err != nil {
-		return nil, false, fmt.Errorf("failed to check domain: %w", err)
-	}
-	if !sameDomain {
-		return nil, false, fmt.Errorf("url %s is not in the same domain as site %s", page.URL, siteInfo.URL)
 	}
 
 	_, err = s.fetchContent(ctx, page)
