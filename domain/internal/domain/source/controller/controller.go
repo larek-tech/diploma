@@ -17,8 +17,9 @@ import (
 )
 
 const (
-	sourceTopic = "source"
-	statusTopic = "status"
+	sourceTopic   = "source"
+	statusTopic   = "status"
+	traceIDHeader = "x-trace-id"
 )
 
 var (

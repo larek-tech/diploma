@@ -75,7 +75,13 @@ func (ctrl *Controller) saveSourceData(ctx context.Context, source model.SourceD
 	}
 
 	ctrl.producer.SendAsyncMessage(&sarama.ProducerMessage{
-		Topic:     sourceTopic,
+		Topic: sourceTopic,
+		Headers: []sarama.RecordHeader{
+			{
+				Key:   []byte(traceIDHeader),
+				Value: []byte(span.SpanContext().TraceID().String()),
+			},
+		},
 		Key:       sarama.StringEncoder(strconv.FormatInt(source.ID, 10)),
 		Value:     sarama.ByteEncoder(data),
 		Timestamp: time.Now(),
