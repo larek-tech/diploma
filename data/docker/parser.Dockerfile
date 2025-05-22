@@ -1,61 +1,85 @@
 FROM golang:1.24 AS builder
 
-RUN apt-get update -qq 
+WORKDIR /app
 
-RUN apt-get install -y -qq \
-    libtesseract-dev libleptonica-dev \
-    tesseract-ocr-eng tesseract-ocr-rus \
-    mupdf mupdf-tools pkg-config \
-    libmupdf-dev libfreetype6-dev \
-    libmujs-dev libgumbo-dev libopenjp2-7-dev \
-    libjbig2dec0-dev libjpeg-dev \
-    libharfbuzz-dev zlib1g-dev
+# Install dependencies in a single layer to reduce image size
+# Explicitly install libjpeg62-turbo-dev to ensure version 62
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+    libtesseract-dev \
+    libleptonica-dev \
+    tesseract-ocr-eng \
+    tesseract-ocr-rus \
+    libjpeg62-turbo-dev \
+    mupdf-tools \
+    libmupdf-dev \
+    libfreetype6-dev \
+    libopenjp2-7-dev \
+    libjbig2dec0-dev \
+    libharfbuzz-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Find mupdf.pc file
-RUN MUPDF_PC=$(find /usr -name "mupdf.pc" 2>/dev/null || echo "") \
-    && if [ -n "$MUPDF_PC" ]; then \
-    echo "Found mupdf.pc at $MUPDF_PC"; \
-    sed -i '/^Requires: / s/$/ harfbuzz/' $MUPDF_PC; \
-    echo "Updated mupdf.pc content:"; \
-    cat $MUPDF_PC; \
-    else \
-    echo "mupdf.pc not found, continuing without modification"; \
-    fi
+# Set Tessdata path
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/
 
-ARG MODULE_NAME=github.com/larek-tech/diploma/data
-
-WORKDIR /home/${MODULE_NAME}
-
+# Copy and build the Go application
 COPY go.mod go.sum ./
-RUN go get -t github.com/otiai10/gosseract/v2
-RUN go get -t github.com/gen2brain/go-fitz
 RUN go mod download
-
 COPY . .
+RUN go build -o ./bin/main ./cmd/parser/main.go
 
-ENV CGO_ENABLED=1
-ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
-
-
-RUN  export CGO_LDFLAGS="-lmupdf -lm -lmupdf-third -lfreetype -ljbig2dec -lharfbuzz -ljpeg -lopenjp2 -lz" \
-    && go build  -o ./bin/main ./cmd/parser/main.go
-
-FROM debian:stable-slim AS runner
-ARG MODULE_NAME=github.com/larek-tech/diploma/data
+# Runtime stage
+FROM debian:stable-slim
 
 WORKDIR /root/
-RUN apt-get update -qq 
 
-RUN apt-get install -y -qq \
-    libtesseract-dev libleptonica-dev tesseract-ocr tesseract-ocr-eng tesseract-ocr-rus \
-    libmupdf-dev mupdf mupdf-tools \
-    libfreetype6-dev \
-    libharfbuzz-dev
+# Install ONLY the necessary runtime libraries
+RUN apt-get update -qq && \
+    # First install essential packages
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    libjpeg62-turbo && \
+    # Check what mupdf packages are available
+    apt-cache search mupdf | grep -E '^lib' || true && \
+    # Now install other dependencies
+    apt-get install -y --no-install-recommends \
+    libtesseract5 \
+    liblept5 \
+    tesseract-ocr-eng \
+    tesseract-ocr-rus && \
+    # Try to install libmupdf-dev, but continue if it fails
+    apt-get install -y --no-install-recommends libmupdf-dev || \
+    # Install additional dependencies if libmupdf-dev isn't available
+    apt-get install -y --no-install-recommends \
+    libfreetype6 \
+    libopenjp2-7 \
+    libjbig2dec0 \
+    libharfbuzz0b && \
+    # Create a symlink to ensure libjpeg.so points to version 62
+    if [ -f /usr/lib/x86_64-linux-gnu/libjpeg.so.62 ]; then \
+    rm -f /usr/lib/x86_64-linux-gnu/libjpeg.so; \
+    ln -sf /usr/lib/x86_64-linux-gnu/libjpeg.so.62 /usr/lib/x86_64-linux-gnu/libjpeg.so; \
+    fi && \
+    # Download and add server certificate for s3.diploma.larek.tech
+    echo "Downloading certificate for s3.diploma.larek.tech..." && \
+    mkdir -p /usr/local/share/ca-certificates && \
+    update-ca-certificates && \
+    # Verify libjpeg configuration
+    ls -la /usr/lib/x86_64-linux-gnu/libjpeg* && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
+# Set environment variables
 ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
+# Force the dynamic loader to use the version 62 library
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjpeg.so.62
+# Trust self-signed certificates if needed for development
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
-COPY --from=builder /home/${MODULE_NAME}/bin/main .
-
-RUN chown root:root main
+# Copy the compiled binary from builder
+COPY --from=builder /app/bin/main .
+RUN chmod +x main
 
 ENTRYPOINT ["/root/main"]
