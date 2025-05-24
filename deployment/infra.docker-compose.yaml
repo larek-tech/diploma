@@ -1,5 +1,7 @@
 volumes:
   jaeger_data:
+  grafana_data:
+  grafana_dashboards:
 
 services:
   jaeger:
@@ -21,12 +23,12 @@ services:
       - '4317:4317'
       - '4318:4318'
     restart: unless-stopped
+
   prometheus:
     image: prom/prometheus:v2.28.0
-    volumes:
-      - ./configs/prometheus.yaml:/etc/prometheus/prometheus.yaml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yaml'
+    environment:
+      - PROM_CONFIG_B64=${PROM_CONFIG_B64}
+    entrypoint: ["/bin/sh", "-c", "echo $PROM_CONFIG_B64 | base64 -d > /etc/prometheus/prometheus.yaml && exec prometheus --config.file=/etc/prometheus/prometheus.yaml"]
     ports:
       - "9090:9090"
 
@@ -36,3 +38,6 @@ services:
       - prometheus
     ports:
       - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - grafana_dashboards:/var/lib/grafana/dashboards
