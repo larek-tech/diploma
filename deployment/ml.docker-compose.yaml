@@ -9,6 +9,7 @@ volumes:
 services:
   ml:
     container_name: ml
+    restart: always
     build:
       context: ../ml
       dockerfile: Dockerfile

@@ -218,7 +218,7 @@ func run() int {
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
 		}
-		slog.Info("Received query", "query", payload.Query)
+		slog.Debug("Received query", "query", payload.Query)
 		if len(payload.SourceIDs) == 0 {
 			err = fmt.Errorf("source IDs are required")
 			slog.Error(err.Error())
@@ -365,7 +365,7 @@ func getSqlCon(db *postgres.DB) *sql.DB {
 func getEmbedderConfig() (string, string, int) {
 	host := os.Getenv("OLLAMA_EMBEDDER_ENDPOINT")
 	if host == "" {
-		host = "http://localhost:11434"
+		host = "http://ollama:11434"
 	}
 	model := os.Getenv("OLLAMA_EMBEDDER_MODEL")
 	if model == "" {
