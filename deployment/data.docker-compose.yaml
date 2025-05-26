@@ -54,7 +54,7 @@ services:
         - configs/data.parser.env
     ports:
       - "9999:8081"
-      - "9095:9090"
+      - "9095:9091"
 
 
 
