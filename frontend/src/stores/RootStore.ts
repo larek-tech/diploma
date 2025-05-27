@@ -124,7 +124,7 @@ export class RootStore {
             );
 
             runInAction(() => {
-                if (response.domains.length < this.domainsLimit) {
+                if (response.domains?.length < this.domainsLimit) {
                     this.hasMoreDomains = false;
                 }
 
