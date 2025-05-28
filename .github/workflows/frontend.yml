@@ -1,10 +1,6 @@
 name: Frontend Deployment
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'frontend/**'  # Only run when files in the frontend directory change
   workflow_dispatch:  # Allows manual triggering regardless of changed files
 
 jobs:
