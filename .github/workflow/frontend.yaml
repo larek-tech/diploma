@@ -1,0 +1,29 @@
+name: Frontend Deployment
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'  # Only run when files in the frontend directory change
+  workflow_dispatch:  # Allows manual triggering regardless of changed files
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to remote server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}  # Custom SSH port
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/${{ secrets.SSH_USERNAME }}/diploma
+            docker compose -f deployment/frontend.docker-compose.yaml down
+            git pull
+            docker compose -f deployment/frontend.docker-compose.yaml up -d --build
