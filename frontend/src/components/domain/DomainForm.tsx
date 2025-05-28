@@ -17,12 +17,14 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {useToast} from '@/components/ui/use-toast';
+import {useStores} from '@/hooks/useStores';
 import {cn} from '@/lib/utils';
 import {Loader2, Plus, X} from 'lucide-react';
 import {useRef, useState} from 'react';
 import {CreateSourceForm} from './CreateSourceForm';
 
 export const DomainForm = () => {
+    const { rootStore } = useStores();
     const [isLoading, setIsLoading] = useState(false);
     const [isSourceLoading, setIsSourceLoading] = useState(true);
     const [domainTitle, setDomainTitle] = useState('');
@@ -112,6 +114,9 @@ export const DomainForm = () => {
 
             const domain = await DomainApiService.createDomain(domainData);
             setCreatedDomain(domain);
+
+            // Обновляем список доменов в RootStore
+            rootStore.getDomains(true); // true означает сброс и полную перезагрузку
 
             toast({
                 title: 'Успех',
