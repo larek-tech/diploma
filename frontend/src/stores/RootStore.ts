@@ -196,10 +196,12 @@ export class RootStore {
         this.activeSession = session;
 
         this.activeDisplayedSession = {
-            messages: session.content.map((message: SessionContentMessages) => ({
-                query: message.query.content,
-                response: message.response.content,
-            })),
+            messages: session.content
+                ? session.content.map((message: SessionContentMessages) => ({
+                      query: message.query.content,
+                      response: message.response.content,
+                  }))
+                : [],
         };
 
         if (connectWS) {

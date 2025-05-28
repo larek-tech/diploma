@@ -1,5 +1,5 @@
-import { Scenario } from './domain';
-import { Time } from './time';
+import {Scenario} from './domain';
+import {Time} from './time';
 
 export interface ShortChatSession {
     createdAt: Time;
@@ -12,7 +12,7 @@ export interface ShortChatSession {
 export interface ChatSession {
     createdAt: Time;
     id: string;
-    content: SessionContentMessages[];
+    content?: SessionContentMessages[];
     title: string;
     updatedAt: Time;
     userId: number;
