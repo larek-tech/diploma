@@ -27,7 +27,7 @@ func New(db db, objectStore objectStore) *Store {
 }
 
 func getObjectStoreKey(f *file.File) string {
-	return FileKeyPrefix + f.ID + "." + f.Extension
+	return "/" + FileKeyPrefix + f.ID + "." + f.Extension
 }
 
 func (s Store) Save(ctx context.Context, f *file.File) error {
