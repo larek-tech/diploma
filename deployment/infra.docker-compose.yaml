@@ -2,6 +2,7 @@ volumes:
   jaeger_data:
   grafana_data:
   grafana_dashboards:
+  prometheus_data:
 
 services:
   jaeger:
@@ -25,12 +26,19 @@ services:
     restart: unless-stopped
 
   prometheus:
-    image: prom/prometheus:v2.28.0
+    image: prom/prometheus:v3.4.0
     environment:
       - PROM_CONFIG_B64=${PROM_CONFIG_B64}
-    entrypoint: ["/bin/sh", "-c", "echo $PROM_CONFIG_B64 | base64 -d > /etc/prometheus/prometheus.yaml && exec prometheus --config.file=/etc/prometheus/prometheus.yaml"]
+    entrypoint:
+      [
+        "/bin/sh",
+        "-c",
+        "echo $PROM_CONFIG_B64 | base64 -d > /etc/prometheus/prometheus.yaml && exec prometheus --enable-feature=metadata-wal-records --web.enable-remote-write-receiver --config.file=/etc/prometheus/prometheus.yaml"
+      ]
     ports:
       - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
 
   grafana:
     image: grafana/grafana:latest

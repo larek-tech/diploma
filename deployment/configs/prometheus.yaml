@@ -6,8 +6,23 @@ global:
 scrape_configs:
   - job_name: 'crawler'
     static_configs:
-      - targets: ['crawler:9090']
+      - targets: ['localhost:9091']
 
   - job_name: 'parser'
     static_configs:
-      - targets: ['parser:9090']
+      - targets: ['localhost:9095']
+
+remote_write:
+  - url: 'http://localhost:9090/api/v1/write'
+    name: 'remote_prometheus'
+    remote_timeout: 120s
+    send_exemplars: true
+
+    queue_config:
+      capacity: 50000000  
+      max_shards: 30
+      min_shards: 2
+      max_samples_per_send: 4000
+      batch_send_deadline: 5s
+      retry_on_http_429: true
+      sample_age_limit: 120m

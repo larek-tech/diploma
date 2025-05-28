@@ -8,10 +8,18 @@ const url = `http://${HOSTNAME}:${PORT}/q`;
 
 export const options = {
     stages: [
-        { duration: '1m', target: 50 },
-        { duration: '5m', target: 200 },
-        { duration: '5m', target: 0 }, // ramp-down to 0 users
+        { duration: '5m', target: 10 },
+        { duration: '5m', target: 20 },
+        { duration: '5m', target: 30 },
+        { duration: '5m', target: 40 },
+        { duration: '5m', target: 50 },
+        { duration: '5m', target: 60 },
+        { duration: '5m', target: 0 },// ramp-down to 0 users
     ],
+    httpDebug: 'none',
+    logFormat: 'json',
+    noVUConnectionReuse: false,
+    discardResponseBodies: true,
 };
 const queries = [
     {
