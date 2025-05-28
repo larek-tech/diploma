@@ -4,4 +4,5 @@ export enum Pages {
     Chat = 'chat',
     Domain = 'domain',
     CreateDomain = 'create-domain',
+    RoleManagement = 'role-management',
 }

@@ -10,6 +10,7 @@ import ChatFromDomain from './pages/ChatFromDomain';
 import ChatFromHistory from './pages/ChatFromHistory';
 import CreateDomain from './pages/CreateDomain';
 import {Login} from './pages/Login';
+import RoleManagement from './pages/RoleManagement';
 import {Pages} from './router/constants';
 
 function App() {
@@ -77,6 +78,16 @@ function App() {
                             <RequireAuth>
                                 <Dashboard>
                                     <CreateDomain />
+                                </Dashboard>
+                            </RequireAuth>
+                        }
+                    />
+                    <Route
+                        path={`/${Pages.RoleManagement}`}
+                        element={
+                            <RequireAuth>
+                                <Dashboard>
+                                    <RoleManagement />
                                 </Dashboard>
                             </RequireAuth>
                         }

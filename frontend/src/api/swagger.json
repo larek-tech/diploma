@@ -1,0 +1,2814 @@
+{
+    "schemes": [],
+    "swagger": "2.0",
+    "info": {
+        "description": "Diploma RAG API service documentation.",
+        "title": "Diploma API",
+        "contact": {},
+        "license": {
+            "name": "MIT",
+            "url": "https://github.com/larek-tech/diploma/blob/api/LICENSE"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:9000",
+    "basePath": "/",
+    "paths": {
+        "/api/v1/chat/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates new chat for RAG system.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Create new chat.",
+                "responses": {
+                    "201": {
+                        "description": "Chat successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Chat"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to create chat",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chat/cancel/{id}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Cancel processing of query (all dependant jobs) by id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Cancel query.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Query ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Processing query successfully canceled",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Chat"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to cancel query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "No access to cancel query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chat/history/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns chat with messages within it.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Get chat.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returned chat",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Chat"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to get chat",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Chat not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chat/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List chats created by user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "List chats.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of chats",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListChatsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list chats",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chat/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update chat information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Update chat.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Chat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.RenameChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Chat updated",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Chat"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to update chat",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Chat not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Soft delete chat by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Delete chat.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Chat successfully deleted",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Chat"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to delete chat",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Chat not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/domain/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates new domain (group of sources used for RAG vector search).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Create new domain.",
+                "parameters": [
+                    {
+                        "description": "Input data for creating domain",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.CreateDomainRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Domain successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Domain"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to create domain",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/domain/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List domains to which user has access.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "List domains.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of domains",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListDomainsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list domains",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/domain/permissions/roles/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns list of roles permitted to domain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Get permitted roles.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permitted roles",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Domain"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates list of roles permitted to domain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Update permitted roles.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New list of permitted roles",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedRoles"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated roles permissions",
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedRoles"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/domain/permissions/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns list of users permitted to domain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Get permitted users.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permitted users",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Domain"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates list of users permitted to domain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Update permitted users.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New list of permitted users",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedUsers"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated users permissions",
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedUsers"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/domain/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns information about domain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Get domain.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Domain",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Domain"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to get domain",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update domain information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Update domain.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.UpdateDomainRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Domain updated",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Domain"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to update domain",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete domain by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Delete domain.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Domain deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to delete domain",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create new role, only for admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "Create new role.",
+                "parameters": [
+                    {
+                        "description": "Input data for creating role",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.CreateRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Role successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Role"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to create role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List roles.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "List roles.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of roles",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListRolesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list roles",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/remove": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Remove role from user's list, only for admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "Remove role.",
+                "parameters": [
+                    {
+                        "description": "Remove role from user's list",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.UpdateRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Role successfully removed",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to remove role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/set": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add new role for user, only for admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "Set role.",
+                "parameters": [
+                    {
+                        "description": "Set role for user",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.UpdateRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Role successfully set",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to set role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns information about role.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "Get role.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested role ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Role",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Role"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to get role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete role by ID, only for admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "Delete role.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Role ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Role deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to delete role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/scenario/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates new scenario (options used for RAG vector search).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scenario"
+                ],
+                "summary": "Create new scenario.",
+                "parameters": [
+                    {
+                        "description": "Input data for creating scenario",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.CreateScenarioRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Scenario successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Scenario"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to create scenario",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/scenario/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List scenarios created by user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scenario"
+                ],
+                "summary": "List scenarios.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of scenarios",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListScenariosResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list scenarios",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/scenario/list_by_domain/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List scenarios by domain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scenario"
+                ],
+                "summary": "List scenarios by domain.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of scenarios",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListScenariosResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list scenarios",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/scenario/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns information about scenario.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scenario"
+                ],
+                "summary": "Get scenario.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested scenario ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Scenario",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Scenario"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to get scenario",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Scenario not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update scenario information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scenario"
+                ],
+                "summary": "Update scenario.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Scenario ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.UpdateScenarioRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Scenario updated",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Scenario"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to update scenario",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Scenario not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete scenario by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scenario"
+                ],
+                "summary": "Delete scenario.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Scenario ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Scenario deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to delete scenario",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Scenario not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/source/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates new source used for RAG vector search.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "Create new source.",
+                "parameters": [
+                    {
+                        "description": "Input data for creating source",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.CreateSourceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Source successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Source"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to create source",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/source/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List sources to which user has access.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "List sources.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of sources",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListSourcesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list sources",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/source/list_by_domain/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List sources by domain to which user has access.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "List sources by domain.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of sources by domain",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListSourcesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list sources by domain",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/source/permissions/roles/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns list of roles permitted to source.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "Get permitted roles.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested source ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permitted roles",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Source"
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates list of roles permitted to source.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "Update permitted roles.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested source ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New list of permitted roles",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedRoles"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated roles permissions",
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedRoles"
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/source/permissions/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns list of users permitted to source.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "Get permitted users.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested source ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permitted users",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Source"
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates list of users permitted to source.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "Update permitted users.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested source ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New list of permitted users",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedUsers"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated users permissions",
+                        "schema": {
+                            "$ref": "#/definitions/pb.PermittedUsers"
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/source/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns information about source and its update parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "Get source.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested source ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Source",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Source"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to get source",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update source information or params for update job.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "Update source.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Source ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.UpdateSourceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Source updated",
+                        "schema": {
+                            "$ref": "#/definitions/pb.Source"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to update source",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete domain source by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "source"
+                ],
+                "summary": "Delete source.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Source ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Source deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to delete source",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Source not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create new user, only for admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Create new user.",
+                "parameters": [
+                    {
+                        "description": "Input data for creating user",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/pb.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to create user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List users.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "List users.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of users",
+                        "schema": {
+                            "$ref": "#/definitions/pb.ListUsersResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list users",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns information about user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get user.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Requested user ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User",
+                        "schema": {
+                            "$ref": "#/definitions/pb.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to get user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete user by ID, only for admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Delete user.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to delete user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Required admin role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/v1/login": {
+            "post": {
+                "description": "Authorizes user with provided credentials.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login user.",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pb.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Auth token and metadata",
+                        "schema": {
+                            "$ref": "#/definitions/pb.LoginResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "internal_chat_pb.Query": {
+            "type": "object",
+            "properties": {
+                "chatId": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "domainId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "scenarioId": {
+                    "type": "integer"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pb.Chat": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.Content"
+                    }
+                },
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pb.Content": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "$ref": "#/definitions/internal_chat_pb.Query"
+                },
+                "response": {
+                    "$ref": "#/definitions/pb.Response"
+                }
+            }
+        },
+        "pb.CreateDomainRequest": {
+            "type": "object",
+            "properties": {
+                "sourceIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "pb.CreateRoleRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "pb.CreateScenarioRequest": {
+            "type": "object",
+            "properties": {
+                "contextSize": {
+                    "type": "integer"
+                },
+                "domainId": {
+                    "type": "integer"
+                },
+                "model": {
+                    "$ref": "#/definitions/pb.LlmModel"
+                },
+                "multiQuery": {
+                    "$ref": "#/definitions/pb.MultiQuery"
+                },
+                "reranker": {
+                    "$ref": "#/definitions/pb.Reranker"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "vectorSearch": {
+                    "$ref": "#/definitions/pb.VectorSearch"
+                }
+            }
+        },
+        "pb.CreateSourceRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "credentials": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "typ": {
+                    "$ref": "#/definitions/pb.SourceType"
+                },
+                "updateParams": {
+                    "$ref": "#/definitions/pb.UpdateParams"
+                }
+            }
+        },
+        "pb.CreateUserRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "pb.CronFormat": {
+            "type": "object",
+            "properties": {
+                "dayOfMonth": {
+                    "type": "integer"
+                },
+                "dayOfWeek": {
+                    "type": "integer"
+                },
+                "hour": {
+                    "type": "integer"
+                },
+                "minute": {
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pb.Domain": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "scenarioIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "sourceIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                }
+            }
+        },
+        "pb.ListChatsResponse": {
+            "type": "object",
+            "properties": {
+                "chats": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.Chat"
+                    }
+                }
+            }
+        },
+        "pb.ListDomainsResponse": {
+            "type": "object",
+            "properties": {
+                "domains": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.Domain"
+                    }
+                }
+            }
+        },
+        "pb.ListRolesResponse": {
+            "type": "object",
+            "properties": {
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.Role"
+                    }
+                }
+            }
+        },
+        "pb.ListScenariosResponse": {
+            "type": "object",
+            "properties": {
+                "scenarios": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.Scenario"
+                    }
+                }
+            }
+        },
+        "pb.ListSourcesResponse": {
+            "type": "object",
+            "properties": {
+                "sources": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.Source"
+                    }
+                }
+            }
+        },
+        "pb.ListUsersResponse": {
+            "type": "object",
+            "properties": {
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pb.User"
+                    }
+                }
+            }
+        },
+        "pb.LlmModel": {
+            "type": "object",
+            "properties": {
+                "modelName": {
+                    "type": "string"
+                },
+                "systemPrompt": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "number"
+                },
+                "topK": {
+                    "type": "integer"
+                },
+                "topP": {
+                    "type": "number"
+                }
+            }
+        },
+        "pb.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "pb.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "meta": {
+                    "$ref": "#/definitions/pb.UserAuthMetadata"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "pb.MultiQuery": {
+            "type": "object",
+            "properties": {
+                "nQueries": {
+                    "description": "Количество перефразированных вопросов",
+                    "type": "integer"
+                },
+                "queryModelName": {
+                    "type": "string"
+                },
+                "useMultiquery": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "pb.PermittedRoles": {
+            "type": "object",
+            "properties": {
+                "resourceId": {
+                    "type": "integer"
+                },
+                "roleIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "pb.PermittedUsers": {
+            "type": "object",
+            "properties": {
+                "resourceId": {
+                    "type": "integer"
+                },
+                "userIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "pb.RenameChatRequest": {
+            "type": "object",
+            "properties": {
+                "chatId": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "pb.Reranker": {
+            "type": "object",
+            "properties": {
+                "rerankerMaxLength": {
+                    "type": "integer"
+                },
+                "rerankerModel": {
+                    "type": "string"
+                },
+                "topK": {
+                    "description": "Количество чанков после реранкинга",
+                    "type": "integer"
+                },
+                "useRerank": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "pb.Response": {
+            "type": "object",
+            "properties": {
+                "chatId": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "queryId": {
+                    "type": "integer"
+                },
+                "status": {
+                    "$ref": "#/definitions/pb.ResponseStatus"
+                },
+                "updatedAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                }
+            }
+        },
+        "pb.ResponseStatus": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "x-enum-varnames": [
+                "ResponseStatus_RESPONSE_UNDEFINED",
+                "ResponseStatus_RESPONSE_CREATED",
+                "ResponseStatus_RESPONSE_PROCESSING",
+                "ResponseStatus_RESPONSE_SUCCESS",
+                "ResponseStatus_RESPONSE_ERROR",
+                "ResponseStatus_RESPONSE_CANCELED"
+            ]
+        },
+        "pb.Role": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "pb.Scenario": {
+            "type": "object",
+            "properties": {
+                "contextSize": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "domainId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "model": {
+                    "$ref": "#/definitions/pb.LlmModel"
+                },
+                "multiQuery": {
+                    "$ref": "#/definitions/pb.MultiQuery"
+                },
+                "reranker": {
+                    "$ref": "#/definitions/pb.Reranker"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "vectorSearch": {
+                    "$ref": "#/definitions/pb.VectorSearch"
+                }
+            }
+        },
+        "pb.Source": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "credentials": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "$ref": "#/definitions/pb.SourceStatus"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "typ": {
+                    "$ref": "#/definitions/pb.SourceType"
+                },
+                "updateParams": {
+                    "$ref": "#/definitions/pb.UpdateParams"
+                },
+                "updatedAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pb.SourceStatus": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "SourceStatus_STATUS_UNDEFINED",
+                "SourceStatus_STATUS_READY",
+                "SourceStatus_STATUS_PARSING",
+                "SourceStatus_STATUS_FAILED"
+            ]
+        },
+        "pb.SourceType": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4
+            ],
+            "x-enum-varnames": [
+                "SourceType_TYPE_UNDEFINED",
+                "SourceType_TYPE_WEB",
+                "SourceType_TYPE_SINGLE_FILE",
+                "SourceType_TYPE_ARCHIVED_FILES",
+                "SourceType_TYPE_WITH_CREDENTIALS"
+            ]
+        },
+        "pb.UpdateDomainRequest": {
+            "type": "object",
+            "properties": {
+                "domainId": {
+                    "type": "integer"
+                },
+                "scenarioIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "sourceIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "pb.UpdateParams": {
+            "type": "object",
+            "properties": {
+                "cron": {
+                    "$ref": "#/definitions/pb.CronFormat"
+                },
+                "everyPeriod": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pb.UpdateRoleRequest": {
+            "type": "object",
+            "properties": {
+                "roleId": {
+                    "type": "integer"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pb.UpdateScenarioRequest": {
+            "type": "object",
+            "properties": {
+                "domainId": {
+                    "type": "integer"
+                },
+                "modelName": {
+                    "type": "string"
+                },
+                "modelTopK": {
+                    "type": "integer"
+                },
+                "nQueries": {
+                    "description": "Количество перефразированных вопросов",
+                    "type": "integer"
+                },
+                "queryModelName": {
+                    "description": "Пока не знаю нучно ли будет",
+                    "type": "string"
+                },
+                "rerankerMaxLength": {
+                    "type": "integer"
+                },
+                "rerankerModel": {
+                    "type": "string"
+                },
+                "rerankerTopK": {
+                    "description": "Количество чанков после реранкинга",
+                    "type": "integer"
+                },
+                "scenarioId": {
+                    "type": "integer"
+                },
+                "searchByQuery": {
+                    "type": "boolean"
+                },
+                "systemPrompt": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "number"
+                },
+                "threshold": {
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "topN": {
+                    "description": "Сколько чанков забирать при векторном поиске.",
+                    "type": "integer"
+                },
+                "topP": {
+                    "type": "number"
+                },
+                "useMultiquery": {
+                    "type": "boolean"
+                },
+                "useRerank": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "pb.UpdateSourceRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "credentials": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "sourceId": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updateParams": {
+                    "$ref": "#/definitions/pb.UpdateParams"
+                }
+            }
+        },
+        "pb.User": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                }
+            }
+        },
+        "pb.UserAuthMetadata": {
+            "type": "object",
+            "properties": {
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pb.VectorSearch": {
+            "type": "object",
+            "properties": {
+                "searchByQuery": {
+                    "type": "boolean"
+                },
+                "threshold": {
+                    "type": "number"
+                },
+                "topN": {
+                    "description": "Сколько чанков забирать при векторном поиске.",
+                    "type": "integer"
+                }
+            }
+        },
+        "timestamppb.Timestamp": {
+            "type": "object",
+            "properties": {
+                "nanos": {
+                    "description": "Non-negative fractions of a second at nanosecond resolution. Negative\nsecond values with fractions must still have non-negative nanos values\nthat count forward in time. Must be from 0 to 999,999,999\ninclusive.",
+                    "type": "integer"
+                },
+                "seconds": {
+                    "description": "Represents seconds of UTC time since Unix epoch\n1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to\n9999-12-31T23:59:59Z inclusive.",
+                    "type": "integer"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
