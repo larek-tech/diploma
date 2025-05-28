@@ -43,6 +43,10 @@ export class DomainApiService {
         return response.data;
     }
 
+    static async deleteDomain(domainId: number): Promise<void> {
+        await axiosInstance.delete(`/api/v1/domain/${domainId}`);
+    }
+
     static async createScenario(data: Scenario): Promise<Scenario> {
         const response = await axiosInstance.post<Scenario>('/api/v1/scenario', data);
         return response.data;

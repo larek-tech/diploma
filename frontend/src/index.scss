@@ -65,6 +65,14 @@
     }
 }
 
+.domain-history-item {
+    &:hover {
+        .domain-history-item__delete-button {
+            opacity: 1;
+        }
+    }
+}
+
 body:has(.dashboard) {
     overflow: hidden;
     // height: 100vh;

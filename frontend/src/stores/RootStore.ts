@@ -149,6 +149,28 @@ export class RootStore {
         }
     }
 
+    async deleteDomain(domainId: number) {
+        try {
+            await DomainApiService.deleteDomain(domainId);
+
+            runInAction(() => {
+                // Удаляем домен из списка
+                this.domains = this.domains.filter((domain) => domain.id !== domainId);
+
+                // Если удаляемый домен был выбран, сбрасываем выбор
+                if (this.selectedDomainId === domainId) {
+                    this.selectedDomain = null;
+                    this.selectedDomainId = null;
+                }
+            });
+
+            return true;
+        } catch (error) {
+            console.error('Error deleting domain:', error);
+            throw error;
+        }
+    }
+
     async deleteSession({ id }: DeleteSessionParams) {
         return ChatApiService.deleteSession({ id }).then(() => {
             if (this.activeSessionId === id) {
