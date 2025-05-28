@@ -66,12 +66,22 @@ const DomainStatusChecker = observer(({ onStatusCheck }: DomainStatusCheckerProp
         const checkDomainSources = async () => {
             if (!rootStore.selectedDomain) {
                 setSources([]);
-                onStatusCheck?.(false);
+                onStatusCheck?.(false); // Явно передаем false когда нет домена
                 return;
             }
 
             setLoading(true);
             try {
+                // Если у домена нет источников, считаем его готовым
+                if (
+                    !rootStore.selectedDomain.sourceIds ||
+                    rootStore.selectedDomain.sourceIds.length === 0
+                ) {
+                    setSources([]);
+                    onStatusCheck?.(true);
+                    return;
+                }
+
                 // Получаем информацию о каждом источнике в домене
                 const sourcePromises = rootStore.selectedDomain.sourceIds.map((sourceId) =>
                     DomainApiService.getSource(sourceId)
@@ -119,6 +129,15 @@ const DomainStatusChecker = observer(({ onStatusCheck }: DomainStatusCheckerProp
             }
 
             try {
+                // Если у домена нет источников, считаем его готовым
+                if (
+                    !rootStore.selectedDomain.sourceIds ||
+                    rootStore.selectedDomain.sourceIds.length === 0
+                ) {
+                    onStatusCheck?.(true);
+                    return;
+                }
+
                 const sourcePromises = rootStore.selectedDomain.sourceIds.map((sourceId) =>
                     DomainApiService.getSource(sourceId)
                 );
@@ -186,56 +205,71 @@ const DomainStatusChecker = observer(({ onStatusCheck }: DomainStatusCheckerProp
                         Источники данных:
                     </h4>
                     <div className='space-y-2'>
-                        {loading && sources.length === 0
-                            ? // Скелетоны во время загрузки
-                              Array.from({ length: 3 }).map((_, index) => (
-                                  <div
-                                      key={index}
-                                      className='flex items-center justify-between p-3 border rounded-lg bg-gray-50 dark:bg-gray-800 animate-pulse'
-                                  >
-                                      <div className='flex items-center gap-3'>
-                                          <Skeleton className='w-4 h-4 rounded-full' />
-                                          <div className='space-y-1'>
-                                              <Skeleton className='h-4 w-32' />
-                                              <Skeleton className='h-3 w-20' />
-                                          </div>
-                                      </div>
-                                      <Skeleton className='h-6 w-16 rounded-full' />
-                                  </div>
-                              ))
-                            : sources.map((source) => (
-                                  <div
-                                      key={source.id}
-                                      className={`flex items-center justify-between p-3 border rounded-lg bg-gray-50 dark:bg-gray-800 transition-all duration-300 ${
-                                          source.status === SourceStatus.Parsing
-                                              ? 'ring-2 ring-yellow-200 dark:ring-yellow-800'
-                                              : ''
-                                      }`}
-                                  >
-                                      <div className='flex items-center gap-3'>
-                                          {getStatusIcon(source.status)}
-                                          <div>
-                                              <p className='font-medium text-sm'>{source.title}</p>
-                                              <p className='text-xs text-gray-500'>
-                                                  ID: {source.id} • Тип: {source.typ}
-                                              </p>
-                                          </div>
-                                      </div>
-                                      <Badge
-                                          variant={getStatusVariant(source.status)}
-                                          className={
-                                              source.status === SourceStatus.Parsing
-                                                  ? 'animate-pulse'
-                                                  : ''
-                                          }
-                                      >
-                                          {getStatusText(source.status)}
-                                      </Badge>
-                                  </div>
-                              ))}
+                        {loading && sources.length === 0 ? (
+                            // Скелетоны во время загрузки
+                            Array.from({ length: 3 }).map((_, index) => (
+                                <div
+                                    key={index}
+                                    className='flex items-center justify-between p-3 border rounded-lg bg-gray-50 dark:bg-gray-800 animate-pulse'
+                                >
+                                    <div className='flex items-center gap-3'>
+                                        <Skeleton className='w-4 h-4 rounded-full' />
+                                        <div className='space-y-1'>
+                                            <Skeleton className='h-4 w-32' />
+                                            <Skeleton className='h-3 w-20' />
+                                        </div>
+                                    </div>
+                                    <Skeleton className='h-6 w-16 rounded-full' />
+                                </div>
+                            ))
+                        ) : sources.length === 0 ? (
+                            // Сообщение когда нет источников
+                            <div className='p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
+                                <div className='flex items-center gap-2 text-blue-800 dark:text-blue-200'>
+                                    <CheckCircle className='w-4 h-4' />
+                                    <p className='text-sm font-medium'>
+                                        У домена нет источников данных
+                                    </p>
+                                </div>
+                                <p className='text-xs text-blue-700 dark:text-blue-300 mt-1'>
+                                    Домен готов к использованию.
+                                </p>
+                            </div>
+                        ) : (
+                            sources.map((source) => (
+                                <div
+                                    key={source.id}
+                                    className={`flex items-center justify-between p-3 border rounded-lg bg-gray-50 dark:bg-gray-800 transition-all duration-300 ${
+                                        source.status === SourceStatus.Parsing
+                                            ? 'ring-2 ring-yellow-200 dark:ring-yellow-800'
+                                            : ''
+                                    }`}
+                                >
+                                    <div className='flex items-center gap-3'>
+                                        {getStatusIcon(source.status)}
+                                        <div>
+                                            <p className='font-medium text-sm'>{source.title}</p>
+                                            <p className='text-xs text-gray-500'>
+                                                ID: {source.id} • Тип: {source.typ}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <Badge
+                                        variant={getStatusVariant(source.status)}
+                                        className={
+                                            source.status === SourceStatus.Parsing
+                                                ? 'animate-pulse'
+                                                : ''
+                                        }
+                                    >
+                                        {getStatusText(source.status)}
+                                    </Badge>
+                                </div>
+                            ))
+                        )}
                     </div>
 
-                    {!allReady && (
+                    {!allReady && sources.length > 0 && (
                         <div className='mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg animate-pulse'>
                             <div className='flex items-center gap-2 text-amber-800 dark:text-amber-200'>
                                 <AlertCircle className='w-4 h-4 animate-pulse' />

@@ -46,7 +46,7 @@ const ChatWrapper = observer(() => {
 
         if (!sessionId) {
             rootStore
-                .createSession()
+                .createSession(false) // Не подключаем WebSocket сразу
                 .then(() => {
                     rootStore.getSessions();
                 })
@@ -58,7 +58,8 @@ const ChatWrapper = observer(() => {
                     });
                 });
         } else {
-            rootStore.getSession({ id: sessionId }).catch(() => {
+            rootStore.getSession({ id: sessionId }, false).catch(() => {
+                // Не подключаем WebSocket сразу
                 toast({
                     title: 'Ошибка',
                     description: 'Не удалось загрузить сессию',
@@ -107,6 +108,13 @@ const ChatWrapper = observer(() => {
 
         checkDomainSources();
     }, [rootStore.selectedDomain]);
+
+    // Подключаем WebSocket когда источники домена готовы
+    useEffect(() => {
+        if (domainSourcesReady && rootStore.activeSessionId && !rootStore.websocket) {
+            rootStore.connectWebSocketIfReady();
+        }
+    }, [domainSourcesReady, rootStore]);
 
     const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
