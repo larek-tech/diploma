@@ -27,7 +27,7 @@ func New(db db, objectStore objectStore) *Store {
 }
 
 func getObjectStoreKey(f *file.File) string {
-	return "/" + FileKeyPrefix + f.ID + "." + f.Extension
+	return FileKeyPrefix + f.ID + "." + f.Extension
 }
 
 func (s Store) Save(ctx context.Context, f *file.File) error {
@@ -35,7 +35,7 @@ func (s Store) Save(ctx context.Context, f *file.File) error {
 	if err != nil && !postgres.IsNoRowsError(err) {
 		return err
 	}
-	f.ObjectURL = s.o.GetBaseURL() + getObjectStoreKey(f)
+	f.ObjectURL = getObjectStoreKey(f)
 	if existingFile != nil {
 		err := s.db.Exec(ctx, `
 UPDATE files
