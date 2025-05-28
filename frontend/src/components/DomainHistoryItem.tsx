@@ -2,8 +2,11 @@ import {Domain} from '@/api/models';
 import {useStores} from '@/hooks/useStores';
 import {cn} from '@/lib/utils';
 import {Format, formatDate} from '@/utils/date-utils';
-import {CheckCircle2, Database} from 'lucide-react';
+import {CheckCircle2, Database, Trash2} from 'lucide-react';
 import {observer} from 'mobx-react-lite';
+import {useState} from 'react';
+import {Button} from './ui/button';
+import {useToast} from './ui/use-toast';
 
 interface DomainHistoryItemProps {
     domain: Domain;
@@ -11,12 +14,46 @@ interface DomainHistoryItemProps {
 
 const DomainHistoryItem = observer(({ domain }: DomainHistoryItemProps) => {
     const { rootStore } = useStores();
+    const { toast } = useToast();
+    const [isDeleting, setIsDeleting] = useState(false);
     const isSelected = rootStore.selectedDomainId === domain.id;
 
     const createdDate = formatDate(
         new Date(domain.createdAt.seconds * 1000),
         Format.DayMonthYearTime
     );
+
+    const handleDeleteDomain = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (isDeleting) return;
+
+        if (!confirm(`Вы уверены, что хотите удалить домен "${domain.title}"?`)) {
+            return;
+        }
+
+        try {
+            setIsDeleting(true);
+            await rootStore.deleteDomain(domain.id);
+
+            toast({
+                title: 'Успех',
+                description: `Домен "${domain.title}" успешно удален`,
+                variant: 'default',
+            });
+        } catch (error) {
+            console.error('Error deleting domain:', error);
+
+            toast({
+                title: 'Ошибка',
+                description: 'Не удалось удалить домен',
+                variant: 'destructive',
+            });
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     // const handleDomainClick = () => {
     //     rootStore.setSelectedDomain(domain.id);
@@ -25,7 +62,7 @@ const DomainHistoryItem = observer(({ domain }: DomainHistoryItemProps) => {
     return (
         <div
             className={cn(
-                'bg-white border rounded-lg p-4 transition-colors duration-200 hover:shadow-sm cursor-pointer relative',
+                'domain-history-item bg-white border rounded-lg p-4 transition-colors duration-200 hover:shadow-sm cursor-pointer relative',
                 isSelected ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary'
             )}
             // onClick={handleDomainClick}
@@ -48,6 +85,18 @@ const DomainHistoryItem = observer(({ domain }: DomainHistoryItemProps) => {
                             {domain?.scenarioIds?.length}
                         </p>
                     </div>
+                </div>
+                <div className='flex-shrink-0'>
+                    <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={handleDeleteDomain}
+                        disabled={isDeleting}
+                        className='domain-history-item__delete-button h-8 w-8 p-0 text-gray-400 hover:text-gray-600 focus:outline-none flex items-center justify-center opacity-0'
+                        title='Удалить домен'
+                    >
+                        <Trash2 className='h-4 w-4' />
+                    </Button>
                 </div>
             </div>
         </div>

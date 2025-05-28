@@ -19,12 +19,19 @@ export interface Source {
     createdAt: TimeStamp;
     credentials: number[];
     id: number;
-    status: number;
+    status: SourceStatus;
     title: string;
     typ: number;
     updateParams: UpdateParams;
     updatedAt: TimeStamp;
     userId: number;
+}
+
+export enum SourceStatus {
+    Undefind = 0,
+    Ready = 1,
+    Parsing = 2,
+    Failed = 3,
 }
 
 export interface SourcesResponse {

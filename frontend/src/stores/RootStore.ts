@@ -49,16 +49,25 @@ export class RootStore {
     }
 
     async setSelectedDomain(domainId: number) {
+        console.log('setSelectedDomain called with domainId:', domainId);
         this.selectedDomainId = domainId;
 
-        // Получаем выбранный домен сетевым запросом
-        const selectedDomain = await DomainApiService.getDomainById(domainId);
+        try {
+            // Получаем выбранный домен сетевым запросом
+            const selectedDomain = await DomainApiService.getDomainById(domainId);
+            console.log('Domain fetched:', selectedDomain);
 
-        this.selectedDomain = selectedDomain;
+            this.selectedDomain = selectedDomain;
 
-        const selectedScenarioId = selectedDomain.scenarioIds[0] || null;
-        if (selectedScenarioId) {
-            this.setSelectedScenario(selectedScenarioId);
+            const selectedScenarioId = selectedDomain.scenarioIds[0] || null;
+            if (selectedScenarioId) {
+                this.setSelectedScenario(selectedScenarioId);
+            }
+
+            console.log('setSelectedDomain completed successfully');
+        } catch (error) {
+            console.error('Error in setSelectedDomain:', error);
+            throw error;
         }
     }
 
@@ -124,7 +133,7 @@ export class RootStore {
             );
 
             runInAction(() => {
-                if (response.domains.length < this.domainsLimit) {
+                if (response.domains?.length < this.domainsLimit) {
                     this.hasMoreDomains = false;
                 }
 
@@ -140,6 +149,28 @@ export class RootStore {
         }
     }
 
+    async deleteDomain(domainId: number) {
+        try {
+            await DomainApiService.deleteDomain(domainId);
+
+            runInAction(() => {
+                // Удаляем домен из списка
+                this.domains = this.domains.filter((domain) => domain.id !== domainId);
+
+                // Если удаляемый домен был выбран, сбрасываем выбор
+                if (this.selectedDomainId === domainId) {
+                    this.selectedDomain = null;
+                    this.selectedDomainId = null;
+                }
+            });
+
+            return true;
+        } catch (error) {
+            console.error('Error deleting domain:', error);
+            throw error;
+        }
+    }
+
     async deleteSession({ id }: DeleteSessionParams) {
         return ChatApiService.deleteSession({ id }).then(() => {
             if (this.activeSessionId === id) {
@@ -149,19 +180,19 @@ export class RootStore {
         });
     }
 
-    async getSession({ id }: GetSessionParams) {
+    async getSession({ id }: GetSessionParams, connectWS: boolean = true) {
         this.activeSessionLoading = true;
 
         return ChatApiService.getSession({ id })
             .then((session) => {
-                this.setActiveSession(session);
+                this.setActiveSession(session, connectWS);
             })
             .finally(() => {
                 this.activeSessionLoading = false;
             });
     }
 
-    setActiveSession(session: ChatSession) {
+    setActiveSession(session: ChatSession, connectWS: boolean = true) {
         this.activeSession = session;
 
         this.activeDisplayedSession = {
@@ -171,7 +202,9 @@ export class RootStore {
             })),
         };
 
-        this.connectWebSocket(session.id);
+        if (connectWS) {
+            this.connectWebSocket(session.id);
+        }
     }
 
     setActiveSessionId(id: string | null) {
@@ -184,13 +217,17 @@ export class RootStore {
         return ChatApiService.renameSession({ id, title });
     }
 
-    async createSession() {
+    async createSession(connectWS: boolean = true) {
         return ChatApiService.createSession().then(async ({ id }) => {
             this.activeDisplayedSession = null;
 
             this.getSessions();
 
-            this.connectWebSocket(id);
+            if (connectWS) {
+                this.connectWebSocket(id);
+            } else {
+                this.setActiveSessionId(id);
+            }
         });
     }
 
@@ -394,6 +431,13 @@ export class RootStore {
 
     private reconnectWebSocket() {
         if (this.activeSessionId) {
+            this.connectWebSocket(this.activeSessionId);
+        }
+    }
+
+    // Метод для подключения WebSocket после проверки статуса домена
+    connectWebSocketIfReady() {
+        if (this.activeSessionId && !this.websocket) {
             this.connectWebSocket(this.activeSessionId);
         }
     }

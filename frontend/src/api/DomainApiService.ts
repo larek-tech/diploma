@@ -15,6 +15,11 @@ export class DomainApiService {
         return response.data;
     }
 
+    static async getSource(id: number): Promise<Source> {
+        const response = await axiosInstance.get<Source>(`/api/v1/source/${id}`);
+        return response.data;
+    }
+
     static async createSource(data: CreateSourceRequest): Promise<Source> {
         const response = await axiosInstance.post<Source>('/api/v1/source', data);
         return response.data;
@@ -36,6 +41,10 @@ export class DomainApiService {
         const response = await axiosInstance.get<Domain>(`/api/v1/domain/${domainId}`);
 
         return response.data;
+    }
+
+    static async deleteDomain(domainId: number): Promise<void> {
+        await axiosInstance.delete(`/api/v1/domain/${domainId}`);
     }
 
     static async createScenario(data: Scenario): Promise<Scenario> {

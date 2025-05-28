@@ -25,7 +25,7 @@ const SessionsHistory = observer(() => {
                           </div>
                       ))
                     : rootStore.sessions
-                          .slice()
+                          ?.slice()
                           .sort(
                               (a, b) =>
                                   new Date(b.createdAt.seconds).getTime() -
