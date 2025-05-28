@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/gofiber/contrib/websocket"
-	"github.com/larek-tech/diploma/api/internal/api/chat/model"
 	"github.com/rs/zerolog/log"
 	"github.com/yogenyslav/pkg/errs"
 )
@@ -18,7 +17,6 @@ type Config struct {
 	AllowMethods     []string `yaml:"allow_methods"`
 	AllowHeaders     []string `yaml:"allow_headers"`
 	AllowCredentials bool     `yaml:"allow_credentials"`
-	wsConfig         websocket.Config
 }
 
 // GetAllowedOrigins assembles all allowed origins from slice into string.
