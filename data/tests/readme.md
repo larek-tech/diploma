@@ -31,12 +31,27 @@ export const config = {
 };
 ````
 
-#### Векторный поиск
-1) запустите тестирование в отдельном терминале
-```bash
-k6 run --vus 10 --duration 10s --http-debug=full --out json=output.json stress/search.js
+казать переменную окружения `K6_PROMETHEUS_RW_SERVER_URL` с адресом сервера Prometheus Remote Write.
+
+
 ```
-2) стресс тестирование 
-```bash
-k6 run --out json=stress_test.json stress/search.js
- ```
+```
+
+#### Векторный поиск
+
+Для запуска тестов с использованием Prometheus Remote Write необходимо:
+
+1. Указать переменную окружения `K6_PROMETHEUS_RW_SERVER_URL` с адресом сервера Prometheus Remote Write.
+
+2.  Пример запуска тестов:
+
+    **Проверка конфигурации теста:**
+    ```bash
+    k6 run --vus 10 --duration 10s --http-debug=full stress/search.js
+    ```
+
+    **Запуск с выгрузкой в Prometheus:**
+    ```bash
+    K6_PROMETHEUS_RW_SERVER_URL=<your_prometheus_endpoint>/api/v1/write \
+    k6 run -o experimental-prometheus-rw --http-debug=none stress/search.js
+    ```
