@@ -7,6 +7,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/larek-tech/diploma/data/internal/domain/document"
+	"github.com/larek-tech/diploma/data/pkg/metric"
 )
 
 type Storage struct {
@@ -80,8 +81,12 @@ func (s Storage) Search(ctx context.Context, query []float32, sourceIDs []string
 	if len(sourceIDs) == 0 {
 		return nil, fmt.Errorf("sourceIDs is empty")
 	}
-	var sql string
+	var (
+		sql   string
+		qType string
+	)
 	if useQuestions {
+		qType = "questions"
 		sql = `
 SELECT
 	c.id,
@@ -102,6 +107,7 @@ ORDER BY  1 - (q.embeddings <=> $1) desc
 LIMIT $4;
 `
 	} else {
+		qType = "chunks"
 		sql = `
 SELECT
 	c.id,
@@ -123,6 +129,12 @@ LIMIT $4;
 
 	var res []*document.SearchResult
 	err := s.db.QueryStructs(ctx, &res, sql, prepareVector(query), sourceIDs, threshold, limit)
+	metric.IncrementSearchQueries(
+		sourceIDs[0],
+		qType,
+		"",
+		err,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query chunks: %w", err)
 	}
