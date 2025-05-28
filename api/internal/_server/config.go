@@ -50,15 +50,6 @@ func (c *Config) WsConfig() websocket.Config {
 			if e := recover(); e != nil {
 				err := errs.WrapErr(fmt.Errorf("%v", e), "internal error")
 				log.Err(err).Msg("ws panic")
-
-				writeErr := conn.WriteJSON(model.SocketMessage{
-					Type:   model.TypeError,
-					IsLast: true,
-					Err:    "internal error",
-				})
-				if writeErr != nil {
-					log.Warn().Err(errs.WrapErr(writeErr)).Msg("failed send recover message")
-				}
 			}
 		},
 	}
