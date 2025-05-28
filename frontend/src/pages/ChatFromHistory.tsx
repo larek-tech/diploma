@@ -16,7 +16,9 @@ const ChatFromHistory = () => {
                 .then(() => {
                     const session = rootStore.activeSession;
 
-                    const domainId = session?.content[0].query.domainId;
+                    const content = session?.content;
+
+                    const domainId = content ? content[0].query.domainId : null;
 
                     if (domainId) {
                         rootStore.setSelectedDomain(domainId);
