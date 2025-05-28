@@ -1,4 +1,6 @@
+import {DomainApiService} from '@/api/DomainApiService';
 import {WSMessageType} from '@/api/models';
+import {SourceStatus} from '@/api/models/domain';
 import Conversation from '@/components/Conversation';
 import EmptyChat from '@/components/EmptyChat';
 import {Button} from '@/components/ui/button';
@@ -8,7 +10,17 @@ import {useToast} from '@/components/ui/use-toast';
 import {useStores} from '@/hooks/useStores';
 import {Pages} from '@/router/constants';
 import debounce from 'lodash/debounce';
-import {ArrowUpIcon, BookOpen, Database, FilePenIcon, Loader2, MicIcon, Settings, StopCircleIcon} from 'lucide-react';
+import {
+  ArrowUpIcon,
+  BookOpen,
+  CheckCircle,
+  Database,
+  FilePenIcon,
+  Loader2,
+  MicIcon,
+  Settings,
+  StopCircleIcon,
+} from 'lucide-react';
 import {observer} from 'mobx-react-lite';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
@@ -23,6 +35,7 @@ const ChatWrapper = observer(() => {
     const [titleValue, setTitleValue] = useState('');
     const [recognizing, setRecognizing] = useState(false);
     const [isScenarioSettingsOpen, setIsScenarioSettingsOpen] = useState(false);
+    const [domainSourcesReady, setDomainSourcesReady] = useState(true);
 
     const titleInputRef = useRef<HTMLInputElement>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -66,6 +79,34 @@ const ChatWrapper = observer(() => {
             });
         }
     }, [rootStore.chatError, toast]);
+
+    // Проверка статуса источников домена
+    useEffect(() => {
+        const checkDomainSources = async () => {
+            if (!rootStore.selectedDomain) {
+                setDomainSourcesReady(true);
+                return;
+            }
+
+            // Сразу устанавливаем false при смене домена
+            setDomainSourcesReady(false);
+
+            try {
+                const sourcePromises = rootStore.selectedDomain.sourceIds.map((sourceId) =>
+                    DomainApiService.getSource(sourceId)
+                );
+
+                const sources = await Promise.all(sourcePromises);
+                const allReady = sources.every((source) => source.status === SourceStatus.Ready);
+                setDomainSourcesReady(allReady);
+            } catch (error) {
+                console.error('Ошибка при проверке статуса источников:', error);
+                setDomainSourcesReady(false);
+            }
+        };
+
+        checkDomainSources();
+    }, [rootStore.selectedDomain]);
 
     const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -222,6 +263,27 @@ const ChatWrapper = observer(() => {
                             >
                                 {rootStore.getSelectedDomainTitle()}
                             </span>
+                            {rootStore.selectedDomainId && (
+                                <div
+                                    className='ml-2 flex items-center'
+                                    title={
+                                        domainSourcesReady
+                                            ? 'Все источники готовы'
+                                            : 'Источники обрабатываются'
+                                    }
+                                >
+                                    {domainSourcesReady ? (
+                                        <CheckCircle className='h-4 w-4 text-green-500' />
+                                    ) : (
+                                        <div className='flex items-center gap-1'>
+                                            <Loader2 className='h-4 w-4 text-yellow-500 animate-spin' />
+                                            <span className='text-xs text-yellow-600 animate-pulse'>
+                                                Обработка...
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         {rootStore.selectedDomainId && rootStore.hasScenarios() && (

@@ -15,6 +15,11 @@ export class DomainApiService {
         return response.data;
     }
 
+    static async getSource(id: number): Promise<Source> {
+        const response = await axiosInstance.get<Source>(`/api/v1/source/${id}`);
+        return response.data;
+    }
+
     static async createSource(data: CreateSourceRequest): Promise<Source> {
         const response = await axiosInstance.post<Source>('/api/v1/source', data);
         return response.data;
