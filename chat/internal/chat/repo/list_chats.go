@@ -8,11 +8,13 @@ import (
 )
 
 const listChats = `
-	select id, user_id, title, created_at, updated_at
-	from chat.chat
-	where user_id = $1
-		and is_deleted = false
-	order by updated_at desc
+	select c.id, c.user_id, c.title, c.created_at, c.updated_at
+	from chat.chat c
+	join chat.query q
+		on q.chat_id = c.id
+	where c.user_id = $1
+		and c.is_deleted = false
+	order by c.updated_at desc
 	offset $2
 	limit $3;
 `
