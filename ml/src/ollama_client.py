@@ -1,7 +1,7 @@
 import asyncio
 import json
 from collections.abc import AsyncIterator
-from typing import Any, AsyncContextManager
+from typing import Any, Union
 
 import httpx
 
@@ -11,13 +11,6 @@ from utils.logger import logger
 
 class AsyncOllamaClient:
     def __init__(self, base_url: str = OLLAMA_BASE_URL) -> None:
-        """Инициализация асинхронного клиента Ollama API.
-
-        Parameters
-        ----------
-        base_url : str, optional
-            Базовый URL сервера Ollama, по умолчанию "http://localhost:11434"
-        """
         self.base_url = base_url
 
     async def generate(
@@ -27,31 +20,8 @@ class AsyncOllamaClient:
         *,
         stream: bool = False,
         **kwargs: dict[str, Any],
-    ) -> str | AsyncIterator[str] | None:
-        """Генерация текста с помощью предустановленной модели.
-
-        Parameters
-        ----------
-        prompt : str
-            Текст промпта для генерации
-        model: str
-            Название модели для использования
-        stream : bool, optional
-            Режим потоковой передачи, по умолчанию False
-        **kwargs
-            Дополнительные параметры для API
-
-        Returns
-        -------
-        str | AsyncIterator[str] | None
-            Сгенерированный текст или итератор при потоковом режиме.
-            Возвращает None в случае ошибки.
-
-        Raises
-        ------
-        RuntimeError
-            При возникновении ошибок сети или API
-        """
+    ) -> Union[str, AsyncIterator[str], None]:
+        """Генерация текста с использованием модели Ollama."""
         url = f"{self.base_url}/api/generate"
         payload = {
             "model": model,
@@ -61,23 +31,23 @@ class AsyncOllamaClient:
             **kwargs,
         }
 
-        async with httpx.AsyncClient(timeout=600) as client:
-            try:
-                logger.debug(f"sending payload {payload}")
+        try:
+            logger.debug(f"Sending payload: {payload}")
 
-                if stream:
-                    async with client.stream("POST", url, json=payload) as response:
-                        return self._handle_stream_response(response)
+            if stream:
+                return self._handle_stream_response(payload)
 
+            async with httpx.AsyncClient(timeout=600) as client:
                 response = await client.post(url, json=payload)
                 response.raise_for_status()
                 return self._handle_regular_response(response)
-            except httpx.HTTPStatusError as e:
-                msg = f"Got bad status: {e}"
-                raise RuntimeError(msg) from e
-            except httpx.RequestError as e:
-                msg = f"API request failed: {e}"
-                raise RuntimeError(msg) from e
+
+        except httpx.HTTPStatusError as e:
+            msg = f"Got bad status: {e}"
+            raise RuntimeError(msg) from e
+        except httpx.RequestError as e:
+            msg = f"API request failed: {e}"
+            raise RuntimeError(msg) from e
 
     def _handle_regular_response(self, response: httpx.Response) -> str:
         """Обработка обычного (не потокового) ответа."""
@@ -85,13 +55,25 @@ class AsyncOllamaClient:
         return result.get("response", "")
 
     async def _handle_stream_response(
-        self, stream: httpx.Response
+        self, payload: dict
     ) -> AsyncIterator[str]:
         """Обработка потокового ответа."""
-        async for line in stream.aiter_lines():
-            if line:
-                chunk = json.loads(line)
-                yield chunk.get("response", "")
+        url = f"{self.base_url}/api/generate"
+        logger.info(f"Sending payload for stream: {payload}")
+
+        async with httpx.AsyncClient(timeout=600) as client:
+            async with client.stream("POST", url, json=payload) as response:
+                response.raise_for_status()
+
+                async for line in response.aiter_lines():
+                    if line.strip():
+                        try:
+                            data = json.loads(line)
+                            text = data.get("response", "")
+                            if text:
+                                yield text
+                        except json.JSONDecodeError as e:
+                            logger.error(f"JSON decode error: {e}")
 
 
 async def main() -> None:
