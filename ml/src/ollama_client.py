@@ -1,7 +1,7 @@
 import asyncio
 import json
 from collections.abc import AsyncIterator
-from typing import Any
+from typing import Any, AsyncContextManager
 
 import httpx
 
@@ -64,11 +64,13 @@ class AsyncOllamaClient:
         async with httpx.AsyncClient(timeout=600) as client:
             try:
                 logger.debug(f"sending payload {payload}")
-                response = await client.post(url, json=payload)
-                response.raise_for_status()
 
                 if stream:
-                    return self._handle_stream_response(response)
+                    async with client.stream("POST", url, json=payload) as response:
+                        return self._handle_stream_response(response)
+
+                response = await client.post(url, json=payload)
+                response.raise_for_status()
                 return self._handle_regular_response(response)
             except httpx.HTTPStatusError as e:
                 msg = f"Got bad status: {e}"
@@ -83,10 +85,10 @@ class AsyncOllamaClient:
         return result.get("response", "")
 
     async def _handle_stream_response(
-        self, response: httpx.Response
+        self, stream: httpx.Response
     ) -> AsyncIterator[str]:
         """Обработка потокового ответа."""
-        async for line in response.aiter_lines():
+        async for line in stream.aiter_lines():
             if line:
                 chunk = json.loads(line)
                 yield chunk.get("response", "")
