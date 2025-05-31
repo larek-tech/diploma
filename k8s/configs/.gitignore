@@ -1,0 +1,4 @@
+crawler-config.yaml
+parser-config.yaml
+postgres-config.yaml
+registry-secret.yaml

@@ -1,0 +1,58 @@
+# k8s/crawler.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crawler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crawler
+  template:
+    metadata:
+      labels:
+        app: crawler
+    spec:
+      imagePullSecrets:
+          - name: regcred
+      containers:
+        - name: crawler
+          image: docker.larek.tech/crawler:v0.1
+          ports:
+            - name: http-metrics
+              containerPort: 9090
+            - name: http-app
+              containerPort: 8080
+            - name: grpc-app
+              containerPort: 50051
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2400m"
+          envFrom:
+            - configMapRef:
+                name: crawler-config
+            - secretRef:
+                name: crawler-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crawler
+spec:
+  type: LoadBalancer
+  selector:
+    app: crawler
+  ports:
+    - name: metrics
+      port: 9091
+      targetPort: 9090
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: grpc
+      port: 50051
+      targetPort: 50051
