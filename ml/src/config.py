@@ -4,6 +4,18 @@ from pathlib import Path
 import dotenv
 
 from utils.logger import logger
+import random
+import string
+
+def generate_pod_name():
+
+   random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
+
+   pod_name = os.getenv("POD_NAME")
+   if not pod_name:
+      pod_name = f"ml-{random_suffix}"
+
+   return pod_name
 
 dotenv_path = Path(__file__).parents[1] / ".env"
 logger.info(dotenv_path)
@@ -21,6 +33,7 @@ DEFAULT_REDIS_URL = os.getenv("DEFAULT_REDIS_URL") # type: ignore
 DEFAULT_EMBEDER_MODEL = os.getenv("DEFAULT_EMBEDER_MODEL") # type: ignore
 OLLAMA_BASE_MODEL:str = os.getenv("OLLAMA_BASE_MODEL") if os.getenv("OLLAMA_BASE_MODEL") else "hf.co/t-tech/T-lite-it-1.0-Q8_0-GGUF:Q8_0" # type: ignore
 NUM_CTX = os.getenv("NUM_CTX")
+TRACING_ENDPOINT = os.getenv("TRACING_ENDPOINT") # type: ignore
 
 MULTI_QUESTION_PROMPT = """
 Переформулируй вопрос: {query}. Предложите {n_questions} различных вариантов, которые помогут рассмотреть тему с разных сторон.

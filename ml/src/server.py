@@ -21,7 +21,75 @@ from RAG_pipeline import RAGPipeline
 from sample_generate import generate_dataset
 from utils.logger import logger
 from ollama_client import OllamaOptions
+from opentelemetry import trace, baggage
+from opentelemetry.trace.status import StatusCode, Status 
 
+from typing import Optional
+from tracing import *
+import functools # Add this import
+import inspect   # Add this impor
+
+tracer = tracerProvider.get_tracer("ml_service")
+
+def trace_grpc_method(func):
+    if inspect.isasyncgenfunction(func):
+        @functools.wraps(func)
+        async def async_gen_wrapper(self, request, context: aio.ServicerContext, *args, **kwargs):
+            class_name = self.__class__.__name__
+            method_name = func.__name__
+            span_name = f"rpc/{class_name}/{method_name}"
+
+            with tracer.start_as_current_span(span_name, kind=trace.SpanKind.SERVER) as span:
+                span.set_attribute("rpc.system", "grpc")
+                span.set_attribute("rpc.service", class_name)
+                span.set_attribute("rpc.method", method_name)
+                if context and hasattr(context, 'peer') and context.peer():
+                    span.set_attribute("net.peer.name", context.peer())
+
+                try:
+                    async for item in func(self, request, context, *args, **kwargs):
+                        yield item
+                    span.set_status(Status(StatusCode.OK))
+                except grpc.RpcError as e:
+                    if e.code() is not None:
+                        span.set_attribute("rpc.grpc.status_code", e.code().value[0])
+                    span.record_exception(e)
+                    span.set_status(Status(StatusCode.ERROR, description=f"gRPC Error: {e.details()}"))
+                    raise
+                except Exception as e:
+                    span.record_exception(e)
+                    span.set_status(Status(StatusCode.ERROR, description=str(e)))
+                    raise
+        return async_gen_wrapper
+    else:  # func is a regular async function
+        @functools.wraps(func)
+        async def regular_async_wrapper(self, request, context: aio.ServicerContext, *args, **kwargs):
+            class_name = self.__class__.__name__
+            method_name = func.__name__
+            span_name = f"rpc/{class_name}/{method_name}"
+
+            with tracer.start_as_current_span(span_name, kind=trace.SpanKind.SERVER) as span:
+                span.set_attribute("rpc.system", "grpc")
+                span.set_attribute("rpc.service", class_name)
+                span.set_attribute("rpc.method", method_name)
+                if context and hasattr(context, 'peer') and context.peer():
+                    span.set_attribute("net.peer.name", context.peer())
+
+                try:
+                    result = await func(self, request, context, *args, **kwargs)
+                    span.set_status(Status(StatusCode.OK))
+                    return result
+                except grpc.RpcError as e:
+                    if e.code() is not None:
+                        span.set_attribute("rpc.grpc.status_code", e.code().value[0])
+                    span.record_exception(e)
+                    span.set_status(Status(StatusCode.ERROR, description=f"gRPC Error: {e.details()}"))
+                    raise
+                except Exception as e:
+                    span.record_exception(e)
+                    span.set_status(Status(StatusCode.ERROR, description=str(e)))
+                    raise
+        return regular_async_wrapper
 
 class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
     def __init__(self) -> None:
@@ -31,11 +99,14 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
             redis_url=DEFAULT_REDIS_URL, embedings_model=DEFAULT_EMBEDER_MODEL
         )
 
+    @trace_grpc_method
     async def ProcessQuery(  # noqa: N802
         self,
         request: ml_pb2_model.ProcessQueryRequest,
         context: aio.ServicerContext,
     ) -> AsyncGenerator[ml_pb2_model.ProcessQueryResponse]:
+        metadata = context.invocation_metadata()
+        
         client_ip = context.peer().split(":")[-1]
         request_id = f"{request.query.userId}-{hash(request.query.content)}"
 
@@ -84,7 +155,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
             logger.error(f"Timeout error processing request {request_id}")
             context.abort(grpc.StatusCode.DEADLINE_EXCEEDED, "Timeout")
 
-
+    @trace_grpc_method
     async def ProcessFirstQuery(  # noqa: N802
         self,
         request: ml_pb2_model.ProcessFirstQueryRequest,
