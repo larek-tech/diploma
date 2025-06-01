@@ -25,11 +25,11 @@ from opentelemetry import trace, baggage, propagate
 from opentelemetry.trace.status import StatusCode, Status 
 
 from typing import Optional
-from tracing import *
+from tracing import TracerProvider, tracer
 import functools # Add this import
 import inspect   # Add this impor
 
-tracer = tracerProvider.get_tracer("ml_service")
+
 
 def trace_grpc_method(func):
     if inspect.isasyncgenfunction(func):
@@ -117,7 +117,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
         context: aio.ServicerContext,
     ) -> AsyncGenerator[ml_pb2_model.ProcessQueryResponse]:
         metadata = context.invocation_metadata()
-        
+
         client_ip = context.peer().split(":")[-1]
         request_id = f"{request.query.userId}-{hash(request.query.content)}"
 

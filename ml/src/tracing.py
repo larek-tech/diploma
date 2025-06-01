@@ -16,6 +16,6 @@ tracerProvider = TracerProvider(resource=resource)
 processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=f"{TRACING_ENDPOINT}"))
 tracerProvider.add_span_processor(processor)
 trace.set_tracer_provider(tracerProvider)
-
+tracer = tracerProvider.get_tracer("ml_service")
 
 logger.info("OpenTelemetry tracing initialized")
