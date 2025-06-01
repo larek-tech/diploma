@@ -2,11 +2,9 @@ package get_documents
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/larek-tech/diploma/data/internal/data/pb"
-	grpcSpan "github.com/larek-tech/diploma/data/internal/infrastructure/grpc/span"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
@@ -27,10 +25,6 @@ func New(documentsStore documentsStore, tracer trace.Tracer) *Handler {
 }
 
 func (h Handler) GetDocuments(ctx context.Context, in *pb.GetDocumentsIn) (*pb.GetDocumentsOut, error) {
-	ctx, err := grpcSpan.GetTraceCtx(ctx)
-	if err != nil {
-		slog.Error("failed to get trace context", "error", err)
-	}
 	ctx, span := h.tracer.Start(ctx, "VectorSearch", trace.WithAttributes(
 		attribute.String("sourceId", in.SourceId),
 		attribute.Int64("page", int64(in.Page)),
@@ -38,7 +32,7 @@ func (h Handler) GetDocuments(ctx context.Context, in *pb.GetDocumentsIn) (*pb.G
 	))
 	defer span.End()
 
-	err = validate(in)
+	err := validate(in)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err

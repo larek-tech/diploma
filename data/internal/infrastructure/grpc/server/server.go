@@ -6,6 +6,7 @@ import (
 	"net"
 	"strconv"
 
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 )
 
@@ -16,7 +17,9 @@ type Server struct {
 }
 
 func New() *Server {
-	srvOpts := []grpc.ServerOption{}
+	srvOpts := []grpc.ServerOption{
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
+	}
 	srv := grpc.NewServer(srvOpts...)
 	return &Server{srv: srv}
 }
