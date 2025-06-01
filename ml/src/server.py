@@ -21,7 +21,7 @@ from RAG_pipeline import RAGPipeline
 from sample_generate import generate_dataset
 from utils.logger import logger
 from ollama_client import OllamaOptions
-from opentelemetry import trace, baggage
+from opentelemetry import trace, baggage, propagate
 from opentelemetry.trace.status import StatusCode, Status 
 
 from typing import Optional
@@ -38,8 +38,13 @@ def trace_grpc_method(func):
             class_name = self.__class__.__name__
             method_name = func.__name__
             span_name = f"rpc/{class_name}/{method_name}"
+            invocation_md = context.invocation_metadata()
+            carrier = {k: v for k, v in invocation_md} if invocation_md else {}
+            parent_context = propagate.extract(carrier)
+            print(f"Invocation metadata: {carrier}")
 
-            with tracer.start_as_current_span(span_name, kind=trace.SpanKind.SERVER) as span:
+            with tracer.start_as_current_span(span_name, context=parent_context, kind=trace.SpanKind.SERVER) as span:
+                # The line "metadata = context.invocation_metadata()" previously here is removed as it's redundant.
                 span.set_attribute("rpc.system", "grpc")
                 span.set_attribute("rpc.service", class_name)
                 span.set_attribute("rpc.method", method_name)
@@ -68,7 +73,13 @@ def trace_grpc_method(func):
             method_name = func.__name__
             span_name = f"rpc/{class_name}/{method_name}"
 
-            with tracer.start_as_current_span(span_name, kind=trace.SpanKind.SERVER) as span:
+            invocation_md = context.invocation_metadata()
+            carrier = {k: v for k, v in invocation_md} if invocation_md else {}
+            print(f"Invocation metadata: {carrier}")
+            parent_context = propagate.extract(carrier)
+
+
+            with tracer.start_as_current_span(span_name, context=parent_context, kind=trace.SpanKind.SERVER) as span:
                 span.set_attribute("rpc.system", "grpc")
                 span.set_attribute("rpc.service", class_name)
                 span.set_attribute("rpc.method", method_name)
