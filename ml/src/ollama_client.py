@@ -1,92 +1,146 @@
 import asyncio
-import json
+
 from collections.abc import AsyncIterator
-from typing import Any, Union
+from typing import Any, Union, Dict
+import ollama
 
-import httpx
 
-from config import OLLAMA_BASE_MODEL, OLLAMA_BASE_URL, NUM_CTX
+from config import OLLAMA_BASE_MODEL, OLLAMA_BASE_URL, NUM_CTX, FIRST_MESSAE_PROMPT, JSON_SCHEMA
 from utils.logger import logger
 
+
+class OllamaOptions (Dict[str, Any]):
+    temperature: float = 0.7
+    top_k: int = 40
+    top_p: float = 0.95
+    system= "You are a helpful assistant."
+    format: dict | None = None
 
 class AsyncOllamaClient:
     def __init__(self, base_url: str = OLLAMA_BASE_URL) -> None:
         self.base_url = base_url
+        self.client = ollama.AsyncClient(host=base_url)
 
     async def generate(
         self,
         prompt: str,
         model: str,
         *,
-        stream: bool = False,
-        **kwargs: dict[str, Any],
-    ) -> Union[str, AsyncIterator[str], None]:
-        """Генерация текста с использованием модели Ollama."""
-        url = f"{self.base_url}/api/generate"
-        payload = {
-            "model": model,
-            "prompt": prompt,
-            "stream": stream,
-            "num_ctx": NUM_CTX,
-            **kwargs,
+        stream_response: bool = False,
+        options: OllamaOptions | None = None,
+    ) -> Union[str, AsyncIterator[str]]:
+
+        ollama_options = {
+            "num_ctx": int(NUM_CTX) if NUM_CTX else 64000,
+            "temperature": options.temperature if options else 0.7,
+            "top_k": options.top_k if options else 40,
+            "top_p": options.top_p if options else 0.95,
+            "system": options.system if options else "You are a helpful assistant.",
         }
 
-        try:
-            logger.debug(f"Sending payload: {payload}")
 
-            if stream:
-                return self._handle_stream_response(payload)
+        if stream_response:
+            return self._streaming(
+                model=model,
+                prompt=prompt,
+                options=ollama_options,
+                format=options.format if options else None,
+            )
+        else:
+            return await self._generate(
+                model=model,
+                prompt=prompt,
+                options=ollama_options,
+                format=options.format if options else None,
+            )
 
-            async with httpx.AsyncClient(timeout=600) as client:
-                response = await client.post(url, json=payload)
-                response.raise_for_status()
-                return self._handle_regular_response(response)
+    async def _generate(
+        self,
+        model: str,
+        prompt: str,
+        options: dict[str, Any],
+        format: dict | None = None,
+        **kwargs: Any,
+    ) -> str:
+        if format:
+            response = await self.client.generate(
+                    model=model,
+                    prompt=prompt,
+                    stream=False,
+                    format=format,
+                    options=options,
+                )
+        else:
+            response = await self.client.generate(
+                model=model,
+                prompt=prompt,
+                stream=False,
+                options=options,
+            )
+        return response.response if response else ""
 
-        except httpx.HTTPStatusError as e:
-            msg = f"Got bad status: {e}"
-            raise RuntimeError(msg) from e
-        except httpx.RequestError as e:
-            msg = f"API request failed: {e}"
-            raise RuntimeError(msg) from e
+    def _streaming(
+            self,
+            model: str,
+            prompt: str,
+            options: dict[str, Any],
+            format: dict | None = None,
+        ) -> AsyncIterator[str]:
 
-    def _handle_regular_response(self, response: httpx.Response) -> str:
-        """Обработка обычного (не потокового) ответа."""
-        result = response.json()
-        return result.get("response", "")
-
-    async def _handle_stream_response(
-        self, payload: dict
-    ) -> AsyncIterator[str]:
-        """Обработка потокового ответа."""
-        url = f"{self.base_url}/api/generate"
-        logger.info(f"Sending payload for stream: {payload}")
-
-        async with httpx.AsyncClient(timeout=600) as client:
-            async with client.stream("POST", url, json=payload) as response:
-                response.raise_for_status()
-
-                async for line in response.aiter_lines():
-                    if line.strip():
-                        try:
-                            data = json.loads(line)
-                            text = data.get("response", "")
-                            if text:
-                                yield text
-                        except json.JSONDecodeError as e:
-                            logger.error(f"JSON decode error: {e}")
+            async def _stream_helper() -> AsyncIterator[str]:
+                if format:
+                    stream = await self.client.generate(
+                        model=model,
+                        prompt=prompt,
+                        stream=True,
+                        format=format,
+                        options=options,
+                    )
+                else:
+                    stream = await self.client.generate(
+                        model=model,
+                        prompt=prompt,
+                        stream=True,
+                        options=options,
+                    )
+                async for chunk in stream:
+                    text = chunk.response
+                    if text:
+                        yield text
+            return _stream_helper()
 
 
 async def main() -> None:
     client = AsyncOllamaClient()
+    test_prompt: str = "Привет, как дела? Напиши мне что-нибудь интересное."
+    test_query: str = "Какой сегодня день?"
+    test_model: str = OLLAMA_BASE_MODEL if OLLAMA_BASE_MODEL else "hf.co/t-tech/T-lite-it-1.0-Q8_0-GGUF:Q8_0"
 
-    stream = await client.generate(
-        prompt="Привет, как дела?",
+    # stream = client.generate(
+    #     prompt=test_prompt,
+    #     model=test_model,
+    #     stream_response=True,
+    # )
+
+    # async for text in await stream:
+    #     logger.info(text)
+
+    # response  =   await client.generate(
+    #     prompt=test_prompt,
+    #     model=test_model,
+    #     stream_response=False,
+    # )
+    # logger.info(f"Response: { response}")
+
+    json_response = await client.generate(
+        prompt=FIRST_MESSAE_PROMPT.format(message=test_query),
         model=OLLAMA_BASE_MODEL,
-        stream=True,
-    )
-
-    async for text in stream:
-        logger.info(text)
+        stream_response=False,
+        options=OllamaOptions(
+            format=JSON_SCHEMA,
+            )
+        )
+    logger.info(f"JSON Response: {json_response}")
 
 
 if __name__ == "__main__":

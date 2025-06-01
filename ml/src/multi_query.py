@@ -1,7 +1,7 @@
 import json
 
 from config import MULTI_QUESTION_PROMPT
-from ollama_client import AsyncOllamaClient
+from ollama_client import AsyncOllamaClient, OllamaOptions
 
 
 def generate_schema(
@@ -41,15 +41,20 @@ async def get_multi_questions(
         schema_title="{i} перефразированный вопрос пользователя.",
         title_template="Перефразированные вопрос пользователя.",
     )
-    return list(
-        json.loads(
-            await client.generate(
+    response = await client.generate(
                 prompt=MULTI_QUESTION_PROMPT.format(
                     query=user_prompt,
                     n_questions=n_questions,
                 ),
-                format=schema,
+                options=OllamaOptions(
+                    format=schema
+                ),
                 model=model,
             )
-        ).values()
-    )
+    if isinstance(response, str):
+        try:
+            return list(json.loads(response))
+        except json.JSONDecodeError:
+            print("Failed to decode JSON response")
+            return []
+    return []

@@ -2,7 +2,6 @@ import asyncio
 from collections.abc import AsyncGenerator
 from concurrent import futures
 import json
-
 import grpc
 from grpc import aio
 
@@ -21,6 +20,7 @@ from optuna_pipline import OptunaPipeline
 from RAG_pipeline import RAGPipeline
 from sample_generate import generate_dataset
 from utils.logger import logger
+from ollama_client import OllamaOptions
 
 
 class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
@@ -46,19 +46,34 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
             f"Documents: {len(request.sourceIds)}"
         )
         try:
-            chunks = None
+            # chunks = None
+            chunk_dict = {}
             async for token, chunk in self.rag.generate_stream(
                 request=request
             ):
                 response = ml_pb2_model.ProcessQueryResponse(
                     chunk=ml_pb2_model.Chunk(content=f"{token}"),
                 )
-                chunks = chunk
+                if chunk:
+                    for c in chunk:
+                        if "id" in c.keys() and "metadata" in c.keys():
+                            if  c["id"] not in chunk_dict:
+                                chunk_dict[c["id"]] = c
+                            else:
+                                chunk_dict[c["id"]]["metadata"].update(c["metadata"])
 
                 logger.debug(f"Sending chunk for request {request_id}")
                 yield response
-            logger.info(chunks)
-            yield ml_pb2_model.ProcessQueryResponse(sourceIds=chunks)
+            meta = [
+                json.dumps({
+                    "metadata": chunk["metadata"],
+                    "id": chunk["id"] if "id" in chunk else "",
+                })
+                for chunk in chunk_dict.values()
+                if "metadata" in chunk and "id" in chunk
+            ] if len(chunk_dict) > 0 else []
+            print(len(meta))
+            yield ml_pb2_model.ProcessQueryResponse(sourceIds=meta)
         except grpc.RpcError as e:
             logger.error(
                 f"gRPC error processing request {request_id}:"
@@ -69,28 +84,6 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
             logger.error(f"Timeout error processing request {request_id}")
             context.abort(grpc.StatusCode.DEADLINE_EXCEEDED, "Timeout")
 
-    async def ProcessFirstQuery(  # noqa: N802
-        self,
-        request: ml_pb2_model.ProcessFirstQueryRequest,
-        context: aio.ServicerContext,
-    ) -> ml_pb2_model.ProcessFirstQueryResponse:
-        client_ip = context.peer().split(":")[-1]
-
-        logger.info(f"New request [From {client_ip}\nQuery: {request.query}\n")
-        try:
-            response = await self.rag.ollama_client.generate(
-                prompt=FIRST_MESSAE_PROMPT.format(message=request.query),
-                model=OLLAMA_BASE_MODEL,
-            )
-            return ml_pb2_model.ProcessFirstQueryResponse(query=response)
-        except grpc.RpcError as e:
-            logger.error(
-                f"gRPC error processing request: {e.code()}: {e.details()}"
-            )
-            await context.abort(e.code(), e.details())
-        except TimeoutError:
-            logger.error("Timeout error processing request")
-            await context.abort(grpc.StatusCode.DEADLINE_EXCEEDED, "Timeout")
 
     async def ProcessFirstQuery(  # noqa: N802
         self,
@@ -104,10 +97,14 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
             json_response = await self.rag.ollama_client.generate(
                 prompt=FIRST_MESSAE_PROMPT.format(message=request.query),
                 model=OLLAMA_BASE_MODEL,
-                format=JSON_SCHEMA,
+                stream_response=False,
+                options=OllamaOptions(
+                    format=JSON_SCHEMA,
+                )
             )
-            response = json.loads(json_response)
-            return ml_pb2_model.ProcessFirstQueryResponse(query=response["chat_title"])
+            print(json_response)
+            # response = json.loads(json_response) #FIXME: structured output
+            return ml_pb2_model.ProcessFirstQueryResponse(query=json_response)
         except grpc.RpcError as e:
             logger.error(
                 f"gRPC error processing request: {e.code()}: {e.details()}"

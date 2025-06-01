@@ -9,17 +9,17 @@ dotenv_path = Path(__file__).parents[1] / ".env"
 logger.info(dotenv_path)
 dotenv.load_dotenv(dotenv_path)
 
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL")
-GIGA_CHAT_API_KEY = os.getenv("GIGA_CHAT_API_KEY")
-DEVICE = os.getenv("DEVICE")
-DATA_SERVICE_PORT = os.getenv("DATA_SERVICE_PORT")
-DATA_SERVICE_HOST = os.getenv("DATA_SERVICE_HOST")
-DEFAULT_RERANKER_NAME = os.environ["DEFAULT_RERANKER_NAME"]
-ML_SERVICE_PORT = os.getenv("ML_SERVICE_PORT")
-HF_TOKEN = os.getenv("HF_TOKEN")
-DEFAULT_REDIS_URL = os.getenv("DEFAULT_REDIS_URL")
-DEFAULT_EMBEDER_MODEL = os.getenv("DEFAULT_EMBEDER_MODEL")
-OLLAMA_BASE_MODEL = os.getenv("OLLAMA_BASE_MODEL")
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL") # type: ignore
+GIGA_CHAT_API_KEY = os.getenv("GIGA_CHAT_API_KEY") # type: ignore
+DEVICE = os.getenv("DEVICE") # type: ignore
+DATA_SERVICE_PORT = os.getenv("DATA_SERVICE_PORT") # type: ignore
+DATA_SERVICE_HOST = os.getenv("DATA_SERVICE_HOST") # type: ignore
+DEFAULT_RERANKER_NAME = os.environ["DEFAULT_RERANKER_NAME"] # type: ignore
+ML_SERVICE_PORT = os.getenv("ML_SERVICE_PORT") # type: ignore
+HF_TOKEN = os.getenv("HF_TOKEN") # type: ignore
+DEFAULT_REDIS_URL = os.getenv("DEFAULT_REDIS_URL") # type: ignore
+DEFAULT_EMBEDER_MODEL = os.getenv("DEFAULT_EMBEDER_MODEL") # type: ignore
+OLLAMA_BASE_MODEL:str = os.getenv("OLLAMA_BASE_MODEL") if os.getenv("OLLAMA_BASE_MODEL") else "hf.co/t-tech/T-lite-it-1.0-Q8_0-GGUF:Q8_0" # type: ignore
 NUM_CTX = os.getenv("NUM_CTX")
 
 MULTI_QUESTION_PROMPT = """

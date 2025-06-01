@@ -1,4 +1,6 @@
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, AsyncIterator
+import json
+from document import Chunk
 
 import ml.v1.model_pb2 as ml_pb2_model
 from config import (
@@ -11,8 +13,9 @@ from config import (
 )
 from data_client import AsyncDataServiceClient
 from multi_query import get_multi_questions
-from ollama_client import AsyncOllamaClient
+from ollama_client import AsyncOllamaClient, OllamaOptions
 from rerank import Reranker
+
 
 
 class RAGPipeline:
@@ -31,7 +34,7 @@ class RAGPipeline:
 
     async def _prepare_chunks(
         self, request: ml_pb2_model.ProcessQueryRequest
-    ) -> list[str]:
+    ) -> list[Chunk]:
         questions = [request.query.content]
         if request.scenario.multiQuery.useMultiquery:
             questions += await get_multi_questions(
@@ -43,30 +46,38 @@ class RAGPipeline:
                 else request.scenario.model.modelName,
             )
 
-        chunk_dict = {}
+        document_chunk_dict = {}
         for question in questions:
             search_result = await self.data_client.vector_search(
                 query=question,
-                source_ids=request.sourceIds,
+                source_ids=request.sourceIds, # type: ignore
                 top_k=request.scenario.vectorSearch.topN,
                 threshold=request.scenario.vectorSearch.threshold,
                 use_questions=request.scenario.vectorSearch.searchByQuery,
             )
-            for chunk in search_result.chunks:
-                chunk_dict[chunk.id] = {
-                    "content": chunk.content,
-                    "similarity": chunk.similarity,
+            for document_chunk in search_result.chunks:
+                document_chunk_dict[document_chunk.id] = {
+                    "id": document_chunk.id,
+                    "content": document_chunk.content,
+                    "similarity": document_chunk.similarity,
+                    "metadata": json.loads(document_chunk.metadata.decode("utf-8")),
                 }
-        chunks = [
-            chunk["content"]
+        chunks: list[Chunk] = [
+            Chunk(
+                content=chunk["content"],
+                id=chunk["id"],
+                similarity=chunk["similarity"],
+                metadata=chunk["metadata"],
+            )
             for chunk in sorted(
-                chunk_dict.values(),
+                document_chunk_dict.values(),
                 key=lambda x: x["similarity"],
                 reverse=True,
             )
+            if "content" in chunk and "id" in chunk and "metadata" in chunk
         ]
         if not chunks:
-            return ["Контент не найден"]
+            return []
         if request.scenario.reranker.useRerank:
             if (
                 request.scenario.reranker.rerankerModel
@@ -90,34 +101,48 @@ class RAGPipeline:
     async def generate_stream(
         self,
         request: ml_pb2_model.ProcessQueryRequest,
-    ) -> AsyncGenerator[tuple[str, list[str]], None]:
+    ) -> AsyncGenerator[tuple[str, list[Chunk]], None]:
         chunks = await self._prepare_chunks(request)
 
         stream = await self.ollama_client.generate(
             prompt=RAG_PROMPT.format(query=request.query.content, docs=chunks),
             model=request.scenario.model.modelName,
-            stream=True,
-            temprature=request.scenario.model.temperature,
-            top_k=request.scenario.model.topK,
-            top_p=request.scenario.model.topP,
-            system=request.scenario.model.systemPrompt,
+            stream_response=True,
+            options=OllamaOptions(
+                temperature=request.scenario.model.temperature,
+                top_k=request.scenario.model.topK,
+                top_p=request.scenario.model.topP,
+                system=request.scenario.model.systemPrompt,
+            )
         )
-        async for token in stream:
+        if isinstance(stream, str):
+            raise ValueError(
+                "Expected an async iterator from the Ollama client."
+            )
+        async for token in stream: # type: ignore[assignment]
             yield token, chunks
 
     async def generate(
         self,
         request: ml_pb2_model.ProcessQueryRequest,
-    ) -> tuple[str, list[str]]:
+    ) -> tuple[str, list[Chunk]]:
         chunks = await self._prepare_chunks(request)
 
-        response = await self.ollama_client.generate(
+        responses = await self.ollama_client.generate(
             prompt=RAG_PROMPT.format(query=request.query.content, docs=chunks),
             model=request.scenario.model.modelName,
-            stream=False,
-            temprature=request.scenario.model.temperature,
-            top_k=request.scenario.model.topK,
-            top_p=request.scenario.model.topP,
-            system=request.scenario.model.systemPrompt,
+            stream_response=False,
+            options=OllamaOptions(
+                temperature=request.scenario.model.temperature,
+                top_k=request.scenario.model.topK,
+                top_p=request.scenario.model.topP,
+                system=request.scenario.model.systemPrompt,
+            )
         )
+        if isinstance(responses, str):
+            response = responses
+        else:
+            raise ValueError(
+                "Expected a string response from the Ollama client."
+            )
         return response, chunks

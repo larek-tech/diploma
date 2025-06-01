@@ -6,6 +6,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from config import HF_TOKEN
 from utils.logger import logger
+from document import Chunk
 
 
 class Reranker:
@@ -42,8 +43,8 @@ class Reranker:
         self.reranker_model.to(device)
 
     def rerank_documents(
-        self, query: str, documents: list[str], max_length: int, top_k: int = 5
-    ) -> list[str]:
+        self, query: str, documents: list[Chunk], max_length: int, top_k: int = 5
+    ) -> list[Chunk]:
         """Повторно оценивает предоставленные документы на основе
         заданного запроса.
 
@@ -66,7 +67,7 @@ class Reranker:
             отсортированный в порядке убывания
             оценок, ограниченный top_k документами.
         """
-        pairs = [(query, doc) for doc in documents]
+        pairs = [(query, doc["content"]) for doc in documents if "content" in doc]
 
         features = self.reranker_tokenizer(
             pairs,
