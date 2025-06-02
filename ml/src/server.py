@@ -11,21 +11,21 @@ from config import (
     DEFAULT_EMBEDER_MODEL,
     DEFAULT_REDIS_URL,
     DEFAULT_RERANKER_NAME,
-    FIRST_MESSAE_PROMPT,
+    FIRST_MESSAGE_PROMPT,
     JSON_SCHEMA,
     ML_SERVICE_PORT,
     OLLAMA_BASE_MODEL,
 )
 from optuna_pipline import OptunaPipeline
 from RAG_pipeline import RAGPipeline
-from sample_generate import generate_dataset
-from utils.logger import logger
-from ollama_client import OllamaOptions
-from opentelemetry import trace, baggage, propagate
-from opentelemetry.trace.status import StatusCode, Status 
 
-from typing import Optional
-from tracing import TracerProvider, tracer
+from utils.logger import logger
+from ollama_client import OllamaOptions, JsonFormats, ChatTitle
+from opentelemetry import trace, baggage, propagate
+from opentelemetry.trace.status import StatusCode, Status
+
+
+from tracing import  tracer
 import functools # Add this import
 import inspect   # Add this impor
 
@@ -147,10 +147,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
                 logger.debug(f"Sending chunk for request {request_id}")
                 yield response
             meta = [
-                json.dumps({
-                    "metadata": chunk["metadata"],
-                    "id": chunk["id"] if "id" in chunk else "",
-                })
+                json.loads(chunk["metadata"])
                 for chunk in chunk_dict.values()
                 if "metadata" in chunk and "id" in chunk
             ] if len(chunk_dict) > 0 else []
@@ -176,17 +173,18 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
 
         logger.info(f"New request [From {client_ip}\nQuery: {request.query}\n")
         try:
+            
             json_response = await self.rag.ollama_client.generate(
-                prompt=FIRST_MESSAE_PROMPT.format(message=request.query),
+                prompt=FIRST_MESSAGE_PROMPT.format(message=request.query),
                 model=OLLAMA_BASE_MODEL,
                 stream_response=False,
                 options=OllamaOptions(
-                    format=JSON_SCHEMA,
-                )
+                    schema=JsonFormats.FORMAT_TITLE,
+                ),
             )
-            print(json_response)
-            # response = json.loads(json_response) #FIXME: structured output
-            return ml_pb2_model.ProcessFirstQueryResponse(query=json_response)
+            print(f"Response: {json_response}, {json.loads(json_response)}")
+            
+            return ml_pb2_model.ProcessFirstQueryResponse(query="test")
         except grpc.RpcError as e:
             logger.error(
                 f"gRPC error processing request: {e.code()}: {e.details()}"
