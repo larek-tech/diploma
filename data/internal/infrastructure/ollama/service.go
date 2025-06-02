@@ -10,11 +10,14 @@ import (
 
 	"github.com/ollama/ollama/api"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Service struct {
 	client *api.Client
 	cfg    *Config
+	tracer trace.Tracer
 }
 
 type Config struct {
@@ -42,9 +45,12 @@ func NewDefaultConfig() *Config {
 
 var keepAlive = time.Hour * 24
 
-func New(host string, cfg ...*Config) (*Service, error) {
+func New(host string, tracer trace.Tracer, cfg ...*Config) (*Service, error) {
 	if len(cfg) == 0 {
 		cfg = append(cfg, NewDefaultConfig())
+	}
+	if tracer == nil {
+		tracer = trace.NewNoopTracerProvider().Tracer("ollama")
 	}
 
 	ollamaURL, err := url.Parse(host)
@@ -53,10 +59,14 @@ func New(host string, cfg ...*Config) (*Service, error) {
 	}
 	client := api.NewClient(ollamaURL, http.DefaultClient)
 
-	return &Service{client: client, cfg: cfg[0]}, nil
+	return &Service{client: client, tracer: tracer, cfg: cfg[0]}, nil
 }
 
 func (s Service) CreateEmbedding(ctx context.Context, inputTexts []string) ([][]float32, error) {
+	ctx, span := s.tracer.Start(ctx, "ollama.CreateEmbedding", trace.WithAttributes(
+		attribute.Int("texts_length", len(inputTexts)),
+	))
+	defer span.End()
 	embeddings := make([][]float32, len(inputTexts))
 	for i, t := range inputTexts {
 		req := &api.EmbeddingRequest{
@@ -67,6 +77,7 @@ func (s Service) CreateEmbedding(ctx context.Context, inputTexts []string) ([][]
 		}
 		res, err := s.client.Embeddings(ctx, req)
 		if err != nil {
+			span.RecordError(err)
 			return nil, err
 		}
 		embeddings[i] = lo.Map(res.Embedding, func(e float64, _ int) float32 { return float32(e) })
@@ -76,6 +87,10 @@ func (s Service) CreateEmbedding(ctx context.Context, inputTexts []string) ([][]
 }
 
 func (s Service) Call(ctx context.Context, prompt string) (string, error) {
+	ctx, span := s.tracer.Start(ctx, "ollama.CreateEmbedding", trace.WithAttributes(
+		attribute.Int("prompt length", len(prompt)),
+	))
+	defer span.End()
 	stream := false
 	req := &api.GenerateRequest{
 		Model:     s.cfg.LLMModel,
@@ -94,6 +109,7 @@ func (s Service) Call(ctx context.Context, prompt string) (string, error) {
 		return nil
 	})
 	if err != nil {
+		span.RecordError(err)
 		return "", err
 	}
 	return response, nil

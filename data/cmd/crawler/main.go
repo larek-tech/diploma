@@ -128,7 +128,7 @@ func run() int {
 	documentStore := documentStorage.New(pg)
 	chunkStore := chunkStorage.New(pg, trManager)
 	embedderURL, embedderModel, embeddingsSize := getEmbedderConfig()
-	embedderService, err := ollama.New(embedderURL, &ollama.Config{
+	embedderService, err := ollama.New(embedderURL, tracer, &ollama.Config{
 		EmbeddingSize:   embeddingsSize,
 		EmbeddingsModel: embedderModel,
 	})

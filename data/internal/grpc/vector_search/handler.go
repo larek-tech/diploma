@@ -2,9 +2,11 @@ package vector_search
 
 import (
 	"context"
+	"log/slog"
 	"strings"
 
 	"github.com/larek-tech/diploma/data/internal/data/pb"
+	"github.com/larek-tech/diploma/data/internal/infrastructure/grpc/span"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/codes"
@@ -22,6 +24,11 @@ func New(chunkStore chunkStorage, embedder embedder, tracer trace.Tracer) *Handl
 }
 
 func (h Handler) VectorSearch(ctx context.Context, in *pb.VectorSearchRequest) (*pb.VectorSearchResponse, error) {
+	ctx, err := span.GetTraceCtx(ctx)
+	if err != nil {
+		slog.Error("failed to get x-trace-id")
+	}
+
 	ctx, span := h.tracer.Start(ctx, "VectorSearch", trace.WithAttributes(
 		attribute.String("query", in.Query),
 		attribute.String("sourceIds", strings.Join(in.SourceIds, ",")),

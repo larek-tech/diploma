@@ -103,7 +103,7 @@ func run() int {
 		Jar: nil,
 	}
 	endpoint, llmModel, contextSize := getLLMConfig()
-	llm, err := ollama.New(endpoint, &ollama.Config{
+	llm, err := ollama.New(endpoint, tracer, &ollama.Config{
 		LLMModel:       llmModel,
 		LLMContextSize: contextSize,
 	})
@@ -112,7 +112,7 @@ func run() int {
 		return -1
 	}
 	embedderURL, embedderModel, embeddingsSize := getEmbedderConfig()
-	embedderService, err := ollama.New(embedderURL, &ollama.Config{
+	embedderService, err := ollama.New(embedderURL, tracer, &ollama.Config{
 		EmbeddingSize:   embeddingsSize,
 		EmbeddingsModel: embedderModel,
 	})

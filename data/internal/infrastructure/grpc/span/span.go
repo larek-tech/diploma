@@ -23,9 +23,7 @@ func GetTraceCtx(ctx context.Context) (context.Context, error) {
 		return ctx, errors.Wrap(err, "failed to parse trace id")
 	}
 
-	spanCtx := trace.NewSpanContext(trace.SpanContextConfig{
+	return trace.ContextWithSpanContext(ctx, trace.NewSpanContext(trace.SpanContextConfig{
 		TraceID: traceID,
-	})
-	ctx = trace.ContextWithSpanContext(ctx, spanCtx)
-	return ctx, nil
+	})), nil
 }
