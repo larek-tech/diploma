@@ -11,8 +11,8 @@ const (
 	offsetParam   = "offset"
 	limitParam    = "limit"
 
-	defaultTitlePattern = "%s (сценарий по умолчанию)"
-	optimalTitlePattern = "%s (оптимальные параметры)"
+	defaultTitlePattern = "%s-%d (сценарий по умолчанию)"
+	optimalTitlePattern = "%s-%d (оптимальные параметры)"
 )
 
 // Handler implements domain methods on transport level.
@@ -38,10 +38,10 @@ func New(
 	}
 }
 
-func domainDefaultTitle(domainTitle string) string {
-	return fmt.Sprintf(defaultTitlePattern, domainTitle)
+func domainDefaultTitle(domainTitle string, domainID int64) string {
+	return fmt.Sprintf(defaultTitlePattern, domainID, domainTitle)
 }
 
-func domainOptimalTitle(domainTitle string) string {
-	return fmt.Sprintf(optimalTitlePattern, domainTitle)
+func domainOptimalTitle(domainTitle string, domainID int64) string {
+	return fmt.Sprintf(optimalTitlePattern, domainID, domainTitle)
 }

@@ -15,7 +15,7 @@ import (
 
 func (h *Handler) checkDefaultScenario(ctx context.Context, domain *pb.Domain, userID int64, roles []int64) (*pb.Domain, error) {
 	defaultScenarioReq := &pb.GetDefaultScenarioRequest{
-		DefaultTitle: domainDefaultTitle(domain.Title),
+		DefaultTitle: domainDefaultTitle(domain.Title, domain.GetId()),
 	}
 	_, err := h.scenarioService.GetDefaultScenario(ctx, defaultScenarioReq)
 	if err != nil {
@@ -30,7 +30,7 @@ func (h *Handler) checkDefaultScenario(ctx context.Context, domain *pb.Domain, u
 			}
 
 			createScenarioReq := &pb.CreateScenarioRequest{
-				Title:        domainDefaultTitle(domain.GetTitle()),
+				Title:        domainDefaultTitle(domain.GetTitle(), domain.GetId()),
 				MultiQuery:   params.GetMultiQuery(),
 				Reranker:     params.GetReranker(),
 				VectorSearch: params.GetVectorSearch(),
@@ -84,7 +84,7 @@ func (h *Handler) createOptimalScenario(ctx context.Context, domain *pb.Domain) 
 	}
 
 	createScenarioReq := &pb.CreateScenarioRequest{
-		Title:        domainOptimalTitle(domain.GetTitle()),
+		Title:        domainOptimalTitle(domain.GetTitle(), domain.GetId()),
 		MultiQuery:   params.GetMultiQuery(),
 		Reranker:     params.GetReranker(),
 		VectorSearch: params.GetVectorSearch(),
