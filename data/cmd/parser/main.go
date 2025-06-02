@@ -152,7 +152,7 @@ func run() int {
 	tesseract.Languages = []string{"rus", "eng"}
 	defer tesseract.Close()
 
-	ocr := ocr.New(tesseract)
+	ocr := ocr.NewRemote(getOCREndpoint())
 	sourceStore := sourceStorage.New(pg)
 	fileStorage := fileStorage.New(pg, objectStorage)
 	siteStore := siteStorage.New(pg)
@@ -278,4 +278,12 @@ func getTracingEndpoint() string {
 		tracingEndpoint = "localhost:4318"
 	}
 	return tracingEndpoint
+}
+
+func getOCREndpoint() string {
+	ocrEndpoint := os.Getenv("OCR_ENDPOINT")
+	if ocrEndpoint == "" {
+		ocrEndpoint = "localhost:5000"
+	}
+	return ocrEndpoint
 }
