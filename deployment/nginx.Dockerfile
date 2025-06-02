@@ -10,6 +10,9 @@ server {
     listen 80;
     server_name ${DOMAIN};
 
+    # Set client body size to 1GB
+    client_max_body_size 1G;
+
     location / {
         proxy_pass http://${HOST};
         proxy_http_version 1.1;
