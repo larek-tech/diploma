@@ -1,20 +1,51 @@
 import asyncio
-
+from pydantic import BaseModel, Field
 from collections.abc import AsyncIterator
 from typing import Any, Union, Dict
 import ollama
 
+from dataclasses import dataclass
 
-from config import OLLAMA_BASE_MODEL, OLLAMA_BASE_URL, NUM_CTX, FIRST_MESSAE_PROMPT, JSON_SCHEMA
+
+from config import OLLAMA_BASE_MODEL, OLLAMA_BASE_URL, NUM_CTX, FIRST_MESSAGE_PROMPT, JSON_SCHEMA
 from utils.logger import logger
+from enum import Enum
 
 
-class OllamaOptions (Dict[str, Any]):
+class Questions(BaseModel):
+    questions: list[str] = Field(
+        title="Переформулированные вопросы",
+        description="Список переформулированных вопросов, которые помогут рассмотреть тему с разных сторон.",
+    )
+
+class ChatTitle(BaseModel):
+    chat_title: str = Field(
+        title="Название чата",
+        description="Краткое название, отражающее суть чата.",
+    )
+    
+
+CHAT_TITLE_SCHEMA = ChatTitle.model_json_schema()
+QUESTIONS_SCHEMA = Questions.model_json_schema()
+
+class JsonFormats(str, Enum):
+    NONE = "none"
+    FORMAT_QUESTIONS = "questions"
+    FORMAT_TITLE = "chat_title"
+    
+SCHEMA_MAP: Dict[JsonFormats, Any] = {
+    JsonFormats.NONE: None,
+    JsonFormats.FORMAT_QUESTIONS: Questions.model_json_schema(),
+    JsonFormats.FORMAT_TITLE: ChatTitle.model_json_schema(),
+}
+
+@dataclass
+class OllamaOptions:
     temperature: float = 0.7
     top_k: int = 40
     top_p: float = 0.95
-    system= "You are a helpful assistant."
-    format: dict | None = None
+    system: str = "You are a helpful assistant."
+    schema: JsonFormats = JsonFormats.NONE
 
 class AsyncOllamaClient:
     def __init__(self, base_url: str = OLLAMA_BASE_URL) -> None:
@@ -27,7 +58,7 @@ class AsyncOllamaClient:
         model: str,
         *,
         stream_response: bool = False,
-        options: OllamaOptions | None = None,
+        options: OllamaOptions = OllamaOptions(),
     ) -> Union[str, AsyncIterator[str]]:
 
         ollama_options = {
@@ -44,14 +75,14 @@ class AsyncOllamaClient:
                 model=model,
                 prompt=prompt,
                 options=ollama_options,
-                format=options.format if options else None,
+                format=options.schema
             )
         else:
             return await self._generate(
                 model=model,
                 prompt=prompt,
                 options=ollama_options,
-                format=options.format if options else None,
+                format=options.schema,
             )
 
     async def _generate(
@@ -59,7 +90,7 @@ class AsyncOllamaClient:
         model: str,
         prompt: str,
         options: dict[str, Any],
-        format: dict | None = None,
+        format: JsonFormats,
         **kwargs: Any,
     ) -> str:
         if format:
@@ -67,7 +98,7 @@ class AsyncOllamaClient:
                     model=model,
                     prompt=prompt,
                     stream=False,
-                    format=format,
+                    format=SCHEMA_MAP.get(format, None),
                     options=options,
                 )
         else:
@@ -84,7 +115,7 @@ class AsyncOllamaClient:
             model: str,
             prompt: str,
             options: dict[str, Any],
-            format: dict | None = None,
+            format: JsonFormats ,
         ) -> AsyncIterator[str]:
 
             async def _stream_helper() -> AsyncIterator[str]:
@@ -93,7 +124,7 @@ class AsyncOllamaClient:
                         model=model,
                         prompt=prompt,
                         stream=True,
-                        format=format,
+                        format=SCHEMA_MAP.get(format, None),
                         options=options,
                     )
                 else:
@@ -133,11 +164,11 @@ async def main() -> None:
     # logger.info(f"Response: { response}")
 
     json_response = await client.generate(
-        prompt=FIRST_MESSAE_PROMPT.format(message=test_query),
+        prompt=FIRST_MESSAGE_PROMPT.format(message=test_query),
         model=OLLAMA_BASE_MODEL,
         stream_response=False,
         options=OllamaOptions(
-            format=JSON_SCHEMA,
+            schema=JsonFormats.FORMAT_QUESTIONS,
             )
         )
     logger.info(f"JSON Response: {json_response}")
