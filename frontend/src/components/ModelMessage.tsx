@@ -82,9 +82,11 @@ const ModelMessage = ({ incomingMessage }: ModelMessageProps) => {
 
                         // Handle both array and object formats
                         if (Array.isArray(sourcesArray)) {
+                            console.log('Setting sources array:', sourcesArray);
                             setSources(sourcesArray);
                         } else if (typeof sourcesArray === 'object') {
                             // If it's a single object, wrap it in an array
+                            console.log('Setting single source object:', sourcesArray);
                             setSources([sourcesArray]);
                         }
                     } catch (jsonError) {
@@ -144,15 +146,15 @@ const ModelMessage = ({ incomingMessage }: ModelMessageProps) => {
         // Check for direct string (some APIs might just return array of URLs)
         if (typeof source === 'string') return source;
 
+        // Check top-level properties first (new format: {"title": "gitflic", "resourceUrl": "https://..."})
+        if (source.resourceUrl) return source.resourceUrl;
+        if (source.url) return source.url;
+        if (source.source) return source.source;
+
         // Check various nested properties
         if (source.metadata?.resourceUrl) return source.metadata.resourceUrl;
         if (source.metadata?.source) return source.metadata.source;
         if (source.metadata?.url) return source.metadata.url;
-
-        // Check top-level properties
-        if (source.url) return source.url;
-        if (source.source) return source.source;
-        if (source.resourceUrl) return source.resourceUrl;
 
         // Check if the entire source might be a URL string
         const sourceStr = String(source);
@@ -173,11 +175,13 @@ const ModelMessage = ({ incomingMessage }: ModelMessageProps) => {
             }
         }
 
-        // Check various properties for title/name
+        // Check top-level properties first (new format: {"title": "gitflic", "resourceUrl": "https://..."})
+        if (source.title) return source.title;
+        if (source.name) return source.name;
+
+        // Check various nested properties for title/name
         if (source.metadata?.title) return source.metadata.title;
         if (source.metadata?.name) return source.metadata.name;
-        if (source.name) return source.name;
-        if (source.title) return source.title;
         if (source.id) return `Источник ${source.id}`;
 
         return `Источник ${index + 1}`;
@@ -202,6 +206,8 @@ const ModelMessage = ({ incomingMessage }: ModelMessageProps) => {
                                         const url = getSourceUrl(source);
                                         const title = getSourceTitle(source, index);
 
+                                        console.log(`Source ${index}:`, { source, url, title });
+
                                         return (
                                             <Badge
                                                 key={index}
@@ -213,7 +219,7 @@ const ModelMessage = ({ incomingMessage }: ModelMessageProps) => {
                                                         href={url}
                                                         target='_blank'
                                                         rel='noopener noreferrer'
-                                                        className='hover:underline flex items-center'
+                                                        className='text-white hover:underline flex items-center'
                                                     >
                                                         {title}
                                                         <ExternalLinkIcon className='ml-1 w-3 h-3' />
