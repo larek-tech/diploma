@@ -147,7 +147,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
                 logger.debug(f"Sending chunk for request {request_id}")
                 yield response
             meta = [
-                json.loads(chunk["metadata"])
+                json.dumps(chunk["metadata"])
                 for chunk in chunk_dict.values()
                 if "metadata" in chunk and "id" in chunk
             ] if len(chunk_dict) > 0 else []
