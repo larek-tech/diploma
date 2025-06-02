@@ -39,9 +39,9 @@ func New(
 }
 
 func domainDefaultTitle(domainTitle string, domainID int64) string {
-	return fmt.Sprintf(defaultTitlePattern, domainID, domainTitle)
+	return fmt.Sprintf(defaultTitlePattern, domainTitle, domainID)
 }
 
 func domainOptimalTitle(domainTitle string, domainID int64) string {
-	return fmt.Sprintf(optimalTitlePattern, domainID, domainTitle)
+	return fmt.Sprintf(optimalTitlePattern, domainTitle, domainID)
 }
