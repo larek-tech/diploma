@@ -53,7 +53,7 @@ func (h *Handler) checkDefaultScenario(ctx context.Context, domain *pb.Domain, u
 				return nil, errs.WrapErr(err)
 			}
 
-			ctx = auth.PushUserMeta(ctx, &authpb.UserAuthMetadata{
+			ctx = auth.PushUserMeta(context.Background(), &authpb.UserAuthMetadata{
 				UserId: userID,
 				Roles:  roles,
 			})
