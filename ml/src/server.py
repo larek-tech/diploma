@@ -201,7 +201,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
     ) -> ml_pb2_model.ModelParams:
         return ml_pb2_model.ModelParams(
             multiQuery=ml_pb2_model.MultiQuery(
-                useMultiquery=True,
+                useMultiquery=False,
                 nQueries=3,
             ),
             reranker=ml_pb2_model.Reranker(
@@ -213,7 +213,7 @@ class MLServiceServicer(ml_pb2_grpc.MLServiceServicer):
             vectorSearch=ml_pb2_model.VectorSearch(
                 topN=10,
                 threshold=0.1,
-                searchByQuery=True,
+                searchByQuery=False,
             ),
             model=ml_pb2_model.LlmModel(
                 modelName=OLLAMA_BASE_MODEL,
