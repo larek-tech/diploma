@@ -2,7 +2,6 @@ package crawler
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -20,11 +19,11 @@ func (s Service) ParsePage(ctx context.Context, page *site.Page, parseSiteJobID 
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to validate page: %w", err)
 	}
-	if parsed, err := s.pageJobStore.IsAlreadyParsed(ctx, page.URL); err != nil {
-		return nil, false, fmt.Errorf("failed to check if page is already parsed: %w", err)
-	} else if parsed {
-		return nil, false, errors.New("page already parsed")
-	}
+	// if parsed, err := s.pageJobStore.IsAlreadyParsed(ctx, page.URL); err != nil {
+	// 	return nil, false, fmt.Errorf("failed to check if page is already parsed: %w", err)
+	// } else if parsed {
+	// 	return nil, false, errors.New("page already parsed")
+	// }
 
 	_, err = s.fetchContent(ctx, page)
 	if err != nil {

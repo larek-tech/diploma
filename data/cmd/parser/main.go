@@ -25,6 +25,7 @@ import (
 	questionStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/question"
 	siteStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/site"
 	"github.com/larek-tech/diploma/data/internal/infrastructure/storage/sitejob"
+	sourceStorage "github.com/larek-tech/diploma/data/internal/infrastructure/storage/source"
 	"github.com/larek-tech/diploma/data/pkg/metric"
 	"github.com/otiai10/gosseract"
 	"github.com/yogenyslav/pkg/infrastructure/tracing"
@@ -152,6 +153,7 @@ func run() int {
 	defer tesseract.Close()
 
 	ocr := ocr.New(tesseract)
+	sourceStore := sourceStorage.New(pg)
 	fileStorage := fileStorage.New(pg, objectStorage)
 	siteStore := siteStorage.New(pg)
 	documentStore := documentStorage.New(pg)
@@ -194,7 +196,7 @@ func run() int {
 
 	go func() {
 		defer wg.Done()
-		err = consumer.Run(ctx, qaas.ParsePageResultQueue, embed_document.New(embeddingService, pageStore, siteStore, fileStorage))
+		err = consumer.Run(ctx, qaas.ParsePageResultQueue, embed_document.New(embeddingService, pageStore, siteStore, fileStorage, sourceStore))
 		if err != nil {
 			slog.Error("failed to run consumer", "error", err)
 		}
@@ -202,7 +204,7 @@ func run() int {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err = consumer.Run(ctx, qaas.ParseFileQueue, embed_document.New(embeddingService, pageStore, siteStore, fileStorage))
+		err = consumer.Run(ctx, qaas.ParseFileQueue, embed_document.New(embeddingService, pageStore, siteStore, fileStorage, sourceStore))
 		if err != nil {
 			slog.Error("failed to run consumer", "error", err)
 		}

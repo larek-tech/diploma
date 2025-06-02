@@ -41,7 +41,6 @@ func (s Service) embed(ctx context.Context, doc *document.Document) ([]*document
 	if err != nil {
 		return nil, fmt.Errorf("failed to create embeddings: %w", err)
 	}
-	// TODO: add generation of questions using llm model
 	metadata, err := json.Marshal(doc)
 	if err != nil {
 		metadata = []byte{}

@@ -15,6 +15,7 @@ import (
 
 const (
 	resourceUrlKey = "resourceUrl"
+	resourceTitle  = "title"
 )
 
 type Handler struct {
@@ -22,14 +23,16 @@ type Handler struct {
 	pageStore        pageStore
 	siteStore        siteStore
 	fileStore        fileStore
+	sourceStore      sourceStore
 }
 
-func New(embeddingService embeddingService, pageStore pageStore, siteStore siteStore, fileStore fileStore) *Handler {
+func New(embeddingService embeddingService, pageStore pageStore, siteStore siteStore, fileStore fileStore, sourceStore sourceStore) *Handler {
 	return &Handler{
 		embeddingService: embeddingService,
 		pageStore:        pageStore,
 		siteStore:        siteStore,
 		fileStore:        fileStore,
+		sourceStore:      sourceStore,
 	}
 }
 
@@ -55,6 +58,10 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 		if err != nil {
 			return true, fmt.Errorf("failed to get site in embed_document: %w", err)
 		}
+		source, err := h.sourceStore.GetByID(ctx, site.SourceID)
+		if err != nil {
+			return true, fmt.Errorf("failed to get source in embed_document: %w", err)
+		}
 		err = h.embeddingService.Process(
 			ctx,
 			strings.NewReader(page.Raw),
@@ -63,6 +70,7 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 			site.SourceID,
 			map[string]any{
 				resourceUrlKey: page.URL,
+				resourceTitle:  source.Title,
 			},
 		)
 		if err != nil {
@@ -93,6 +101,7 @@ func (h Handler) Handle(ctx context.Context, msg *pgq.MessageIncoming) (bool, er
 			file.SourceID,
 			map[string]any{
 				resourceUrlKey: file.ObjectURL,
+				resourceTitle:  file.Filename,
 			},
 		)
 		if err != nil {

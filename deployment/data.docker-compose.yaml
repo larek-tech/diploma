@@ -22,9 +22,6 @@ services:
       context: ../data
       dockerfile: docker/migrator.Dockerfile
     container_name: migrator_local
-    depends_on:
-      postgres:
-        condition: service_healthy
     env_file:
         - configs/data.migrator.env
 
@@ -34,8 +31,6 @@ services:
       dockerfile: docker/crawler.Dockerfile
     container_name: crawler_local
     restart: unless-stopped
-    depends_on:
-      - postgres
     env_file:
         - configs/data.crawler.env
     ports:
@@ -48,8 +43,6 @@ services:
       dockerfile: docker/parser.Dockerfile
     container_name: parser_local
     restart: unless-stopped
-    depends_on:
-      - postgres
     env_file:
         - configs/data.parser.env
     ports:
