@@ -11,7 +11,7 @@ import (
 
 const (
 	FileBucketName = "files"
-	FileKeyPrefix  = "files/"
+	FileKeyPrefix  = "/files/"
 )
 
 type Store struct {
@@ -28,6 +28,10 @@ func New(db db, objectStore objectStore) *Store {
 
 func getObjectStoreKey(f *file.File) string {
 	return FileKeyPrefix + f.ID + "." + f.Extension
+}
+
+func (s Store) getObjectStoreURL(f *file.File) string {
+	return s.o.GetBaseURL() + "/" + FileBucketName + getObjectStoreKey(f)
 }
 
 func (s Store) Save(ctx context.Context, f *file.File) error {

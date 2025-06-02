@@ -12,7 +12,7 @@ import (
 
 const (
 	PageBucketName = "pages"
-	PageKeyPrefix  = "page/"
+	PageKeyPrefix  = "/page/"
 )
 
 type Store struct {

@@ -50,16 +50,16 @@ func (s Service) Process(ctx context.Context, obj io.ReadSeeker, fileExt documen
 		}
 
 		// Add check for nil questionService
-		questions, txErr := s.questionService.GenerateQuestions(ctx, chunks)
-		if txErr != nil {
-			return fmt.Errorf("failed to generate questions: %w", txErr)
-		}
-		if questions != nil && len(questions) > 0 {
-			txErr = s.questionStorage.Save(ctx, questions)
-			if txErr != nil {
-				return fmt.Errorf("failed to save questions: %w", txErr)
-			}
-		}
+		//questions, txErr := s.questionService.GenerateQuestions(ctx, chunks)
+		//if txErr != nil {
+		//	return fmt.Errorf("failed to generate questions: %w", txErr)
+		//}
+		//if questions != nil && len(questions) > 0 {
+		//	txErr = s.questionStorage.Save(ctx, questions)
+		//	if txErr != nil {
+		//		return fmt.Errorf("failed to save questions: %w", txErr)
+		//	}
+		//}
 
 		doc.Chunks = lo.Map(chunks, func(chunk *document.Chunk, _ int) string {
 			return chunk.ID
