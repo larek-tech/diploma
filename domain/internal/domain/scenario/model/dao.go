@@ -36,8 +36,10 @@ type ScenarioDao struct {
 // ToProto converts dao model into protobuf format.
 func (s *ScenarioDao) ToProto() *pb.Scenario {
 	return &pb.Scenario{
-		Id:    s.ID,
-		Title: s.Title,
+		Id:          s.ID,
+		Title:       s.Title,
+		DomainId:    s.DomainID,
+		ContextSize: s.ContextSize,
 		MultiQuery: &pb.MultiQuery{
 			UseMultiquery:  s.UseMultiquery,
 			NQueries:       s.NQueries,
